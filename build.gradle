@@ -1,0 +1,53 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath libs.android.gradlePlug
+        classpath libs.kotlin.gradlePlug
+
+        classpath libs.hilt.gradlePlug
+        classpath libs.gradleMavenPublishPlugin
+    }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.20' apply false
+}
+
+subprojects {
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        kotlinOptions {
+            // Treat all Kotlin warnings as errors
+            allWarningsAsErrors = false
+
+            // Enable experimental APIs
+            freeCompilerArgs += "-Xallow-kotlin-package"
+            freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+            freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+            freeCompilerArgs += "-Xopt-in=kotlin.Experimental"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterialApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.material.ExperimentalMaterialApi"
+            freeCompilerArgs += "-Xopt-in=coil.annotation.ExperimentalCoilApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.foundation.text.InternalFoundationTextApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi"
+            freeCompilerArgs += "-Xopt-in=com.google.accompanist.pager.ExperimentalPagerApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.ui.unit.ExperimentalUnitApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.ui.ExperimentalComposeUiApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.foundation.ExperimentalFoundationApi"
+            freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalStdlibApi"
+            freeCompilerArgs += "-Xopt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi"
+            freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+            freeCompilerArgs += "-Xopt-in=kotlin.annotation.AnnotationTarget.ExperimentalTime"
+            freeCompilerArgs += "-Xopt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi"
+            freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+
+            // Set JVM target to 1.8
+            jvmTarget = "1.8"
+        }
+    }
+}
+
