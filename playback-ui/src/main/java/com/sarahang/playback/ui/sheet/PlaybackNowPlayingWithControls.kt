@@ -1,12 +1,7 @@
-/*
- * Copyright (C) 2021, Alashov Berkeli
- * All rights reserved.
- */
 package com.sarahang.playback.ui.sheet
 
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,8 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.PauseCircleFilled
-import androidx.compose.material.icons.filled.PlayCircleFilled
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.RepeatOn
 import androidx.compose.material.icons.filled.RepeatOneOn
@@ -36,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,9 +48,11 @@ import com.sarahang.playback.ui.components.IconButton
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.disabledAlpha
 import com.sarahang.playback.ui.theme.orNa
+import com.sarahang.playback.ui.theme.simpleClickable
+import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
-    val titleTextStyle @Composable get() = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
+    val titleTextStyle @Composable get() = MaterialTheme.typography.headlineSmall
     val artistTextStyle @Composable get() = MaterialTheme.typography.titleMedium
 }
 
@@ -118,7 +112,7 @@ internal fun PlaybackNowPlaying(
             style = titleTextStyle,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            modifier = Modifier.clickable(onClick = onTitleClick)
+            modifier = Modifier.simpleClickable(onClick = onTitleClick)
         )
         Text(
             text = nowPlaying.artist.orNa(),
@@ -126,7 +120,7 @@ internal fun PlaybackNowPlaying(
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.clickable(onClick = onArtistClick)
+            modifier = Modifier.simpleClickable(onClick = onArtistClick)
         )
     }
 }
@@ -192,9 +186,9 @@ internal fun PlaybackControls(
                 painter = rememberVectorPainter(
                     when {
                         playbackState.isError -> Icons.Filled.ErrorOutline
-                        playbackState.isPlaying -> Icons.Filled.PauseCircleFilled
-                        playbackState.isPlayEnabled -> Icons.Filled.PlayCircleFilled
-                        else -> Icons.Filled.PlayCircleFilled
+                        playbackState.isPlaying -> PlayerIcons.Pause
+                        playbackState.isPlayEnabled -> PlayerIcons.Play
+                        else -> PlayerIcons.Play
                     }
                 ),
                 tint = contentColor,

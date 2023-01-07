@@ -8,6 +8,7 @@ import android.net.Uri
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -19,6 +20,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.core.net.toUri
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import com.sarahang.playback.ui.theme.Specs
 
 @Composable
 fun PlaybackArtworkPagerWithNowPlayingAndControls(
@@ -40,6 +42,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
             nowPlaying = nowPlaying,
             pagerState = pagerState,
             modifier = Modifier
+                .padding(horizontal = Specs.paddingLarge)
                 .constrainAs(pager) {
                     centerHorizontallyTo(parent)
                     top.linkTo(parent.top)

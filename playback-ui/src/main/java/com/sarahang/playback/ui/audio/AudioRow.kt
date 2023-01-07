@@ -133,13 +133,13 @@ fun AudioRowItem(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 val artistAndDuration = listOf(
-                    audio.subtitle,
-                    audio.duration.millisToDuration()
+                    audio.album,
+                    audio.durationMillis().millisToDuration()
                 ).interpunctize()
                 Text(
                     text = artistAndDuration,
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.tertiary,
+                    color = MaterialTheme.colorScheme.secondary,
                     maxLines = maxLines,
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier

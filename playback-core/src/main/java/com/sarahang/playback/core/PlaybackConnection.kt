@@ -136,7 +136,7 @@ class PlaybackConnectionImpl(
     ): PlaybackQueue {
         val (nowPlaying, state, queue) = data
         val nowPlayingId = nowPlaying.id.toMediaId().value
-        val audios = audioDataSource.getByMediaIds(queue.ids.toMediaAudioIds())
+        val audios = audioDataSource.getByIds(queue.ids.toMediaAudioIds())
 
         return queue.copy(audios = audios, currentIndex = state.currentIndex).let {
             // check if now playing id and current audio's id by index matches

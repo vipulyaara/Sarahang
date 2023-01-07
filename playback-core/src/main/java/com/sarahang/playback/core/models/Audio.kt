@@ -12,6 +12,8 @@ data class Audio(
     val subtitle: String
         get() = listOfNotNull(artist, album).filter { it.isNotEmpty() }.joinToString(" - ")
 
+    fun durationMillis() = duration * 1000
+
     companion object {
         val unknown = Audio(
             id = "unknown",

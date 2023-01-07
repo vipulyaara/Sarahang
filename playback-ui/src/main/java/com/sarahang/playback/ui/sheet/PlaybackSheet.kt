@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -309,54 +308,12 @@ private fun PlaybackSheetTopBarTitle(
         val context = LocalContext.current
         val queueTitle = QueueTitle.from(playbackQueue.title.orEmpty())
         Text(
-            text = queueTitle.localizeType(context).uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Light),
+            text = queueTitle.localizeValue(context).uppercase(),
+            style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
         )
-        val titleValue = queueTitle.localizeValue(context)
-        if (titleValue.isNotBlank()) { // TODO: Remove when https://issuetracker.google.com/issues/245209981 is fixed
-            Text(
-                text = titleValue,
-                style = MaterialTheme.typography.bodyLarge,
-                textAlign = TextAlign.Center,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 2,
-            )
-        }
     }
 }
-
-//@Composable
-//private fun PlaybackAudioInfo(audio: Audio, modifier: Modifier = Modifier) {
-//    val context = LocalContext.current
-//    val dlItem = audio.audioDownloadItem
-//
-//    if (dlItem != null) {
-//        val audiHeader = dlItem.audioHeader(context)
-//        Column(
-//            verticalArrangement = Arrangement.Center,
-//            horizontalAlignment = Alignment.CenterHorizontally,
-//            modifier = modifier
-//                .fillMaxWidth()
-//                .padding(bottom = Specs.padding)
-//        ) {
-//            Surface(
-//                color = plainBackgroundColor().copy(alpha = 0.1f),
-//                shape = CircleShape,
-//            ) {
-//                Text(
-//                    text = audiHeader.info(),
-//                    style = MaterialTheme.typography.bodyMedium.copy(
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 10.sp
-//                    ),
-//                    textAlign = TextAlign.Center,
-//                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
-//                )
-//            }
-//        }
-//    }
-//}
 
 private fun LazyListScope.playbackQueueLabel(modifier: Modifier = Modifier) {
     item {

@@ -22,6 +22,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,7 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackProgressState
 import com.sarahang.playback.ui.components.Slider
 import com.sarahang.playback.ui.components.SliderDefaults
+import timber.log.Timber
 import kotlin.math.roundToLong
 
 @Composable
@@ -53,6 +55,10 @@ internal fun PlaybackProgress(
 ) {
     val progressState by playbackConnection.playbackProgress.collectAsStateWithLifecycle()
     val (draggingProgress, setDraggingProgress) = remember { mutableStateOf<Float?>(null) }
+
+    LaunchedEffect(draggingProgress) {
+        Timber.d("Dragging $draggingProgress")
+    }
 
     Box {
         PlaybackProgressSlider(
@@ -149,6 +155,9 @@ internal fun BoxScope.PlaybackProgressDuration(
     draggingProgress: Float?,
     thumbRadius: Dp
 ) {
+    LaunchedEffect(progressState ) {
+        Timber.d("Progress $progressState")
+    }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier

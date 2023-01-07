@@ -312,6 +312,7 @@ class SarahangPlayerImpl @Inject constructor(
     override fun fastForward() {
         val forwardTo = mediaSession.position() + DEFAULT_FORWARD_REWIND
         queueManager.currentAudio?.apply {
+            val duration = durationMillis()
             if (forwardTo > duration) {
                 seekTo(duration)
             } else {
