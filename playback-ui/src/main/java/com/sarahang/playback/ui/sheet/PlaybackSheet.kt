@@ -1,7 +1,6 @@
 package com.sarahang.playback.ui.sheet
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -68,14 +67,14 @@ import com.sarahang.playback.ui.audio.audioActionHandler
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
+import com.sarahang.playback.ui.theme.PlayerTheme
 import com.sarahang.playback.ui.theme.Specs
-import com.sarahang.playback.ui.theme.simpleClickable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 @Composable
-fun PlaybackSheet(onClose: () -> Unit) {
+fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit) {
     val listState = rememberLazyListState()
 
     val coroutine = rememberCoroutineScope()
@@ -91,6 +90,7 @@ fun PlaybackSheet(onClose: () -> Unit) {
         PlaybackSheet(
             onClose = onClose,
             scrollToTop = scrollToTop,
+            goToItem = goToItem,
             listState = listState,
             queueListState = rememberLazyListState()
         )
@@ -102,17 +102,18 @@ fun PlaybackSheet(onClose: () -> Unit) {
 internal fun PlaybackSheet(
     onClose: () -> Unit,
     scrollToTop: () -> Unit,
+    goToItem: () -> Unit,
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
-    val playbackQueue by rememberFlowWithLifecycle(stateFlow = playbackConnection.playbackQueue)
+    val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState(playbackQueue.currentIndex)
 
     val adaptiveColor by adaptiveColor(
-        nowPlaying.artwork,
+        image = nowPlaying.artwork,
         initial = MaterialTheme.colorScheme.onBackground,
         gradientEndColor = MaterialTheme.colorScheme.background,
     )
@@ -129,7 +130,7 @@ internal fun PlaybackSheet(
         return
     }
 
-    MaterialTheme(MaterialTheme.colorScheme) {
+    PlayerTheme {
         BoxWithConstraints {
             val isWideLayout = isWideLayout()
             val maxWidth = maxWidth
@@ -158,29 +159,26 @@ internal fun PlaybackSheet(
                         item {
                             PlaybackSheetTopBar(
                                 playbackQueue = playbackQueue,
-                                onClose = onClose,
-                                onTitleClick = { }
+                                onClose = onClose
                             )
                         }
+
                         item {
                             PlaybackArtworkPagerWithNowPlayingAndControls(
                                 nowPlaying = nowPlaying,
                                 playbackState = playbackState,
                                 pagerState = pagerState,
                                 contentColor = contentColor,
-                                onTitleClick = { },
+                                onTitleClick = goToItem,
                                 onArtistClick = { },
                                 artworkVerticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.fillParentMaxHeight(fraction = 0.75f),
+                                modifier = Modifier
+                                    .fillParentMaxHeight(fraction = 0.70f)
+                                    .padding(vertical = 12.dp),
                             )
                         }
 
-                        if (playbackQueue.isValid)
-                            item {
-//                                PlaybackAudioInfo(playbackQueue.currentAudio)
-                            }
-
-                        if (!isWideLayout && !playbackQueue.isLastAudio && playbackQueue.isNotEmpty()) {
+                        if (!isWideLayout && playbackQueue.isNotEmpty()) {
                             playbackQueue(
                                 playbackQueue = playbackQueue,
                                 scrollToTop = scrollToTop,
@@ -260,8 +258,7 @@ private fun RowScope.ResizablePlaybackQueue(
 @Composable
 private fun PlaybackSheetTopBar(
     playbackQueue: PlaybackQueue,
-    onClose: () -> Unit,
-    onTitleClick: () -> Unit,
+    onClose: () -> Unit
 ) {
     // TODO: Remove after https://android-review.googlesource.com/c/platform/frameworks/support/+/2209896/ is available
     // override colorScheme for TopAppBar so we can make the background transparent
@@ -269,12 +266,7 @@ private fun PlaybackSheetTopBar(
     val colorScheme = MaterialTheme.colorScheme
     MaterialTheme(colorScheme.copy(surface = Color.Transparent)) {
         TopAppBar(
-            title = { PlaybackSheetTopBarTitle(playbackQueue, onTitleClick) },
-            actions = {
-                MaterialTheme(colorScheme) {
-//                    PlaybackSheetTopBarActions(playbackQueue)
-                }
-            },
+            title = { PlaybackSheetTopBarTitle(playbackQueue) },
             navigationIcon = {
                 IconButton(onClick = onClose) {
                     Icon(
@@ -295,7 +287,6 @@ private fun PlaybackSheetTopBar(
 @Composable
 private fun PlaybackSheetTopBarTitle(
     playbackQueue: PlaybackQueue,
-    onTitleClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -303,7 +294,6 @@ private fun PlaybackSheetTopBarTitle(
         modifier = modifier
             .fillMaxWidth()
             .offset(x = (-8).dp)
-            .simpleClickable(onClick = onTitleClick)
     ) {
         val context = LocalContext.current
         val queueTitle = QueueTitle.from(playbackQueue.title.orEmpty())
@@ -327,25 +317,22 @@ private fun LazyListScope.playbackQueueLabel(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 private fun LazyListScope.playbackQueue(
     playbackQueue: PlaybackQueue,
     scrollToTop: () -> Unit,
     playbackConnection: PlaybackConnection,
 ) {
-    val lastIndex = playbackQueue.lastIndex
-    val firstIndex = (playbackQueue.currentIndex + 1).coerceAtMost(lastIndex)
-    val queue = playbackQueue.subList(firstIndex, lastIndex)
-    itemsIndexed(queue, key = { _, a -> a.id }) { index, audio ->
-        val realPosition = firstIndex + index
+    itemsIndexed(playbackQueue, key = { _, a -> a.id }) { index, audio ->
         AudioRow(
             audio = audio,
             imageSize = 40.dp,
+            audioIndex = index,
             onPlayAudio = {
-                playbackConnection.transportControls?.skipToQueueItem(realPosition.toLong())
-                scrollToTop()
+                playbackConnection.transportControls?.skipToQueueItem(index.toLong())
+//                scrollToTop()
             },
             modifier = Modifier.animateItemPlacement()
         )
     }
 }
+

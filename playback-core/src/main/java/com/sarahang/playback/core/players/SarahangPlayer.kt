@@ -25,6 +25,7 @@ import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import com.sarahang.playback.core.BY_UI_KEY
+import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.R
 import com.sarahang.playback.core.REPEAT_ALL
 import com.sarahang.playback.core.REPEAT_ONE
@@ -51,6 +52,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import javax.inject.Inject
@@ -117,7 +119,7 @@ class SarahangPlayerImpl @Inject constructor(
     private val audioFocusHelper: AudioFocusHelperImpl,
     private val audioDataSource: AudioDataSource,
     private val playerEventLogger: PlayerEventLogger,
-//    private val preferences: PreferencesStore
+    private val preferences: PreferencesStore
 ) : SarahangPlayer, CoroutineScope by MainScope() {
 
     companion object {
@@ -523,45 +525,45 @@ class SarahangPlayerImpl @Inject constructor(
         )
 
         Timber.d("Saving queue state: idx=${queueState.currentIndex}, size=${queueState.queue.size}, title=${queueState.title}")
-//        preferences.save(queueStateKey, queueState, QueueState.serializer())
+        preferences.save(queueStateKey, queueState, QueueState.serializer())
     }
 
     override suspend fun restoreQueueState() {
 //        Timber.d("Restoring queue state")
-//        var queueState =
-//            preferences.get(queueStateKey, QueueState.serializer(), QueueState(emptyList())).first()
-//        Timber.d("Restoring state: ${queueState.currentIndex}, size=${queueState.queue.size}")
-//
-//        if (queueState.state in listOf(
-//                STATE_PLAYING,
-//                STATE_BUFFERING,
-//                STATE_BUFFERING,
-//                STATE_ERROR
-//            )
-//        ) {
-//            queueState = queueState.copy(state = STATE_PAUSED)
-//        }
-//
-//        if (queueState.queue.isNotEmpty()) {
-//            setCurrentAudioId(queueState.queue[queueState.currentIndex], queueState.currentIndex)
-//
-//            setData(queueState.queue, queueState.title ?: "")
-//
-//            queueManager.refreshCurrentAudio()?.apply {
-//                Timber.d("Setting metadata from saved state: currentAudio=$id")
-//                setMetaData(this)
-//            }
-//        }
-//
-//        val extras = bundleOf(
-//            REPEAT_MODE to queueState.repeatMode,
-//            SHUFFLE_MODE to SHUFFLE_MODE_NONE
-//        )
-//
-//        updatePlaybackState {
-//            setState(queueState.state, queueState.seekPosition, 1F)
-//            setExtras(extras)
-//        }
+        var queueState =
+            preferences.get(queueStateKey, QueueState.serializer(), QueueState(emptyList())).first()
+        Timber.d("Restoring state: ${queueState.currentIndex}, size=${queueState.queue.size}")
+
+        if (queueState.state in listOf(
+                STATE_PLAYING,
+                STATE_BUFFERING,
+                STATE_BUFFERING,
+                STATE_ERROR
+            )
+        ) {
+            queueState = queueState.copy(state = STATE_PAUSED)
+        }
+
+        if (queueState.queue.isNotEmpty()) {
+            setCurrentAudioId(queueState.queue[queueState.currentIndex], queueState.currentIndex)
+
+            setData(queueState.queue, queueState.title ?: "")
+
+            queueManager.refreshCurrentAudio()?.apply {
+                Timber.d("Setting metadata from saved state: currentAudio=$id")
+                setMetaData(this)
+            }
+        }
+
+        val extras = bundleOf(
+            REPEAT_MODE to queueState.repeatMode,
+            SHUFFLE_MODE to SHUFFLE_MODE_NONE
+        )
+
+        updatePlaybackState {
+            setState(queueState.state, queueState.seekPosition, 1F)
+            setExtras(extras)
+        }
     }
 
     override fun clearRandomAudioPlayed() {

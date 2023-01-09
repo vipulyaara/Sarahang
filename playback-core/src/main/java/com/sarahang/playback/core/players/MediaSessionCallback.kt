@@ -8,7 +8,6 @@ import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL
 import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE
 import android.support.v4.media.session.PlaybackStateCompat.STATE_NONE
 import androidx.core.os.bundleOf
-import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.BY_UI_KEY
 import com.sarahang.playback.core.PAUSE_ACTION
 import com.sarahang.playback.core.PLAY_ACTION
@@ -21,6 +20,7 @@ import com.sarahang.playback.core.REPEAT_ONE
 import com.sarahang.playback.core.SET_MEDIA_STATE
 import com.sarahang.playback.core.SWAP_ACTION
 import com.sarahang.playback.core.UPDATE_QUEUE
+import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.models.toMediaIdList
 import kotlinx.coroutines.CoroutineScope
@@ -45,14 +45,14 @@ class MediaSessionCallback(
 
     init {
         audioFocusHelper.onAudioFocusGain {
-            Timber.d("GAIN")
             if (isAudioFocusGranted && !sarahangPlayer.getSession().isPlaying()) {
                 sarahangPlayer.playAudio()
-            } else audioFocusHelper.setVolume(AudioManager.ADJUST_RAISE)
+            } else {
+                audioFocusHelper.setVolume(AudioManager.ADJUST_RAISE)
+            }
             isAudioFocusGranted = false
         }
         audioFocusHelper.onAudioFocusLoss {
-            Timber.d("LOSS")
             abandonPlayback()
             isAudioFocusGranted = false
             sarahangPlayer.pause()

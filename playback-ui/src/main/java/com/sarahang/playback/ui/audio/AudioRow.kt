@@ -21,14 +21,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.placeholder.material.placeholder
+import com.airbnb.lottie.compose.LottieAnimation
+import com.airbnb.lottie.compose.LottieCompositionSpec
+import com.airbnb.lottie.compose.rememberLottieComposition
 import com.sarahang.playback.core.PlaybackConnection
-import com.sarahang.playback.core.id
 import com.sarahang.playback.core.millisToDuration
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
+import com.sarahang.playback.core.models.PlaybackQueue.NowPlayingAudio.Companion.isCurrentAudio
 import com.sarahang.playback.ui.components.CoverImage
-import com.sarahang.playback.ui.components.icons.Icons
 import com.sarahang.playback.ui.theme.Specs
 
 object AudiosDefaults {
@@ -44,6 +45,7 @@ fun AudioRow(
     isPlaceholder: Boolean = false,
     onClick: ((Audio) -> Unit)? = null,
     onPlayAudio: ((Audio) -> Unit)? = null,
+    audioIndex: Int = 0,
     actionHandler: AudioActionHandler = LocalAudioActionHandler.current
 ) {
     var menuVisible by remember { mutableStateOf(false) }
@@ -70,6 +72,7 @@ fun AudioRow(
             audio = audio,
             isPlaceholder = isPlaceholder,
             imageSize = imageSize,
+            audioIndex = audioIndex,
             modifier = Modifier
         )
 
@@ -100,24 +103,28 @@ fun AudioRowItem(
     imageSize: Dp = AudiosDefaults.imageSize,
     isPlaceholder: Boolean = false,
     maxLines: Int = AudiosDefaults.maxLines,
+    audioIndex: Int = 0,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
-    val loadingModifier = Modifier.placeholder(visible = isPlaceholder)
-    val nowPlayingAudio by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
-    val isCurrentAudio = nowPlayingAudio.id == audio.id
-    val titleTextColor =
-        if (isCurrentAudio) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.onBackground
+    val nowPlayingAudio by playbackConnection.nowPlayingAudio.collectAsStateWithLifecycle()
+    val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
+
+    val titleTextColor = if (isCurrentAudio) MaterialTheme.colorScheme.primary
+    else MaterialTheme.colorScheme.onBackground
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(Specs.padding),
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = modifier.fillMaxWidth()
     ) {
-        CoverImage(
-            data = if (isCurrentAudio) Icons.Play else audio.coverImage,
-            size = imageSize,
-            imageModifier = Modifier.then(loadingModifier),
-        )
+        if (isCurrentAudio) {
+            PlayBars(size = imageSize)
+        } else {
+            CoverImage(
+                data = audio.coverImage,
+                size = imageSize,
+            )
+        }
 
         Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
             Text(
@@ -126,7 +133,6 @@ fun AudioRowItem(
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
                 color = titleTextColor,
-                modifier = loadingModifier
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Specs.paddingTiny),
@@ -142,13 +148,16 @@ fun AudioRowItem(
                     color = MaterialTheme.colorScheme.secondary,
                     maxLines = maxLines,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .alignByBaseline()
-                        .then(loadingModifier)
+                    modifier = Modifier.alignByBaseline()
                 )
             }
         }
     }
+}
+
+@Composable
+private fun PlayBars(size: Dp) {
+    LottieAnimation(composition = rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.ra)), progress = { /*TODO*/ })
 }
 
 private fun List<String?>.interpunctize(interpunct: String = " ꞏ ") = joinToString(interpunct)

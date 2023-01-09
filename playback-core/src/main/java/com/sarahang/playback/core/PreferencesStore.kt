@@ -3,7 +3,6 @@ package com.sarahang.playback.core
 import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -24,18 +23,21 @@ private const val STORE_NAME = "sarahang_preferences"
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
 
-val DEFAULT_JSON_FORMAT = Json {
-    ignoreUnknownKeys = true
-}
-
-private val format = DEFAULT_JSON_FORMAT
-
 class PreferencesStore @Inject constructor(@ApplicationContext private val context: Context) {
+    private val json = Json {
+        ignoreUnknownKeys = true
+        coerceInputValues = true
+    }
 
     suspend fun <T> remove(key: Preferences.Key<T>) {
         context.dataStore.edit { settings ->
             settings.remove(key)
         }
+    }
+
+    suspend fun <T> save(keyName: String, value: T, serializer: KSerializer<T>) {
+        val key = stringPreferencesKey(keyName)
+        save(key, json.encodeToString(serializer, value))
     }
 
     suspend fun <T> save(key: Preferences.Key<T>, value: T) {
@@ -44,31 +46,22 @@ class PreferencesStore @Inject constructor(@ApplicationContext private val conte
         }
     }
 
+    fun <T> get(key: String, serializer: KSerializer<T>, defaultValue: T): Flow<T> {
+        return context.dataStore.data
+            .map { preferences ->
+                try {
+                    json.decodeFromString(
+                        serializer,
+                        preferences[stringPreferencesKey(key)].orEmpty()
+                    )
+                } catch (ex: Exception) {
+                    defaultValue
+                }
+            }
+    }
+
     fun <T> get(key: Preferences.Key<T>, defaultValue: T): Flow<T> = context.dataStore.data
         .map { preferences -> preferences[key] ?: return@map defaultValue }
-
-    fun get(key: Preferences.Key<String>, defaultValue: String): Flow<String> =
-        context.dataStore.data
-            .map { preferences -> preferences[key] ?: return@map defaultValue }
-
-    suspend fun <T> save(name: String, value: T, serializer: KSerializer<T>) {
-        val key = stringPreferencesKey(name)
-        save(key, Json.encodeToString(serializer, value))
-    }
-
-    fun <T> get(name: String, serializer: KSerializer<T>, defaultValue: T): Flow<T> {
-        return get(stringPreferencesKey(name), "").map {
-            try {
-                format.decodeFromString(serializer, it)
-            } catch (ex: Exception) {
-                defaultValue
-            }
-        }
-    }
-
-    fun get(name: String, defaultValue: Boolean): Flow<Boolean> {
-        return get(booleanPreferencesKey(name), defaultValue)
-    }
 
     fun <T> getStateFlow(
         keyName: Preferences.Key<T>,

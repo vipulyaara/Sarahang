@@ -101,7 +101,7 @@ class MediaNotificationsImpl @Inject constructor(
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID).apply {
             setStyle(style)
-            setSmallIcon(R.drawable.ic_play)
+            setSmallIcon(R.drawable.ic_player_logo)
 //            setLargeIcon(artwork)
             setContentIntent(clickIntent)
             setContentTitle(trackName)
@@ -115,12 +115,7 @@ class MediaNotificationsImpl @Inject constructor(
             if (isBuffering)
                 addAction(getBufferingAction())
             else
-                addAction(
-                    getPlayPauseAction(
-                        context,
-                        if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
-                    )
-                )
+                addAction(getPlayPauseAction(context, if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play))
             addAction(getNextAction(context))
             addAction(getStopAction(context))
         }

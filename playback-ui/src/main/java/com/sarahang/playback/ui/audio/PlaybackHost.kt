@@ -7,7 +7,7 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 
 @Composable
 fun PlaybackHost(
-    viewModel: PlaybackViewModel = hiltViewModel(),
+    viewModel: PlaybackConnectionViewModel = hiltViewModel(),
     content: @Composable () -> Unit
 ) {
 

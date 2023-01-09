@@ -122,9 +122,7 @@ inline val PlaybackStateCompat.hasNext
 
 inline val MediaMetadataCompat.mediaId: String get() = getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
 
-inline val MediaMetadataCompat.id: String
-    get() = if (containsKey(METADATA_KEY_ID)) getString(METADATA_KEY_ID)
-    else ""
+inline val MediaMetadataCompat.id: String? get() = getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
 
 inline val MediaMetadataCompat.title: String? get() = getString(MediaMetadataCompat.METADATA_KEY_TITLE)
 

@@ -16,7 +16,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.calculateCurrentOffsetForPage
@@ -24,7 +23,6 @@ import com.google.accompanist.pager.rememberPagerState
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
-import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.toAudio
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
@@ -40,12 +38,10 @@ internal fun PlaybackPager(
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     content: @Composable (Audio, Int, Modifier) -> Unit,
 ) {
-    val playbackQueue by playbackConnection.playbackQueue.collectAsStateWithLifecycle(PlaybackQueue())
+    val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
     val playbackCurrentIndex = playbackQueue.currentIndex
     var lastRequestedPage by remember(playbackQueue, nowPlaying) {
-        mutableStateOf<Int?>(
-            playbackCurrentIndex
-        )
+        mutableStateOf<Int?>(playbackCurrentIndex)
     }
 
     if (!playbackQueue.isValid) {
@@ -73,7 +69,7 @@ internal fun PlaybackPager(
         count = playbackQueue.size,
         modifier = modifier,
         state = pagerState,
-        key = { playbackQueue.getOrNull(it) ?: it },
+        key = { playbackQueue.getOrNull(it)?.id ?: it },
         verticalAlignment = verticalAlignment,
     ) { page ->
         val currentAudio = playbackQueue.getOrNull(page) ?: Audio.unknown

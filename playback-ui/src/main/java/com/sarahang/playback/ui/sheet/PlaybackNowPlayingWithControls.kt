@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -17,8 +18,6 @@ import androidx.compose.material.icons.filled.RepeatOn
 import androidx.compose.material.icons.filled.RepeatOneOn
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ShuffleOn
-import androidx.compose.material.icons.filled.SkipNext
-import androidx.compose.material.icons.filled.SkipPrevious
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.PlaybackConnection
@@ -52,7 +52,7 @@ import com.sarahang.playback.ui.theme.simpleClickable
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
-    val titleTextStyle @Composable get() = MaterialTheme.typography.headlineSmall
+    val titleTextStyle @Composable get() = MaterialTheme.typography.titleLarge
     val artistTextStyle @Composable get() = MaterialTheme.typography.titleMedium
 }
 
@@ -89,6 +89,7 @@ internal fun PlaybackNowPlayingWithControls(
         PlaybackControls(
             playbackState = playbackState,
             contentColor = contentColor,
+            modifier = Modifier.padding(top = 12.dp)
         )
     }
 }
@@ -130,11 +131,12 @@ internal fun PlaybackControls(
     playbackState: PlaybackStateCompat,
     contentColor: Color,
     modifier: Modifier = Modifier,
+    smallRippleRadius: Dp = 30.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ) {
     val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
     Row(
-        modifier = modifier.width(288.dp),
+        modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -142,7 +144,8 @@ internal fun PlaybackControls(
             onClick = { playbackConnection.mediaController?.toggleShuffleMode() },
             modifier = Modifier
                 .size(20.dp)
-                .weight(2f)
+                .weight(2f),
+            rippleRadius = smallRippleRadius,
         ) {
             Icon(
                 painter = rememberVectorPainter(
@@ -162,12 +165,13 @@ internal fun PlaybackControls(
 
         IconButton(
             onClick = { playbackConnection.transportControls?.skipToPrevious() },
+            rippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(40.dp)
                 .weight(4f)
         ) {
             Icon(
-                painter = rememberVectorPainter(Icons.Default.SkipPrevious),
+                painter = rememberVectorPainter(PlayerIcons.Previous),
                 tint = contentColor.disabledAlpha(playbackState.hasPrevious),
                 modifier = Modifier.fillMaxSize(),
                 contentDescription = null
@@ -180,7 +184,8 @@ internal fun PlaybackControls(
             onClick = { playbackConnection.mediaController?.playPause() },
             modifier = Modifier
                 .size(80.dp)
-                .weight(8f)
+                .weight(8f),
+            rippleRadius = 35.dp,
         ) {
             Icon(
                 painter = rememberVectorPainter(
@@ -201,12 +206,13 @@ internal fun PlaybackControls(
 
         IconButton(
             onClick = { playbackConnection.transportControls?.skipToNext() },
+            rippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(40.dp)
                 .weight(4f)
         ) {
             Icon(
-                painter = rememberVectorPainter(Icons.Default.SkipNext),
+                painter = rememberVectorPainter(PlayerIcons.Next),
                 tint = contentColor.disabledAlpha(playbackState.hasNext),
                 modifier = Modifier.fillMaxSize(),
                 contentDescription = null
@@ -217,6 +223,7 @@ internal fun PlaybackControls(
 
         IconButton(
             onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
+            rippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(20.dp)
                 .weight(2f)

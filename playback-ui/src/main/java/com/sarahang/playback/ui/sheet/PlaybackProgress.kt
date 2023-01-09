@@ -171,6 +171,8 @@ internal fun BoxScope.PlaybackProgressDuration(
 
             else -> progressState.currentDuration
         }
+
+
         Text(
             currentDuration,
             style = MaterialTheme.typography.bodySmall,

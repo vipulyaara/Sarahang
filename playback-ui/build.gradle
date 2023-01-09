@@ -53,6 +53,7 @@ dependencies {
     api(libs.compose.ui.tooling)
     api(libs.compose.ui.ui)
     api(libs.compose.ui.util)
+    api libs.compose.ui.textfonts
 
     implementation(libs.accompanist.pager.core)
     implementation(libs.accompanist.placeholder)
@@ -77,9 +78,11 @@ dependencies {
     implementation libs.coil.compose
     implementation libs.icons.tabler
     implementation libs.icons.feather
+    implementation libs.icons.font.awesome
 
     implementation libs.timber
     implementation libs.dataStore
+    implementation libs.lottie.compose
 
     implementation libs.compose.runtime.runtime
 }

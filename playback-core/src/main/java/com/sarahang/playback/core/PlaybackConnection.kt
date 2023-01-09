@@ -20,7 +20,6 @@ import com.sarahang.playback.core.models.PlaybackModeState
 import com.sarahang.playback.core.models.PlaybackProgressState
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
-import com.sarahang.playback.core.models.fromMediaController
 import com.sarahang.playback.core.models.toMediaAudioIds
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.players.AudioPlayer
@@ -34,6 +33,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -47,6 +47,7 @@ interface PlaybackConnection {
     val isConnected: StateFlow<Boolean>
     val playbackState: StateFlow<PlaybackStateCompat>
     val nowPlaying: StateFlow<MediaMetadataCompat>
+    val nowPlayingAudio: StateFlow<PlaybackQueue.NowPlayingAudio?>
 
     val playbackQueue: StateFlow<PlaybackQueue>
 
@@ -80,13 +81,23 @@ class PlaybackConnectionImpl(
     override val isConnected = MutableStateFlow(false)
     override val playbackState = MutableStateFlow(NONE_PLAYBACK_STATE)
     override val nowPlaying = MutableStateFlow(NONE_PLAYING)
-
     private val playbackQueueState = MutableStateFlow(PlaybackQueue())
 
     override val playbackQueue = combine(nowPlaying, playbackState, playbackQueueState, ::Triple)
         .map(::buildPlaybackQueue)
         .distinctUntilChanged()
         .stateIn(this, SharingStarted.WhileSubscribed(5000), PlaybackQueue())
+
+    override val nowPlayingAudio = combine(playbackQueue, playbackState, ::Pair)
+        .map { (queue, playbackState) ->
+            when (queue.isIndexValid && queue.isValid && !playbackState.isIdle) {
+                true -> PlaybackQueue.NowPlayingAudio.from(queue)
+                else -> null
+            }
+        }
+        .distinctUntilChanged()
+        .stateIn(this, SharingStarted.WhileSubscribed(5000), null)
+
 
     private var playbackProgressInterval: Job = Job()
     override val playbackProgress = MutableStateFlow(PlaybackProgressState())
@@ -97,10 +108,10 @@ class PlaybackConnectionImpl(
     override val transportControls get() = mediaController?.transportControls
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(context)
     private val mediaBrowser = MediaBrowserCompat(
-        /* context = */ context,
-        /* serviceComponent = */ serviceComponent,
-        /* callback = */ mediaBrowserConnectionCallback,
-        /* rootHints = */ null
+        context,
+        serviceComponent,
+        mediaBrowserConnectionCallback,
+        null
     ).apply { connect() }
 
     init {
@@ -108,13 +119,13 @@ class PlaybackConnectionImpl(
     }
 
     private fun startPlaybackProgress() = launch {
-        combine(playbackState, nowPlaying, ::Pair).collect { (state, current) ->
+        combine(playbackState, nowPlaying, ::Pair).collectLatest { (state, current) ->
             playbackProgressInterval.cancel()
             val duration = current.duration
             val position = state.position
 
             if (state == NONE_PLAYBACK_STATE || current == NONE_PLAYING || duration < 1)
-                return@collect
+                return@collectLatest
 
             val initial = PlaybackProgressState(
                 total = duration,
@@ -274,8 +285,18 @@ class PlaybackConnectionImpl(
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
-            Timber.d("New queue: size=${queue?.size}")
-            val newQueue = fromMediaController(mediaController ?: return)
+//            val newQueue = fromMediaController(mediaController ?: return)
+
+            val newQueue = PlaybackQueue(
+                title = mediaController!!.queueTitle?.toString(),
+                ids = mediaController!!.queue.mapNotNull { it.description.mediaId },
+                initialMediaId = mediaController!!.metadata?.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+                    ?: "",
+                currentIndex = mediaController!!.playbackState.currentIndex
+            )
+            Timber.d("Controller $mediaController")
+            Timber.d("Old queue: size=${queue?.size} ${queue?.joinToString()}")
+            Timber.d("New queue: size=${newQueue?.size} ${newQueue?.joinToString()}")
             this@PlaybackConnectionImpl.playbackQueueState.value = newQueue
         }
 
