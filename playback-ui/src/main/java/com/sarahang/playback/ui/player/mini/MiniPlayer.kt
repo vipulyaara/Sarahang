@@ -8,6 +8,7 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -221,13 +222,15 @@ private fun PlaybackNowPlaying(audio: Audio, modifier: Modifier = Modifier) {
             text = audio.title.orNa(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            modifier = Modifier.basicMarquee()
         )
         Text(
             text = audio.subtitle.orNa(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelMedium
+            style = MaterialTheme.typography.labelMedium,
+            modifier = Modifier.basicMarquee()
         )
     }
 }
@@ -247,7 +250,7 @@ private fun RowScope.PlaybackPlayPause(
             imageVector = when {
                 playbackState.isError -> Icons.ErrorOutline
                 playbackState.isPlaying -> Icons.Pause
-                playbackState.isPlayEnabled -> Icons.Play
+                playbackState.isPlayEnabled -> Icons.PlayCircle
                 else -> Icons.Hourglass
             },
             modifier = Modifier.size(size),

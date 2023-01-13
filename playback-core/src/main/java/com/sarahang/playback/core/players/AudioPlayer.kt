@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.util.PriorityTaskManager
@@ -64,10 +65,11 @@ class AudioPlayerImpl @Inject constructor(
 
     private var isPrepared = false
     private var isBuffering = false
-    private var onPrepared: OnPrepared<AudioPlayer> = {}
-    private var onError: OnError<AudioPlayer> = {}
-    private var onBuffering: OnBuffering<AudioPlayer> = {}
-    private var onIsPlaying: OnIsPlaying<AudioPlayer> = { _, _ -> }
+    private var onPrepared: OnPrepared<AudioPlayer> = { Timber.d("Prepared") }
+    private var onError: OnError<AudioPlayer> = { Timber.e(it) }
+    private var onBuffering: OnBuffering<AudioPlayer> = { Timber.d("Buffering") }
+    private var onIsPlaying: OnIsPlaying<AudioPlayer> =
+        { playing, byUi -> Timber.d("$playing $byUi") }
     private var onReady: OnReady<AudioPlayer> = {}
     private var onCompletion: OnCompletion<AudioPlayer> = {}
 
@@ -199,7 +201,7 @@ class AudioPlayerImpl @Inject constructor(
                 }
             })
             .build().apply {
-                val attr = com.google.android.exoplayer2.audio.AudioAttributes.Builder().apply {
+                val attr = AudioAttributes.Builder().apply {
                     setContentType(C.CONTENT_TYPE_MUSIC)
                     setUsage(C.USAGE_MEDIA)
                 }.build()

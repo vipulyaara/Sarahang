@@ -2,42 +2,18 @@ package com.sarahang.playback.ui.sheet
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.*
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -59,37 +35,21 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.ADAPTIVE_COLOR_ANIMATION
-import com.sarahang.playback.ui.audio.AudioRow
-import com.sarahang.playback.ui.audio.LocalAudioActionHandler
-import com.sarahang.playback.ui.audio.adaptiveColor
-import com.sarahang.playback.ui.audio.audioActionHandler
+import com.sarahang.playback.ui.audio.*
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
-import com.sarahang.playback.ui.theme.PlayerTheme
 import com.sarahang.playback.ui.theme.Specs
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.launch
 
 @Composable
 fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit) {
     val listState = rememberLazyListState()
-
-    val coroutine = rememberCoroutineScope()
-    val scrollToTop = {
-        coroutine.launch {
-            listState.animateScrollToItem(0)
-        }
-        Unit
-    }
-
     val audioActionHandler = audioActionHandler()
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
         PlaybackSheet(
             onClose = onClose,
-            scrollToTop = scrollToTop,
             goToItem = goToItem,
             listState = listState,
             queueListState = rememberLazyListState()
@@ -101,7 +61,6 @@ fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit) {
 @Composable
 internal fun PlaybackSheet(
     onClose: () -> Unit,
-    scrollToTop: () -> Unit,
     goToItem: () -> Unit,
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
@@ -130,7 +89,7 @@ internal fun PlaybackSheet(
         return
     }
 
-    PlayerTheme {
+    MaterialTheme {
         BoxWithConstraints {
             val isWideLayout = isWideLayout()
             val maxWidth = maxWidth
@@ -141,7 +100,7 @@ internal fun PlaybackSheet(
                         maxWidth = maxWidth,
                         playbackQueue = playbackQueue,
                         queueListState = queueListState,
-                        scrollToTop = scrollToTop
+                        adaptiveColor = adaptiveColor
                     )
                 }
 
@@ -181,8 +140,8 @@ internal fun PlaybackSheet(
                         if (!isWideLayout && playbackQueue.isNotEmpty()) {
                             playbackQueue(
                                 playbackQueue = playbackQueue,
-                                scrollToTop = scrollToTop,
                                 playbackConnection = playbackConnection,
+                                adaptiveColor = adaptiveColor
                             )
                         }
                     }
@@ -196,7 +155,6 @@ internal fun PlaybackSheet(
 private fun RowScope.ResizablePlaybackQueue(
     maxWidth: Dp,
     playbackQueue: PlaybackQueue,
-    scrollToTop: () -> Unit,
     queueListState: LazyListState,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
@@ -204,6 +162,7 @@ private fun RowScope.ResizablePlaybackQueue(
     dragOffset: State<Float> = resizableLayoutViewModel.dragOffset.collectAsStateWithLifecycle(),
     setDragOffset: (Float) -> Unit = resizableLayoutViewModel::setDragOffset,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
+    adaptiveColor: AdaptiveColorResult
 ) {
     ResizableLayout(
         availableWidth = maxWidth,
@@ -239,8 +198,8 @@ private fun RowScope.ResizablePlaybackQueue(
 
                 playbackQueue(
                     playbackQueue = playbackQueue,
-                    scrollToTop = scrollToTop,
                     playbackConnection = playbackConnection,
+                    adaptiveColor = adaptiveColor
                 )
             }
             Divider(
@@ -293,6 +252,7 @@ private fun PlaybackSheetTopBarTitle(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier
             .fillMaxWidth()
+            .basicMarquee()
             .offset(x = (-8).dp)
     ) {
         val context = LocalContext.current
@@ -319,17 +279,17 @@ private fun LazyListScope.playbackQueueLabel(modifier: Modifier = Modifier) {
 
 private fun LazyListScope.playbackQueue(
     playbackQueue: PlaybackQueue,
-    scrollToTop: () -> Unit,
     playbackConnection: PlaybackConnection,
+    adaptiveColor: AdaptiveColorResult
 ) {
     itemsIndexed(playbackQueue, key = { _, a -> a.id }) { index, audio ->
         AudioRow(
             audio = audio,
             imageSize = 40.dp,
             audioIndex = index,
+            adaptiveColor = adaptiveColor,
             onPlayAudio = {
                 playbackConnection.transportControls?.skipToQueueItem(index.toLong())
-//                scrollToTop()
             },
             modifier = Modifier.animateItemPlacement()
         )

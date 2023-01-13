@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import com.sarahang.playback.ui.R
@@ -23,17 +24,13 @@ private val defaultMenuActionLabels = listOf(
     R.string.audio_menu_playNext
 )
 
-val currentPlayingMenuActionLabels = listOf(
-    R.string.audio_menu_download,
-    R.string.audio_menu_copyLink
-)
-
 @Composable
 fun AudioDropdownMenu(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
     actionLabels: List<Int> = defaultMenuActionLabels,
+    tint: Color = MaterialTheme.colorScheme.onPrimaryContainer,
     onDropdownSelect: (Int) -> Unit = {}
 ) {
     IconButton(onClick = { onExpandedChange(true) }) {
@@ -41,7 +38,7 @@ fun AudioDropdownMenu(
             modifier = modifier,
             painter = rememberVectorPainter(Icons.Default.MoreVert),
             contentDescription = stringResource(R.string.audio_menu_cd),
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
+            tint = tint
         )
     }
 

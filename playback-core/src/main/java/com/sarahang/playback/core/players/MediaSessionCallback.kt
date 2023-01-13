@@ -45,10 +45,11 @@ class MediaSessionCallback(
 
     init {
         audioFocusHelper.onAudioFocusGain {
+            Timber.d("onAudioFocusGain")
             if (isAudioFocusGranted && !sarahangPlayer.getSession().isPlaying()) {
                 sarahangPlayer.playAudio()
             } else {
-                audioFocusHelper.setVolume(AudioManager.ADJUST_RAISE)
+//                audioFocusHelper.setVolume(AudioManager.ADJUST_RAISE)
             }
             isAudioFocusGranted = false
         }
@@ -131,7 +132,7 @@ class MediaSessionCallback(
 
     override fun onStop() {
         Timber.d("onStop()")
-        sarahangPlayer.stop()
+        sarahangPlayer.stop(true)
     }
 
     override fun onSetRepeatMode(repeatMode: Int) {

@@ -8,25 +8,14 @@ import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -43,6 +32,7 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackProgressState
 import com.sarahang.playback.ui.components.Slider
 import com.sarahang.playback.ui.components.SliderDefaults
+import com.sarahang.playback.ui.components.animatePlaybackProgress
 import timber.log.Timber
 import kotlin.math.roundToLong
 
@@ -55,10 +45,7 @@ internal fun PlaybackProgress(
 ) {
     val progressState by playbackConnection.playbackProgress.collectAsStateWithLifecycle()
     val (draggingProgress, setDraggingProgress) = remember { mutableStateOf<Float?>(null) }
-
-    LaunchedEffect(draggingProgress) {
-        Timber.d("Dragging $draggingProgress")
-    }
+    val isDragging by derivedStateOf { draggingProgress != null }
 
     Box {
         PlaybackProgressSlider(
@@ -66,7 +53,7 @@ internal fun PlaybackProgress(
             progressState = progressState,
             draggingProgress = draggingProgress,
             setDraggingProgress = setDraggingProgress,
-            thumbRadius = thumbRadius,
+            thumbRadius = if (isDragging) thumbRadius * 3 else thumbRadius,
             contentColor = contentColor
         )
         PlaybackProgressDuration(progressState, draggingProgress, thumbRadius)
@@ -155,9 +142,6 @@ internal fun BoxScope.PlaybackProgressDuration(
     draggingProgress: Float?,
     thumbRadius: Dp
 ) {
-    LaunchedEffect(progressState ) {
-        Timber.d("Progress $progressState")
-    }
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = Modifier
@@ -174,12 +158,12 @@ internal fun BoxScope.PlaybackProgressDuration(
 
 
         Text(
-            currentDuration,
+            text = currentDuration,
             style = MaterialTheme.typography.bodySmall,
             color = LocalContentColor.current.copy(alpha = 0.6f)
         )
         Text(
-            progressState.totalDuration,
+            text = progressState.totalDuration,
             style = MaterialTheme.typography.bodySmall,
             color = LocalContentColor.current.copy(alpha = 0.6f)
         )

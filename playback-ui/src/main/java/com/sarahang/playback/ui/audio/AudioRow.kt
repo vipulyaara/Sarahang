@@ -1,8 +1,12 @@
 package com.sarahang.playback.ui.audio
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.MarqueeAnimationMode
+import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -17,19 +21,19 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.airbnb.lottie.compose.LottieAnimation
-import com.airbnb.lottie.compose.LottieCompositionSpec
-import com.airbnb.lottie.compose.rememberLottieComposition
 import com.sarahang.playback.core.PlaybackConnection
+import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.millisToDuration
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue.NowPlayingAudio.Companion.isCurrentAudio
-import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.theme.Specs
 
 object AudiosDefaults {
@@ -42,57 +46,82 @@ fun AudioRow(
     audio: Audio,
     modifier: Modifier = Modifier,
     imageSize: Dp = AudiosDefaults.imageSize,
-    isPlaceholder: Boolean = false,
     onClick: ((Audio) -> Unit)? = null,
     onPlayAudio: ((Audio) -> Unit)? = null,
     audioIndex: Int = 0,
-    actionHandler: AudioActionHandler = LocalAudioActionHandler.current
+    adaptiveColor: AdaptiveColorResult,
+    actionHandler: AudioActionHandler = LocalAudioActionHandler.current,
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     var menuVisible by remember { mutableStateOf(false) }
+
+    val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
+    val nowPlayingAudio by playbackConnection.nowPlayingAudio.collectAsStateWithLifecycle()
+    val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
+
+    val containerColor by animateColorAsState(if (isCurrentAudio) adaptiveColor.backgroundColor else Color.Transparent)
+    val borderColor by animateColorAsState(if (isCurrentAudio) adaptiveColor.borderColor else Color.Transparent)
+    val contentColor =
+        if (isCurrentAudio) adaptiveColor.color else MaterialTheme.colorScheme.onPrimaryContainer
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .drawBehind {
+                val strokeWidth = 2.dp.value * density
+                val y = size.height - strokeWidth / 2
+
+                drawLine(
+                    borderColor,
+                    Offset(0f, 0f),
+                    Offset(size.width, 0f),
+                    strokeWidth
+                )
+
+                drawLine(
+                    borderColor,
+                    Offset(0f, y),
+                    Offset(size.width, y),
+                    strokeWidth
+                )
+            }
             .combinedClickable(
                 onClick = {
-                    if (!isPlaceholder)
-                        if (onClick != null) onClick(audio)
-                        else if (onPlayAudio != null) onPlayAudio(audio)
-                        else actionHandler(AudioItemAction.Play(audio))
+                    if (onClick != null) onClick(audio)
+                    else if (onPlayAudio != null) onPlayAudio(audio)
+                    else actionHandler(AudioItemAction.Play(audio))
                 },
                 onLongClick = {
                     menuVisible = true
                 }
             )
             .fillMaxWidth()
-            .padding(PaddingValues(horizontal = 16.dp, vertical = 8.dp))
+            .background(containerColor)
+            .padding(PaddingValues(vertical = 8.dp))
     ) {
         AudioRowItem(
             audio = audio,
-            isPlaceholder = isPlaceholder,
             imageSize = imageSize,
-            audioIndex = audioIndex,
-            modifier = Modifier
+            isCurrentAudio = isCurrentAudio,
+            modifier = Modifier.weight(1f),
+            adaptiveColor = adaptiveColor.color,
+            isPlaying = playbackState.isPlaying
         )
 
-        Box(modifier = Modifier.weight(1f))
-
-        if (!isPlaceholder) {
-            AudioDropdownMenu(
-                expanded = menuVisible,
-                onExpandedChange = { menuVisible = it },
-                modifier = Modifier
-                    .align(Alignment.CenterVertically),
-                onDropdownSelect = {
-                    val action = AudioItemAction.from(it, audio)
-                    when {
-                        action is AudioItemAction.Play && onPlayAudio != null -> onPlayAudio(audio)
-                        else -> actionHandler(action)
-                    }
-                },
-            )
-        }
+        AudioDropdownMenu(
+            expanded = menuVisible,
+            onExpandedChange = { menuVisible = it },
+            modifier = Modifier.align(Alignment.CenterVertically),
+            tint = contentColor,
+            onDropdownSelect = {
+                val action = AudioItemAction.from(it, audio)
+                when {
+                    action is AudioItemAction.Play && onPlayAudio != null -> onPlayAudio(audio)
+                    else -> actionHandler(action)
+                }
+            },
+        )
     }
 }
 
@@ -101,38 +130,39 @@ fun AudioRowItem(
     audio: Audio,
     modifier: Modifier = Modifier,
     imageSize: Dp = AudiosDefaults.imageSize,
-    isPlaceholder: Boolean = false,
     maxLines: Int = AudiosDefaults.maxLines,
-    audioIndex: Int = 0,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
+    adaptiveColor: Color = MaterialTheme.colorScheme.primary,
+    isCurrentAudio: Boolean,
+    isPlaying: Boolean
 ) {
-    val nowPlayingAudio by playbackConnection.nowPlayingAudio.collectAsStateWithLifecycle()
-    val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
-
-    val titleTextColor = if (isCurrentAudio) MaterialTheme.colorScheme.primary
-    else MaterialTheme.colorScheme.onBackground
+    val contentColor by animateColorAsState(
+        if (isCurrentAudio) adaptiveColor else MaterialTheme.colorScheme.onBackground
+    )
 
     Row(
-        horizontalArrangement = Arrangement.spacedBy(Specs.padding),
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier.fillMaxWidth()
     ) {
-        if (isCurrentAudio) {
-            PlayBars(size = imageSize)
-        } else {
-            CoverImage(
-                data = audio.coverImage,
+        AnimatedVisibility(isCurrentAudio) {
+            PlayBars(
                 size = imageSize,
+                containerColor = adaptiveColor,
+                isPlaying = isPlaying,
+                modifier = Modifier.padding(start = 16.dp)
             )
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(2.dp),
+            modifier = Modifier.padding(start = 16.dp)
+        ) {
             Text(
                 text = audio.title,
                 style = MaterialTheme.typography.bodyMedium,
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
-                color = titleTextColor,
+                color = contentColor,
+                modifier = Modifier.basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused)
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Specs.paddingTiny),
@@ -140,24 +170,21 @@ fun AudioRowItem(
             ) {
                 val artistAndDuration = listOf(
                     audio.album,
-                    audio.durationMillis().millisToDuration()
+                    audio.durationMillis().millisToDuration(),
                 ).interpunctize()
                 Text(
                     text = artistAndDuration,
                     style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.secondary,
+                    color = contentColor.copy(alpha = 0.7f),
                     maxLines = maxLines,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.alignByBaseline()
+                    modifier = Modifier
+                        .alignByBaseline()
+                        .basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused)
                 )
             }
         }
     }
-}
-
-@Composable
-private fun PlayBars(size: Dp) {
-    LottieAnimation(composition = rememberLottieComposition(spec = LottieCompositionSpec.RawRes(R.ra)), progress = { /*TODO*/ })
 }
 
 private fun List<String?>.interpunctize(interpunct: String = " ꞏ ") = joinToString(interpunct)

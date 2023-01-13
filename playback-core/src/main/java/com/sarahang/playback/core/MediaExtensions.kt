@@ -63,9 +63,19 @@ fun MediaControllerCompat.toggleRepeatMode() {
     )
 }
 
+
 fun createDefaultPlaybackState(): PlaybackStateCompat.Builder {
     return PlaybackStateCompat.Builder().setActions(
-        PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_PAUSE or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH or PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID or PlaybackStateCompat.ACTION_PLAY_PAUSE or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE or PlaybackStateCompat.ACTION_SET_REPEAT_MODE or PlaybackStateCompat.ACTION_SEEK_TO
+        PlaybackStateCompat.ACTION_PLAY
+                or PlaybackStateCompat.ACTION_PAUSE
+                or PlaybackStateCompat.ACTION_PLAY_FROM_SEARCH
+                or PlaybackStateCompat.ACTION_PLAY_FROM_MEDIA_ID
+                or PlaybackStateCompat.ACTION_PLAY_PAUSE
+                or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+                or PlaybackStateCompat.ACTION_SET_SHUFFLE_MODE
+                or PlaybackStateCompat.ACTION_SET_REPEAT_MODE
+                or PlaybackStateCompat.ACTION_SEEK_TO
     )
 }
 
@@ -91,7 +101,9 @@ inline val Pair<PlaybackStateCompat, MediaMetadataCompat>.isActive
     get() = (first.state != PlaybackStateCompat.STATE_NONE && second != NONE_PLAYING)
 
 inline val PlaybackStateCompat.isPrepared
-    get() = (state == PlaybackStateCompat.STATE_BUFFERING) || (state == PlaybackStateCompat.STATE_PLAYING) || (state == PlaybackStateCompat.STATE_PAUSED)
+    get() = (state == PlaybackStateCompat.STATE_BUFFERING)
+            || (state == PlaybackStateCompat.STATE_PLAYING)
+            || (state == PlaybackStateCompat.STATE_PAUSED)
 
 inline val PlaybackStateCompat.isPlaying
     get() = (state == PlaybackStateCompat.STATE_PLAYING) || isBuffering
@@ -109,7 +121,9 @@ inline val PlaybackStateCompat.isError
     get() = (state == PlaybackStateCompat.STATE_ERROR)
 
 inline val PlaybackStateCompat.isPlayEnabled
-    get() = (actions and PlaybackStateCompat.ACTION_PLAY != 0L) || ((actions and PlaybackStateCompat.ACTION_PLAY_PAUSE != 0L) && (state == PlaybackStateCompat.STATE_PAUSED))
+    get() = (actions and PlaybackStateCompat.ACTION_PLAY != 0L)
+            || ((actions and PlaybackStateCompat.ACTION_PLAY_PAUSE != 0L)
+            && (state == PlaybackStateCompat.STATE_PAUSED))
 
 inline val PlaybackStateCompat.currentIndex
     get() = (extras?.getInt(QUEUE_CURRENT_INDEX) ?: 0)
@@ -138,6 +152,3 @@ inline val MediaMetadataCompat.artwork: Bitmap? get() = getBitmap(MediaMetadataC
 
 inline val MediaMetadataCompat.artworkUri: Uri
     get() = (getString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI) ?: "").toUri()
-
-const val METADATA_KEY_CONTENT_ID = "android.media.metadata.CONTENT_ID"
-const val METADATA_KEY_ID = "android.media.metadata.ID"

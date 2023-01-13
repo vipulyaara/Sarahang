@@ -14,6 +14,7 @@ data class Audio(
 
     fun durationMillis() = duration * 1000
 
+
     companion object {
         val unknown = Audio(
             id = "unknown",
@@ -22,11 +23,9 @@ data class Audio(
             duration = 0,
             artist = "unknown",
             album = "unknown",
-            coverImage = "unknown"
+            coverImage = "unknown",
         )
     }
 }
 
-const val UNKNOWN_ARTIST = "Unknown Artist"
 const val UNTITLED_SONG = "Untitled Song"
-const val UNTITLED_ALBUM = "Untitled"

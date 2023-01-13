@@ -7,10 +7,9 @@ const val MEDIA_TYPE_AUDIO = "Media.Audio"
 const val MEDIA_TYPE_ARTIST = "Media.Artist"
 const val MEDIA_TYPE_ALBUM = "Media.Album"
 const val MEDIA_TYPE_AUDIO_QUERY = "Media.AudioQuery"
-const val MEDIA_TYPE_AUDIO_MINERVA_QUERY = "Media.AudioMinervaQuery"
-const val MEDIA_TYPE_AUDIO_FLACS_QUERY = "Media.AudioFlacsQuery"
 
 private const val MEDIA_ID_SEPARATOR = " | "
+const val MEDIA_ID_INDEX_SHUFFLED = -1000
 
 data class MediaId(
     val type: String = MEDIA_TYPE_AUDIO,
@@ -18,6 +17,8 @@ data class MediaId(
     val index: Int = 0,
     val caller: String = CALLER_SELF
 ) {
+    val hasIndex = index >= 0
+    val isShuffleIndex = index == MEDIA_ID_INDEX_SHUFFLED
 
     companion object {
         const val CALLER_SELF = "self"
@@ -39,11 +40,7 @@ fun String?.toMediaId(): MediaId {
     val parts = split(MEDIA_ID_SEPARATOR)
     val type = parts[0]
 
-    val knownTypes = listOf(
-        MEDIA_TYPE_AUDIO, MEDIA_TYPE_ARTIST,
-        MEDIA_TYPE_ALBUM, MEDIA_TYPE_AUDIO_QUERY,
-        MEDIA_TYPE_AUDIO_MINERVA_QUERY, MEDIA_TYPE_AUDIO_FLACS_QUERY
-    )
+    val knownTypes = listOf(MEDIA_TYPE_AUDIO, MEDIA_TYPE_AUDIO_QUERY, MEDIA_TYPE_ALBUM)
     if (type !in knownTypes) {
         Timber.e("Unknown media type: $type")
         return MediaId()
@@ -58,9 +55,8 @@ suspend fun MediaId.toAudioList(
     audioDataSource: AudioDataSource,
 ): List<Audio> = when (type) {
     MEDIA_TYPE_AUDIO -> listOfNotNull(audioDataSource.findAudio(value))
-    MEDIA_TYPE_AUDIO_QUERY, MEDIA_TYPE_AUDIO_MINERVA_QUERY, MEDIA_TYPE_AUDIO_FLACS_QUERY -> {
-        audioDataSource.findAudioList(value)
-    }
+    MEDIA_TYPE_AUDIO_QUERY -> audioDataSource.findAudioList(value)
+    MEDIA_TYPE_ALBUM -> audioDataSource.findAudiosByItemId(value)
 
     else -> emptyList()
 }
@@ -69,9 +65,8 @@ suspend fun MediaId.toQueueTitle(
     audioDataSource: AudioDataSource,
 ): QueueTitle = when (type) {
     MEDIA_TYPE_AUDIO -> QueueTitle(QueueTitle.Type.AUDIO, audioDataSource.findAudio(value)?.title)
-    MEDIA_TYPE_AUDIO_QUERY, MEDIA_TYPE_AUDIO_MINERVA_QUERY, MEDIA_TYPE_AUDIO_FLACS_QUERY -> {
-        QueueTitle(QueueTitle.Type.SEARCH, value)
-    }
 
     else -> QueueTitle()
 }
+
+

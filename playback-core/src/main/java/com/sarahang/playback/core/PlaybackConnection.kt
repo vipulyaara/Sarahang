@@ -13,6 +13,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.models.Audio
+import com.sarahang.playback.core.models.MEDIA_TYPE_ALBUM
 import com.sarahang.playback.core.models.MEDIA_TYPE_AUDIO
 import com.sarahang.playback.core.models.MEDIA_TYPE_AUDIO_QUERY
 import com.sarahang.playback.core.models.MediaId
@@ -20,6 +21,7 @@ import com.sarahang.playback.core.models.PlaybackModeState
 import com.sarahang.playback.core.models.PlaybackProgressState
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
+import com.sarahang.playback.core.models.fromMediaController
 import com.sarahang.playback.core.models.toMediaAudioIds
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.players.AudioPlayer
@@ -54,16 +56,15 @@ interface PlaybackConnection {
     val playbackProgress: StateFlow<PlaybackProgressState>
     val playbackMode: StateFlow<PlaybackModeState>
 
-    var mediaController: MediaControllerCompat?
+    val mediaController: MediaControllerCompat?
     val transportControls: MediaControllerCompat.TransportControls?
 
     fun playAudio(audio: Audio, title: QueueTitle = QueueTitle())
     fun playNextAudio(audio: Audio)
-    fun playAudios(itemId: String)
+    fun playAlbum(albumId: String, index: Int = 0)
     fun playAudios(audios: List<Audio>, index: Int = 0, title: QueueTitle = QueueTitle())
     fun playWithQuery(query: String, audioId: String)
 
-    fun addToQueue(audios: List<Audio>, title: QueueTitle = QueueTitle())
     fun swapQueue(from: Int, to: Int)
 
     fun removeByPosition(position: Int)
@@ -149,6 +150,7 @@ class PlaybackConnectionImpl(
         val nowPlayingId = nowPlaying.id.toMediaId().value
         val audios = audioDataSource.getByIds(queue.ids.toMediaAudioIds())
 
+        Timber.d("new queue ${audios.size} ${state.currentIndex}")
         return queue.copy(audios = audios, currentIndex = state.currentIndex).let {
             // check if now playing id and current audio's id by index matches
             val synced = when {
@@ -160,7 +162,7 @@ class PlaybackConnectionImpl(
             // if not, try to override current index by finding audio via now playing id
             when (synced) {
                 true -> it
-                else -> it.copy(currentIndex = it.indexOfFirst { a -> a.id == nowPlayingId })
+                else -> it.copy(isIndexValid = false, currentIndex = it.indexOfFirst { a -> a.id == nowPlayingId })
             }
         }
     }
@@ -175,16 +177,7 @@ class PlaybackConnectionImpl(
         }
     }
 
-    override fun playAudio(audio: Audio, title: QueueTitle) {
-        playAudios(audios = listOf(audio), index = 0, title = title)
-    }
-
-    override fun playAudios(itemId: String) {
-        coroutineScope.launch {
-            val audios = audioDataSource.findAudiosByItemId(itemId)
-            playAudios(audios)
-        }
-    }
+    override fun playAudio(audio: Audio, title: QueueTitle) = playAudios(audios = listOf(audio), index = 0, title = title)
 
     override fun playAudios(audios: List<Audio>, index: Int, title: QueueTitle) {
         val audiosIds = audios.map { it.id }.toTypedArray()
@@ -198,16 +191,8 @@ class PlaybackConnectionImpl(
         )
     }
 
-    override fun addToQueue(audios: List<Audio>, title: QueueTitle) {
-        val audiosIds = audios.map { it.id }.toTypedArray()
-        val audio = audios[0]
-        transportControls?.prepareFromMediaId(
-            MediaId(MEDIA_TYPE_AUDIO, audio.id).toString(),
-            Bundle().apply {
-                putStringArray(QUEUE_LIST_KEY, audiosIds)
-                putString(QUEUE_TITLE_KEY, title.toString())
-            }
-        )
+    override fun playAlbum(albumId: String, index: Int) {
+        transportControls?.playFromMediaId(MediaId(MEDIA_TYPE_ALBUM, albumId, index).toString(), null)
     }
 
     override fun playNextAudio(audio: Audio) {
@@ -285,18 +270,10 @@ class PlaybackConnectionImpl(
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
-//            val newQueue = fromMediaController(mediaController ?: return)
-
-            val newQueue = PlaybackQueue(
-                title = mediaController!!.queueTitle?.toString(),
-                ids = mediaController!!.queue.mapNotNull { it.description.mediaId },
-                initialMediaId = mediaController!!.metadata?.getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
-                    ?: "",
-                currentIndex = mediaController!!.playbackState.currentIndex
-            )
+            val newQueue = fromMediaController(mediaController ?: return)
             Timber.d("Controller $mediaController")
             Timber.d("Old queue: size=${queue?.size} ${queue?.joinToString()}")
-            Timber.d("New queue: size=${newQueue?.size} ${newQueue?.joinToString()}")
+            Timber.d("New queue: size=${newQueue.size} ${newQueue.joinToString()}")
             this@PlaybackConnectionImpl.playbackQueueState.value = newQueue
         }
 

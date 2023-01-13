@@ -2,6 +2,7 @@ package com.sarahang.playback.ui.sheet
 
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -40,6 +41,7 @@ import com.sarahang.playback.core.isError
 import com.sarahang.playback.core.isPlayEnabled
 import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.models.LocalPlaybackConnection
+import com.sarahang.playback.core.models.PlaybackModeState
 import com.sarahang.playback.core.playPause
 import com.sarahang.playback.core.title
 import com.sarahang.playback.core.toggleRepeatMode
@@ -52,8 +54,8 @@ import com.sarahang.playback.ui.theme.simpleClickable
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
-    val titleTextStyle @Composable get() = MaterialTheme.typography.titleLarge
-    val artistTextStyle @Composable get() = MaterialTheme.typography.titleMedium
+    val titleTextStyle @Composable get() = MaterialTheme.typography.titleMedium
+    val artistTextStyle @Composable get() = MaterialTheme.typography.titleSmall
 }
 
 @Composable
@@ -70,7 +72,7 @@ internal fun PlaybackNowPlayingWithControls(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(Specs.paddingLarge)
+        modifier = modifier.padding(32.dp)
     ) {
         if (!onlyControls)
             PlaybackNowPlaying(
@@ -79,6 +81,7 @@ internal fun PlaybackNowPlayingWithControls(
                 onArtistClick = onArtistClick,
                 titleTextStyle = titleTextStyle,
                 artistTextStyle = artistTextStyle,
+                contentColor = contentColor,
             )
 
         PlaybackProgress(
@@ -103,7 +106,10 @@ internal fun PlaybackNowPlaying(
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
+    contentColor: Color = MaterialTheme.colorScheme.surface,
 ) {
+    val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
     Column(
         horizontalAlignment = horizontalAlignment,
         modifier = modifier
@@ -113,7 +119,9 @@ internal fun PlaybackNowPlaying(
             style = titleTextStyle,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            modifier = Modifier.simpleClickable(onClick = onTitleClick)
+            modifier = Modifier
+                .simpleClickable(onClick = onTitleClick)
+                .basicMarquee()
         )
         Text(
             text = nowPlaying.artist.orNa(),
@@ -121,8 +129,31 @@ internal fun PlaybackNowPlaying(
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier.simpleClickable(onClick = onArtistClick)
+            modifier = Modifier
+                .simpleClickable(onClick = onArtistClick)
+                .basicMarquee()
         )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            ShuffleButton(
+                playbackConnection = playbackConnection,
+                smallRippleRadius = 30.dp,
+                playbackMode = playbackMode,
+                contentColor = contentColor
+            )
+
+            RepeatButton(
+                playbackConnection = playbackConnection,
+                smallRippleRadius = 30.dp,
+                playbackMode = playbackMode,
+                contentColor = contentColor
+            )
+        }
     }
 }
 
@@ -134,27 +165,20 @@ internal fun PlaybackControls(
     smallRippleRadius: Dp = 30.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ) {
-    val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         IconButton(
-            onClick = { playbackConnection.mediaController?.toggleShuffleMode() },
+            onClick = { playbackConnection.transportControls?.rewind() },
+            rippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(20.dp)
-                .weight(2f),
-            rippleRadius = smallRippleRadius,
+                .weight(2f)
         ) {
             Icon(
-                painter = rememberVectorPainter(
-                    when (playbackMode.shuffleMode) {
-                        PlaybackStateCompat.SHUFFLE_MODE_NONE -> Icons.Default.Shuffle
-                        PlaybackStateCompat.SHUFFLE_MODE_ALL -> Icons.Default.ShuffleOn
-                        else -> Icons.Default.Shuffle
-                    }
-                ),
+                painter = rememberVectorPainter(PlayerIcons.Rewind),
                 tint = contentColor,
                 modifier = Modifier.fillMaxSize(),
                 contentDescription = null
@@ -192,8 +216,8 @@ internal fun PlaybackControls(
                     when {
                         playbackState.isError -> Icons.Filled.ErrorOutline
                         playbackState.isPlaying -> PlayerIcons.Pause
-                        playbackState.isPlayEnabled -> PlayerIcons.Play
-                        else -> PlayerIcons.Play
+                        playbackState.isPlayEnabled -> PlayerIcons.PlayCircle
+                        else -> PlayerIcons.PlayCircle
                     }
                 ),
                 tint = contentColor,
@@ -222,24 +246,74 @@ internal fun PlaybackControls(
         Spacer(Modifier.width(Specs.paddingLarge))
 
         IconButton(
-            onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
+            onClick = { playbackConnection.transportControls?.fastForward() },
             rippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(20.dp)
                 .weight(2f)
         ) {
             Icon(
-                painter = rememberVectorPainter(
-                    when (playbackMode.repeatMode) {
-                        PlaybackStateCompat.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
-                        PlaybackStateCompat.REPEAT_MODE_ALL -> Icons.Default.RepeatOn
-                        else -> Icons.Default.Repeat
-                    }
-                ),
+                painter = rememberVectorPainter(PlayerIcons.FasForward),
                 tint = contentColor,
                 modifier = Modifier.fillMaxSize(),
                 contentDescription = null
             )
         }
+    }
+}
+
+@Composable
+private fun RepeatButton(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
+    playbackMode: PlaybackModeState,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
+        rippleRadius = smallRippleRadius,
+        modifier = modifier.size(20.dp)
+    ) {
+        Icon(
+            painter = rememberVectorPainter(
+                when (playbackMode.repeatMode) {
+                    PlaybackStateCompat.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
+                    PlaybackStateCompat.REPEAT_MODE_ALL -> Icons.Default.RepeatOn
+                    else -> Icons.Default.Repeat
+                }
+            ),
+            tint = contentColor,
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun ShuffleButton(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
+    playbackMode: PlaybackModeState,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = { playbackConnection.mediaController?.toggleShuffleMode() },
+        modifier = modifier.size(20.dp),
+        rippleRadius = smallRippleRadius,
+    ) {
+        Icon(
+            painter = rememberVectorPainter(
+                when (playbackMode.shuffleMode) {
+                    PlaybackStateCompat.SHUFFLE_MODE_NONE -> Icons.Default.Shuffle
+                    PlaybackStateCompat.SHUFFLE_MODE_ALL -> Icons.Default.ShuffleOn
+                    else -> Icons.Default.Shuffle
+                }
+            ),
+            tint = contentColor,
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
     }
 }
