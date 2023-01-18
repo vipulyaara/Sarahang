@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import com.sarahang.playback.core.PLAYBACK_PROGRESS_INTERVAL
 
 @Composable
-internal fun animatePlaybackProgress(
+fun animatePlaybackProgress(
     targetValue: Float,
 ) = animateFloatAsState(
     targetValue = targetValue,

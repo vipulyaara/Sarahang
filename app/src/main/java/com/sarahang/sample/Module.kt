@@ -15,10 +15,6 @@ class PlaybackModule {
 
     @Provides
     fun audioDataSource(): AudioDataSource = object : AudioDataSource {
-        override suspend fun getByMediaIds(mediaIds: List<String>): List<Audio> {
-            return audios
-        }
-
         override suspend fun getByIds(ids: List<String>): List<Audio> {
             return audios
         }
@@ -28,6 +24,10 @@ class PlaybackModule {
         }
 
         override suspend fun findAudioList(id: String): List<Audio> {
+            return audios
+        }
+
+        override suspend fun findAudiosByItemId(itemId: String): List<Audio> {
             return audios
         }
     }

@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit) {
+fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit = {}) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {

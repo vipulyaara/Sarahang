@@ -6,6 +6,7 @@ import androidx.compose.foundation.MarqueeAnimationMode
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -49,7 +50,8 @@ fun AudioRow(
     onClick: ((Audio) -> Unit)? = null,
     onPlayAudio: ((Audio) -> Unit)? = null,
     audioIndex: Int = 0,
-    adaptiveColor: AdaptiveColorResult,
+    adaptiveColor: AdaptiveColorResult = MaterialTheme.colorScheme.background
+        .toAdaptiveColor(isSystemInDarkTheme()),
     actionHandler: AudioActionHandler = LocalAudioActionHandler.current,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {

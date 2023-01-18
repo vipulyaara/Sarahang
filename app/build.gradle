@@ -41,8 +41,8 @@ android {
 }
 
 dependencies {
-    implementation project(':playback-core')
-    implementation project(':playback-ui')
+    implementation project(':core-playback')
+    implementation project(':ui-playback')
 
     api(libs.media)
 

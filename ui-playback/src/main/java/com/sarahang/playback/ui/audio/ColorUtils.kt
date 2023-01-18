@@ -157,9 +157,9 @@ fun backgroundGradient(
     endColor: Color,
     isDark: Boolean,
 ): Brush {
-    val first = gradientShift(isDark, accent.toArgb(), 0.4f, 100)
-    val second = gradientShift(isDark, accent.toArgb(), 0.26f, 66)
-    val third = gradientShift(isDark, accent.toArgb(), 0.13f, 33)
+    val first = gradientShift(isDark, accent.toArgb(), 0.4f, 70)
+    val second = gradientShift(isDark, accent.toArgb(), 0.26f, 33)
+    val third = gradientShift(isDark, accent.toArgb(), 0.13f, 12)
 
     return Brush.verticalGradient(listOf(first, second, third, endColor))
 }

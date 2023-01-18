@@ -96,7 +96,7 @@ fun MiniPlayer(
 }
 
 @Composable
-fun  PlaybackMiniControls(
+fun PlaybackMiniControls(
     playbackState: PlaybackStateCompat,
     nowPlaying: MediaMetadataCompat,
     onPlayPause: () -> Unit,
@@ -288,6 +288,20 @@ private fun PlaybackProgress(
             )
         }
     }
+}
+
+@Composable
+fun MiniPlayerProgress(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colorScheme.primary
+) {
+    LinearProgressIndicator(
+        progress = progress,
+        color = color,
+        trackColor = color.copy(alpha = 0.24f),
+        modifier = modifier
+    )
 }
 
 @Preview

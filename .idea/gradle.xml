@@ -11,8 +11,8 @@
           <set>
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
-            <option value="$PROJECT_DIR$/playback-core" />
-            <option value="$PROJECT_DIR$/playback-ui" />
+            <option value="$PROJECT_DIR$/core-playback" />
+            <option value="$PROJECT_DIR$/ui-playback" />
           </set>
         </option>
       </GradleProjectSettings>
