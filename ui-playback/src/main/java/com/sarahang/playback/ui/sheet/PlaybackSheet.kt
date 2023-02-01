@@ -44,7 +44,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit = {}) {
+fun PlaybackSheet(onClose: (() -> Unit)?, goToItem: () -> Unit = {}) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
@@ -57,10 +57,9 @@ fun PlaybackSheet(onClose: () -> Unit, goToItem: () -> Unit = {}) {
     }
 }
 
-
 @Composable
 internal fun PlaybackSheet(
-    onClose: () -> Unit,
+    onClose: (() -> Unit)?,
     goToItem: () -> Unit,
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
@@ -81,7 +80,7 @@ internal fun PlaybackSheet(
     LaunchedEffect(playbackConnection) {
         playbackConnection.playbackState
             .filter { it != NONE_PLAYBACK_STATE }
-            .collectLatest { if (it.isIdle) onClose() }
+            .collectLatest { if (it.isIdle) if (onClose != null) onClose() }
     }
 
     if (playbackState == NONE_PLAYBACK_STATE) {
@@ -115,11 +114,13 @@ internal fun PlaybackSheet(
                         state = listState,
                         contentPadding = paddings.copy(top = 0.dp),
                     ) {
-                        item {
-                            PlaybackSheetTopBar(
-                                playbackQueue = playbackQueue,
-                                onClose = onClose
-                            )
+                        if (onClose != null) {
+                            item {
+                                PlaybackSheetTopBar(
+                                    playbackQueue = playbackQueue,
+                                    onClose = onClose
+                                )
+                            }
                         }
 
                         item {

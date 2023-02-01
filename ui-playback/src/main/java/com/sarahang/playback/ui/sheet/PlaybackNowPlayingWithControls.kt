@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -54,7 +55,7 @@ import com.sarahang.playback.ui.theme.simpleClickable
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
-    val titleTextStyle @Composable get() = MaterialTheme.typography.titleMedium
+    val titleTextStyle @Composable get() = MaterialTheme.typography.titleLarge
     val artistTextStyle @Composable get() = MaterialTheme.typography.titleSmall
 }
 
@@ -123,6 +124,7 @@ internal fun PlaybackNowPlaying(
                 .simpleClickable(onClick = onTitleClick)
                 .basicMarquee()
         )
+        Spacer(modifier = Modifier.height(8.dp))
         Text(
             text = nowPlaying.artist.orNa(),
             style = artistTextStyle,

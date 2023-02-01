@@ -102,7 +102,7 @@ class MediaNotificationsImpl @Inject constructor(
         val builder = NotificationCompat.Builder(context, CHANNEL_ID).apply {
             setStyle(style)
             setSmallIcon(R.drawable.ic_player_logo)
-//            setLargeIcon(artwork)
+            setLargeIcon(artwork)
             setContentIntent(clickIntent)
             setContentTitle(trackName)
             setContentText("$artistName - $albumName")

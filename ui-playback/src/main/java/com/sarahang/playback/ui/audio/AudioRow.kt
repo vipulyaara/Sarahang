@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.isPlaying
-import com.sarahang.playback.core.millisToDuration
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue.NowPlayingAudio.Companion.isCurrentAudio
@@ -148,7 +147,7 @@ fun AudioRowItem(
         AnimatedVisibility(isCurrentAudio) {
             PlayBars(
                 size = imageSize,
-                containerColor = adaptiveColor,
+                color = adaptiveColor,
                 isPlaying = isPlaying,
                 modifier = Modifier.padding(start = 16.dp)
             )
@@ -164,18 +163,13 @@ fun AudioRowItem(
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
                 color = contentColor,
-                modifier = Modifier.basicMarquee(animationMode = MarqueeAnimationMode.WhileFocused)
             )
             Row(
                 horizontalArrangement = Arrangement.spacedBy(Specs.paddingTiny),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                val artistAndDuration = listOf(
-                    audio.album,
-                    audio.durationMillis().millisToDuration(),
-                ).interpunctize()
                 Text(
-                    text = artistAndDuration,
+                    text = audio.audioRowSubtitle,
                     style = MaterialTheme.typography.labelMedium,
                     color = contentColor.copy(alpha = 0.7f),
                     maxLines = maxLines,
@@ -188,5 +182,3 @@ fun AudioRowItem(
         }
     }
 }
-
-private fun List<String?>.interpunctize(interpunct: String = " ꞏ ") = joinToString(interpunct)

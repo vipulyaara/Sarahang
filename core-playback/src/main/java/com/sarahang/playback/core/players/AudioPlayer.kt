@@ -46,6 +46,7 @@ interface AudioPlayer {
     fun onIsPlaying(playing: OnIsPlaying<AudioPlayer>)
     fun onReady(ready: OnReady<AudioPlayer>)
     fun onCompletion(completion: OnCompletion<AudioPlayer>)
+    fun playWhenReady(): Boolean
 }
 
 @Singleton
@@ -114,6 +115,8 @@ class AudioPlayerImpl @Inject constructor(
     override fun isBuffering() = isBuffering
 
     override fun isPlaying() = player.isPlaying
+
+    override fun playWhenReady() = player.playWhenReady
 
     override fun position() = player.currentPosition
 
