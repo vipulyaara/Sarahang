@@ -7,12 +7,15 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Repeat
@@ -27,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
@@ -210,20 +214,24 @@ internal fun PlaybackControls(
             onClick = { playbackConnection.mediaController?.playPause() },
             modifier = Modifier
                 .size(80.dp)
+                .clip(CircleShape)
                 .weight(8f),
             rippleRadius = 35.dp,
         ) {
+            val painter = rememberVectorPainter(
+                when {
+                    playbackState.isError -> Icons.Filled.ErrorOutline
+                    playbackState.isPlaying -> PlayerIcons.Pause
+                    playbackState.isPlayEnabled -> PlayerIcons.PlayCircle
+                    else -> PlayerIcons.PlayCircle
+                }
+            )
             Icon(
-                painter = rememberVectorPainter(
-                    when {
-                        playbackState.isError -> Icons.Filled.ErrorOutline
-                        playbackState.isPlaying -> PlayerIcons.Pause
-                        playbackState.isPlayEnabled -> PlayerIcons.PlayCircle
-                        else -> PlayerIcons.PlayCircle
-                    }
-                ),
+                painter = painter,
                 tint = contentColor,
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .aspectRatio(1f),
                 contentDescription = null
             )
         }

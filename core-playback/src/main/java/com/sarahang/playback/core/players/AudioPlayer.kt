@@ -19,8 +19,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import timber.log.Timber
 import javax.inject.Inject
+import javax.inject.Named
 import javax.inject.Singleton
-import com.sarahang.playback.core.injection.Player as PlayerProvides
 
 /**
  * Lower level player that handles the playback of a single audio file.
@@ -52,7 +52,7 @@ interface AudioPlayer {
 @Singleton
 class AudioPlayerImpl @Inject constructor(
     @ApplicationContext internal val context: Context,
-    @PlayerProvides private val okHttpClient: OkHttpClient,
+    @Named("player") private val okHttpClient: OkHttpClient,
 ) : AudioPlayer, Player.Listener {
 
     private var playerBase: ExoPlayer? = null

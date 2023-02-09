@@ -12,7 +12,8 @@ data class Audio(
     val coverImage: String? = null,
 ) {
     val subtitle: String
-        get() = listOfNotNull(artist, album).filter { it.isNotEmpty() }.joinToString(" • ")
+        get() = listOfNotNull(album, artist).filter { it.isNotEmpty() }
+            .joinToString(" • ")
 
     val audioRowSubtitle: String
         get() = listOfNotNull(truncatedAlbum, durationMillis().millisToDuration())

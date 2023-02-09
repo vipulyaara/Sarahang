@@ -3,12 +3,35 @@ package com.sarahang.playback.ui.sheet
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.*
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
-import androidx.compose.material3.*
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +58,12 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.*
+import com.sarahang.playback.ui.audio.ADAPTIVE_COLOR_ANIMATION
+import com.sarahang.playback.ui.audio.AdaptiveColorResult
+import com.sarahang.playback.ui.audio.AudioRow
+import com.sarahang.playback.ui.audio.LocalAudioActionHandler
+import com.sarahang.playback.ui.audio.adaptiveColor
+import com.sarahang.playback.ui.audio.audioActionHandler
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
@@ -72,8 +100,8 @@ internal fun PlaybackSheet(
 
     val adaptiveColor by adaptiveColor(
         image = nowPlaying.artwork,
-        initial = MaterialTheme.colorScheme.onBackground,
-        gradientEndColor = MaterialTheme.colorScheme.background,
+        initial = colorScheme.onBackground,
+        gradientEndColor = colorScheme.background,
     )
     val contentColor by animateColorAsState(adaptiveColor.color, ADAPTIVE_COLOR_ANIMATION)
 
@@ -88,63 +116,61 @@ internal fun PlaybackSheet(
         return
     }
 
-    MaterialTheme {
-        BoxWithConstraints {
-            val isWideLayout = isWideLayout()
-            val maxWidth = maxWidth
+    BoxWithConstraints {
+        val isWideLayout = isWideLayout()
+        val maxWidth = maxWidth
 
-            Row(Modifier.fillMaxSize()) {
-                if (isWideLayout) {
-                    ResizablePlaybackQueue(
-                        maxWidth = maxWidth,
-                        playbackQueue = playbackQueue,
-                        queueListState = queueListState,
-                        adaptiveColor = adaptiveColor
-                    )
-                }
+        Row(Modifier.fillMaxSize()) {
+            if (isWideLayout) {
+                ResizablePlaybackQueue(
+                    maxWidth = maxWidth,
+                    playbackQueue = playbackQueue,
+                    queueListState = queueListState,
+                    adaptiveColor = adaptiveColor
+                )
+            }
 
-                Scaffold(
-                    containerColor = Color.Transparent,
-                    contentColor = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier
-                        .background(adaptiveColor.gradient)
-                        .weight(1f)
-                ) { paddings ->
-                    LazyColumn(
-                        state = listState,
-                        contentPadding = paddings.copy(top = 0.dp),
-                    ) {
-                        if (onClose != null) {
-                            item {
-                                PlaybackSheetTopBar(
-                                    playbackQueue = playbackQueue,
-                                    onClose = onClose
-                                )
-                            }
-                        }
-
+            Scaffold(
+                containerColor = Color.Transparent,
+                contentColor = colorScheme.onSurface,
+                modifier = Modifier
+                    .background(adaptiveColor.gradient)
+                    .weight(1f)
+            ) { paddings ->
+                LazyColumn(
+                    state = listState,
+                    contentPadding = paddings.copy(top = 0.dp),
+                ) {
+                    if (onClose != null) {
                         item {
-                            PlaybackArtworkPagerWithNowPlayingAndControls(
-                                nowPlaying = nowPlaying,
-                                playbackState = playbackState,
-                                pagerState = pagerState,
-                                contentColor = contentColor,
-                                onTitleClick = goToItem,
-                                onArtistClick = { },
-                                artworkVerticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier
-                                    .fillParentMaxHeight(fraction = 0.70f)
-                                    .padding(vertical = 12.dp),
-                            )
-                        }
-
-                        if (!isWideLayout && playbackQueue.isNotEmpty()) {
-                            playbackQueue(
+                            PlaybackSheetTopBar(
                                 playbackQueue = playbackQueue,
-                                playbackConnection = playbackConnection,
-                                adaptiveColor = adaptiveColor
+                                onClose = onClose
                             )
                         }
+                    }
+
+                    item {
+                        PlaybackArtworkPagerWithNowPlayingAndControls(
+                            nowPlaying = nowPlaying,
+                            playbackState = playbackState,
+                            pagerState = pagerState,
+                            contentColor = contentColor,
+                            onTitleClick = goToItem,
+                            onArtistClick = { },
+                            artworkVerticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier
+                                .fillParentMaxHeight(fraction = 0.70f)
+                                .padding(vertical = 12.dp),
+                        )
+                    }
+
+                    if (!isWideLayout && playbackQueue.isNotEmpty()) {
+                        playbackQueue(
+                            playbackQueue = playbackQueue,
+                            playbackConnection = playbackConnection,
+                            adaptiveColor = adaptiveColor
+                        )
                     }
                 }
             }
@@ -214,18 +240,13 @@ private fun RowScope.ResizablePlaybackQueue(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PlaybackSheetTopBar(
     playbackQueue: PlaybackQueue,
     onClose: () -> Unit
 ) {
-    // TODO: Remove after https://android-review.googlesource.com/c/platform/frameworks/support/+/2209896/ is available
-    // override colorScheme for TopAppBar so we can make the background transparent
-    // but revert it back for actions since PlaybackSheetTopBarActions uses a Surface
-    val colorScheme = MaterialTheme.colorScheme
     MaterialTheme(colorScheme.copy(surface = Color.Transparent)) {
-        TopAppBar(
+        CenterAlignedTopAppBar(
             title = { PlaybackSheetTopBarTitle(playbackQueue) },
             navigationIcon = {
                 IconButton(onClick = onClose) {
@@ -254,7 +275,6 @@ private fun PlaybackSheetTopBarTitle(
         modifier = modifier
             .fillMaxWidth()
             .basicMarquee()
-            .offset(x = (-8).dp)
     ) {
         val context = LocalContext.current
         val queueTitle = QueueTitle.from(playbackQueue.title.orEmpty())

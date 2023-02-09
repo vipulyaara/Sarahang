@@ -4,11 +4,11 @@ import android.content.ComponentName
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import com.sarahang.playback.core.audio.AudioFocusHelper
-import com.sarahang.playback.core.audio.AudioFocusHelperImpl
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.PlaybackConnectionImpl
 import com.sarahang.playback.core.apis.AudioDataSource
+import com.sarahang.playback.core.audio.AudioFocusHelper
+import com.sarahang.playback.core.audio.AudioFocusHelperImpl
 import com.sarahang.playback.core.players.AudioPlayer
 import com.sarahang.playback.core.players.AudioPlayerImpl
 import com.sarahang.playback.core.players.SarahangPlayer
@@ -21,11 +21,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
+import okhttp3.Cache
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
 import javax.inject.Qualifier
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -36,16 +39,15 @@ abstract class PlaybackCoreModule {
         @Named("process")
         fun processScope(): CoroutineScope = ProcessLifecycleOwner.get().lifecycleScope
 
-        @Player
         @Provides
-        fun provideOkHttpClientPlayer(): OkHttpClient {
-            val builder = OkHttpClient.Builder().apply {
-                readTimeout(60, TimeUnit.SECONDS)
-                connectTimeout(60, TimeUnit.SECONDS)
-            }
-
-            return builder.build()
-        }
+        @Named("player")
+        fun playerOkHttp(
+            cache: Cache,
+        ) = getBaseBuilder(cache)
+            .readTimeout(PLAYER_TIMEOUT, TimeUnit.MILLISECONDS)
+            .writeTimeout(PLAYER_TIMEOUT, TimeUnit.MILLISECONDS)
+            .connectTimeout(PLAYER_TIMEOUT_CONNECT, TimeUnit.MILLISECONDS)
+            .build()
 
         @Provides
         @Singleton
@@ -69,6 +71,15 @@ abstract class PlaybackCoreModule {
 
     @Binds
     abstract fun provideSarahangPlayer(bind: SarahangPlayerImpl): SarahangPlayer
+}
+
+private val PLAYER_TIMEOUT = 2.minutes.inWholeMilliseconds
+private val PLAYER_TIMEOUT_CONNECT = 30.seconds.inWholeMilliseconds
+
+private fun getBaseBuilder(cache: Cache): OkHttpClient.Builder {
+    return OkHttpClient.Builder()
+        .cache(cache)
+        .retryOnConnectionFailure(true)
 }
 
 @Retention(AnnotationRetention.RUNTIME)

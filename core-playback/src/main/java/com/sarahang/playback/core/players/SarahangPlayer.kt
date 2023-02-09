@@ -142,16 +142,23 @@ class SarahangPlayerImpl @Inject constructor(
     private val metadataBuilder = MediaMetadataCompat.Builder()
     private val stateBuilder = createDefaultPlaybackState()
 
-    private val pendingIntent = PendingIntent.getBroadcast(context, 0, Intent(Intent.ACTION_MEDIA_BUTTON), FLAG_IMMUTABLE)
+    private val pendingIntent =
+        PendingIntent.getBroadcast(context, 0, Intent(Intent.ACTION_MEDIA_BUTTON), FLAG_IMMUTABLE)
 
-    private val mediaSession = MediaSessionCompat(context, context.getString(R.string.player_name), null, pendingIntent).apply {
+    private val mediaSession = MediaSessionCompat(
+        context,
+        context.getString(R.string.player_name),
+        null,
+        pendingIntent
+    ).apply {
         setCallback(
             MediaSessionCallback(this, this@SarahangPlayerImpl, audioFocusHelper)
         )
         setPlaybackState(stateBuilder.build())
 
         val sessionIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
-        val sessionActivityPendingIntent = PendingIntent.getActivity(context, 0, sessionIntent, FLAG_IMMUTABLE)
+        val sessionActivityPendingIntent =
+            PendingIntent.getActivity(context, 0, sessionIntent, FLAG_IMMUTABLE)
         setSessionActivity(sessionActivityPendingIntent)
         isActive = true
     }
@@ -163,6 +170,7 @@ class SarahangPlayerImpl @Inject constructor(
             launch {
                 if (!mediaSession.isPlaying()) audioPlayer.seekTo(mediaSession.position())
                 playAudio()
+
             }
         }
 
@@ -195,13 +203,13 @@ class SarahangPlayerImpl @Inject constructor(
         }
         audioPlayer.onReady {
 //            if (audioPlayer.playWhenReady()) {
-                if (!audioPlayer.isPlaying()) {
-                    Timber.d("Player ready but not currently playing, requesting to play")
-                    audioPlayer.play()
-                }
-                updatePlaybackState {
-                    setState(STATE_PLAYING, mediaSession.position(), 1F)
-                }
+            if (!audioPlayer.isPlaying()) {
+                Timber.d("Player ready but not currently playing, requesting to play")
+                audioPlayer.play()
+            }
+            updatePlaybackState {
+                setState(STATE_PLAYING, mediaSession.position(), 1F)
+            }
 //            }
         }
         audioPlayer.onError { throwable ->
@@ -501,6 +509,8 @@ class SarahangPlayerImpl @Inject constructor(
         if (queue == null)
             queue = mediaQueueBuilder.buildAudioList(mediaId).map { it.id }
 
+        Timber.d("setDataFromMediaId: $mediaId, queue: $queue, queueTitle: $queueTitle")
+
         if (queueTitle.isNullOrBlank())
             queueTitle = mediaQueueBuilder.buildQueueTitle(mediaId).toString()
 
@@ -508,7 +518,8 @@ class SarahangPlayerImpl @Inject constructor(
             with(queue) {
                 when {
                     mediaId.isShuffleIndex -> audioId = shuffled().first()
-                    mediaId.hasIndex -> audioId = if (mediaId.index < size) get(mediaId.index) else first()
+                    mediaId.hasIndex -> audioId =
+                        if (mediaId.index < size) get(mediaId.index) else first()
                 }
             }
 
@@ -549,10 +560,17 @@ class SarahangPlayerImpl @Inject constructor(
 
     override suspend fun restoreQueueState() {
         Timber.d("Restoring queue state")
-        var queueState = preferences.get(queueStateKey, QueueState.serializer(), QueueState(emptyList())).first()
+        var queueState =
+            preferences.get(queueStateKey, QueueState.serializer(), QueueState(emptyList())).first()
         Timber.d("Restoring state: ${queueState.currentIndex}, size=${queueState.queue.size}")
 
-        if (queueState.state in listOf(STATE_PLAYING, STATE_BUFFERING, STATE_BUFFERING, STATE_ERROR)) {
+        if (queueState.state in listOf(
+                STATE_PLAYING,
+                STATE_BUFFERING,
+                STATE_BUFFERING,
+                STATE_ERROR
+            )
+        ) {
             queueState = queueState.copy(state = STATE_PAUSED)
         }
 
@@ -627,11 +645,13 @@ class SarahangPlayerImpl @Inject constructor(
 
             // cover image is applied separately to avoid delaying metadata setting while fetching bitmap from network
             val smallCoverBitmap = context.getBitmap(audio.coverImage.toString().toUri(), 1200)
-            val updatedMetadata = mediaMetadata.apply { putBitmap(METADATA_KEY_ALBUM_ART, smallCoverBitmap) }.build()
+            val updatedMetadata =
+                mediaMetadata.apply { putBitmap(METADATA_KEY_ALBUM_ART, smallCoverBitmap) }.build()
             mediaSession.setMetadata(updatedMetadata)
             metaDataChangedCallback(player)
         }
     }
 
-    private fun logEvent(event: String, mediaId: String = queueManager.currentAudioId) = playerEventLogger.logEvent("player.$event", mapOf("mediaId" to mediaId))
+    private fun logEvent(event: String, mediaId: String = queueManager.currentAudioId) =
+        playerEventLogger.logEvent("player.$event", mapOf("mediaId" to mediaId))
 }

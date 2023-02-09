@@ -67,6 +67,7 @@ dependencies {
     implementation libs.exoplayer.okhttp
     implementation libs.hilt.library
     implementation libs.kotlin.serialization
+    implementation libs.rive
 
     implementation libs.hilt.library
     kapt libs.hilt.compiler

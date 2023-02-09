@@ -110,19 +110,19 @@ fun AudioRow(
             isPlaying = playbackState.isPlaying
         )
 
-        AudioDropdownMenu(
-            expanded = menuVisible,
-            onExpandedChange = { menuVisible = it },
-            modifier = Modifier.align(Alignment.CenterVertically),
-            tint = contentColor,
-            onDropdownSelect = {
-                val action = AudioItemAction.from(it, audio)
-                when {
-                    action is AudioItemAction.Play && onPlayAudio != null -> onPlayAudio(audio)
-                    else -> actionHandler(action)
-                }
-            },
-        )
+//        AudioDropdownMenu(
+//            expanded = menuVisible,
+//            onExpandedChange = { menuVisible = it },
+//            modifier = Modifier.align(Alignment.CenterVertically),
+//            tint = contentColor,
+//            onDropdownSelect = {
+//                val action = AudioItemAction.from(it, audio)
+//                when {
+//                    action is AudioItemAction.Play && onPlayAudio != null -> onPlayAudio(audio)
+//                    else -> actionHandler(action)
+//                }
+//            },
+//        )
     }
 }
 
