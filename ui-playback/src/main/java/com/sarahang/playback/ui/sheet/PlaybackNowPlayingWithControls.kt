@@ -6,16 +6,14 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ErrorOutline
 import androidx.compose.material.icons.filled.Repeat
@@ -30,7 +28,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.text.TextStyle
@@ -67,7 +64,7 @@ object PlaybackNowPlayingDefaults {
 internal fun PlaybackNowPlayingWithControls(
     nowPlaying: MediaMetadataCompat,
     playbackState: PlaybackStateCompat,
-    contentColor: Color,
+    color: Color,
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -86,17 +83,17 @@ internal fun PlaybackNowPlayingWithControls(
                 onArtistClick = onArtistClick,
                 titleTextStyle = titleTextStyle,
                 artistTextStyle = artistTextStyle,
-                contentColor = contentColor,
+                contentColor = color,
             )
 
         PlaybackProgress(
             playbackState = playbackState,
-            contentColor = contentColor
+            contentColor = color
         )
 
         PlaybackControls(
             playbackState = playbackState,
-            contentColor = contentColor,
+            color = color,
             modifier = Modifier.padding(top = 12.dp)
         )
     }
@@ -166,7 +163,7 @@ internal fun PlaybackNowPlaying(
 @Composable
 internal fun PlaybackControls(
     playbackState: PlaybackStateCompat,
-    contentColor: Color,
+    color: Color,
     modifier: Modifier = Modifier,
     smallRippleRadius: Dp = 30.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
@@ -176,99 +173,175 @@ internal fun PlaybackControls(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        IconButton(
-            onClick = { playbackConnection.transportControls?.rewind() },
-            rippleRadius = smallRippleRadius,
+        Rewind(
+            playbackConnection = playbackConnection,
+            smallRippleRadius = smallRippleRadius,
+            color = color,
             modifier = Modifier
                 .size(20.dp)
                 .weight(2f)
-        ) {
-            Icon(
-                painter = rememberVectorPainter(PlayerIcons.Rewind),
-                tint = contentColor,
-                modifier = Modifier.fillMaxSize(),
-                contentDescription = null
-            )
-        }
+        )
 
         Spacer(Modifier.width(Specs.paddingLarge))
 
-        IconButton(
-            onClick = { playbackConnection.transportControls?.skipToPrevious() },
-            rippleRadius = smallRippleRadius,
-            modifier = Modifier
-                .size(40.dp)
-                .weight(4f)
-        ) {
-            Icon(
-                painter = rememberVectorPainter(PlayerIcons.Previous),
-                tint = contentColor.disabledAlpha(playbackState.hasPrevious),
-                modifier = Modifier.fillMaxSize(),
-                contentDescription = null
-            )
-        }
+        PlayerPreviousControl(
+            playbackConnection = playbackConnection,
+            smallRippleRadius = smallRippleRadius,
+            size = 40.dp,
+            color = color,
+            playbackState = playbackState
+        )
 
         Spacer(Modifier.width(Specs.padding))
 
-        IconButton(
-            onClick = { playbackConnection.mediaController?.playPause() },
-            modifier = Modifier
-                .size(80.dp)
-                .clip(CircleShape)
-                .weight(8f),
-            rippleRadius = 35.dp,
-        ) {
-            val painter = rememberVectorPainter(
-                when {
-                    playbackState.isError -> Icons.Filled.ErrorOutline
-                    playbackState.isPlaying -> PlayerIcons.Pause
-                    playbackState.isPlayEnabled -> PlayerIcons.PlayCircle
-                    else -> PlayerIcons.PlayCircle
-                }
-            )
-            Icon(
-                painter = painter,
-                tint = contentColor,
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .aspectRatio(1f),
-                contentDescription = null
-            )
-        }
+        PlayerPlayControl(
+            playbackConnection = playbackConnection,
+            playbackState = playbackState,
+            contentColor = color,
+            size = 80.dp
+        )
 
         Spacer(Modifier.width(Specs.padding))
 
-        IconButton(
-            onClick = { playbackConnection.transportControls?.skipToNext() },
-            rippleRadius = smallRippleRadius,
-            modifier = Modifier
-                .size(40.dp)
-                .weight(4f)
-        ) {
-            Icon(
-                painter = rememberVectorPainter(PlayerIcons.Next),
-                tint = contentColor.disabledAlpha(playbackState.hasNext),
-                modifier = Modifier.fillMaxSize(),
-                contentDescription = null
-            )
-        }
+        PlayerNextControl(
+            playbackConnection = playbackConnection,
+            smallRippleRadius = smallRippleRadius,
+            size = 40.dp,
+            color = color,
+            playbackState = playbackState
+        )
 
         Spacer(Modifier.width(Specs.paddingLarge))
 
-        IconButton(
-            onClick = { playbackConnection.transportControls?.fastForward() },
-            rippleRadius = smallRippleRadius,
+        FastForward(
+            playbackConnection = playbackConnection,
+            smallRippleRadius = smallRippleRadius,
+            color = color,
             modifier = Modifier
                 .size(20.dp)
                 .weight(2f)
-        ) {
-            Icon(
-                painter = rememberVectorPainter(PlayerIcons.FasForward),
-                tint = contentColor,
-                modifier = Modifier.fillMaxSize(),
-                contentDescription = null
-            )
-        }
+        )
+    }
+}
+
+@Composable
+private fun Rewind(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = { playbackConnection.transportControls?.rewind() },
+        rippleRadius = smallRippleRadius,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.Rewind),
+            tint = color,
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun FastForward(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = { playbackConnection.transportControls?.fastForward() },
+        rippleRadius = smallRippleRadius,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.FasForward),
+            tint = color,
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+internal fun RowScope.PlayerPreviousControl(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
+    size: Dp,
+    color: Color,
+    playbackState: PlaybackStateCompat
+) {
+    IconButton(
+        onClick = { playbackConnection.transportControls?.skipToPrevious() },
+        rippleRadius = smallRippleRadius,
+        modifier = Modifier
+            .size(size)
+            .weight(4f)
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.Previous),
+            tint = color.disabledAlpha(playbackState.hasPrevious),
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+internal fun RowScope.PlayerNextControl(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
+    size: Dp,
+    color: Color,
+    playbackState: PlaybackStateCompat
+) {
+    IconButton(
+        onClick = { playbackConnection.transportControls?.skipToNext() },
+        rippleRadius = smallRippleRadius,
+        modifier = Modifier
+            .size(size)
+            .weight(4f)
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.Next),
+            tint = color.disabledAlpha(playbackState.hasNext),
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+internal fun RowScope.PlayerPlayControl(
+    playbackConnection: PlaybackConnection,
+    playbackState: PlaybackStateCompat,
+    contentColor: Color,
+    size: Dp
+) {
+    IconButton(
+        onClick = { playbackConnection.mediaController?.playPause() },
+        modifier = Modifier
+            .size(size)
+            .weight(8f),
+        rippleRadius = 35.dp,
+    ) {
+        val painter = rememberVectorPainter(
+            when {
+                playbackState.isError -> Icons.Filled.ErrorOutline
+                playbackState.isPlaying -> PlayerIcons.Pause
+                playbackState.isPlayEnabled -> PlayerIcons.PlayCircle
+                else -> PlayerIcons.PlayCircle
+            }
+        )
+        Icon(
+            painter = painter,
+            tint = contentColor,
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
     }
 }
 

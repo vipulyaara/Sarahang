@@ -23,7 +23,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
     nowPlaying: MediaMetadataCompat,
     playbackState: PlaybackStateCompat,
     modifier: Modifier = Modifier,
-    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    color: Color = MaterialTheme.colorScheme.onSurface,
     artworkVerticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
@@ -48,7 +48,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
         ) { audio, _, pagerMod ->
             PlaybackArtwork(
                 artwork = audio.coverImage,
-                contentColor = contentColor,
+                contentColor = color,
                 nowPlaying = nowPlaying,
                 onClick = onArtworkClick,
                 modifier = pagerMod,
@@ -57,7 +57,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
         PlaybackNowPlayingWithControls(
             nowPlaying = nowPlaying,
             playbackState = playbackState,
-            contentColor = contentColor,
+            color = color,
             titleTextStyle = titleTextStyle,
             artistTextStyle = artistTextStyle,
             onTitleClick = onTitleClick,

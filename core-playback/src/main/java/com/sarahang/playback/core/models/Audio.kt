@@ -19,7 +19,7 @@ data class Audio(
         get() = listOfNotNull(truncatedAlbum, durationMillis().millisToDuration())
             .filter { it.isNotEmpty() }.joinToString(" • ")
 
-    private val truncatedAlbum: String
+    val truncatedAlbum: String
         get() = album?.substring(0, album.length.coerceAtMost(30)) +
                 if (album != null && album.length > 30) "…" else ""
 

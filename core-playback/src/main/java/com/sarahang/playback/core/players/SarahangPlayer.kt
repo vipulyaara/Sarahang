@@ -74,7 +74,7 @@ const val QUEUE_CURRENT_INDEX = "queue_current_index"
 const val QUEUE_HAS_PREVIOUS = "queue_has_previous"
 const val QUEUE_HAS_NEXT = "queue_has_next"
 
-const val DEFAULT_FORWARD_FORWARD = 20 * 1000
+const val DEFAULT_FORWARD_FORWARD = 10 * 1000
 const val DEFAULT_FORWARD_REWIND = 10 * 1000
 
 interface SarahangPlayer {

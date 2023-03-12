@@ -19,10 +19,10 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,7 +44,6 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -68,17 +67,19 @@ import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
 import com.sarahang.playback.ui.theme.Specs
+import com.sarahang.playback.ui.theme.simpleClickable
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun PlaybackSheet(onClose: (() -> Unit)?, goToItem: () -> Unit = {}) {
+fun PlaybackSheet(onClose: (() -> Unit)?, goToItem: () -> Unit = {}, goToCreator: () -> Unit = {}) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
         PlaybackSheet(
             onClose = onClose,
             goToItem = goToItem,
+            goToCreator = goToCreator,
             listState = listState,
             queueListState = rememberLazyListState()
         )
@@ -89,6 +90,7 @@ fun PlaybackSheet(onClose: (() -> Unit)?, goToItem: () -> Unit = {}) {
 internal fun PlaybackSheet(
     onClose: (() -> Unit)?,
     goToItem: () -> Unit,
+    goToCreator: () -> Unit,
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
@@ -103,7 +105,7 @@ internal fun PlaybackSheet(
         initial = colorScheme.onBackground,
         gradientEndColor = colorScheme.background,
     )
-    val contentColor by animateColorAsState(adaptiveColor.color, ADAPTIVE_COLOR_ANIMATION)
+    val color by animateColorAsState(adaptiveColor.color, ADAPTIVE_COLOR_ANIMATION)
 
     LaunchedEffect(playbackConnection) {
         playbackConnection.playbackState
@@ -116,7 +118,7 @@ internal fun PlaybackSheet(
         return
     }
 
-    BoxWithConstraints {
+    BoxWithConstraints(Modifier.fillMaxSize()) {
         val isWideLayout = isWideLayout()
         val maxWidth = maxWidth
 
@@ -145,7 +147,8 @@ internal fun PlaybackSheet(
                         item {
                             PlaybackSheetTopBar(
                                 playbackQueue = playbackQueue,
-                                onClose = onClose
+                                onClose = onClose,
+                                onTitleClick = goToItem,
                             )
                         }
                     }
@@ -155,9 +158,9 @@ internal fun PlaybackSheet(
                             nowPlaying = nowPlaying,
                             playbackState = playbackState,
                             pagerState = pagerState,
-                            contentColor = contentColor,
+                            color = color,
                             onTitleClick = goToItem,
-                            onArtistClick = { },
+                            onArtistClick = goToCreator,
                             artworkVerticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillParentMaxHeight(fraction = 0.70f)
@@ -210,19 +213,6 @@ private fun RowScope.ResizablePlaybackQueue(
             ) {
                 playbackQueueLabel(resizableModifier.then(labelMod))
 
-                if (playbackQueue.isLastAudio) {
-                    item {
-                        Text(
-                            text = stringResource(R.string.playback_queue_empty),
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = Specs.padding)
-                        )
-                    }
-                }
-
                 playbackQueue(
                     playbackQueue = playbackQueue,
                     playbackConnection = playbackConnection,
@@ -243,15 +233,16 @@ private fun RowScope.ResizablePlaybackQueue(
 @Composable
 private fun PlaybackSheetTopBar(
     playbackQueue: PlaybackQueue,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onTitleClick: () -> Unit = {},
 ) {
     MaterialTheme(colorScheme.copy(surface = Color.Transparent)) {
         CenterAlignedTopAppBar(
-            title = { PlaybackSheetTopBarTitle(playbackQueue) },
+            title = { PlaybackSheetTopBarTitle(playbackQueue, onTitleClick = onTitleClick) },
             navigationIcon = {
                 IconButton(onClick = onClose) {
                     Icon(
-                        rememberVectorPainter(Icons.Default.KeyboardArrowDown),
+                        painter = rememberVectorPainter(Icons.Default.KeyboardArrowDown),
                         modifier = Modifier.size(Specs.iconSize),
                         contentDescription = null,
                     )
@@ -268,7 +259,8 @@ private fun PlaybackSheetTopBar(
 @Composable
 private fun PlaybackSheetTopBarTitle(
     playbackQueue: PlaybackQueue,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onTitleClick: () -> Unit = {},
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -282,6 +274,7 @@ private fun PlaybackSheetTopBarTitle(
             text = queueTitle.localizeValue(context).uppercase(),
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
+            modifier = Modifier.simpleClickable { onTitleClick() },
         )
     }
 }
@@ -306,7 +299,6 @@ private fun LazyListScope.playbackQueue(
     itemsIndexed(playbackQueue, key = { _, a -> a.id }) { index, audio ->
         AudioRow(
             audio = audio,
-            imageSize = 40.dp,
             audioIndex = index,
             adaptiveColor = adaptiveColor,
             onPlayAudio = {

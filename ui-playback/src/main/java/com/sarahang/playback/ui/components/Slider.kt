@@ -37,7 +37,6 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.progressSemantics
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
@@ -253,7 +252,6 @@ fun Slider(
  * parts in different state. See [SliderDefaults.colors] to customize.
  */
 @Composable
-@ExperimentalMaterialApi
 fun RangeSlider(
     values: ClosedFloatingPointRange<Float>,
     onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
