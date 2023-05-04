@@ -8,6 +8,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.players.QUEUE_CURRENT_INDEX
 import com.sarahang.playback.core.players.QUEUE_HAS_NEXT
 import com.sarahang.playback.core.players.QUEUE_HAS_PREVIOUS
@@ -137,6 +138,8 @@ inline val PlaybackStateCompat.hasNext
 inline val MediaMetadataCompat.mediaId: String get() = getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
 
 inline val MediaMetadataCompat.id: String? get() = getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
+
+inline val MediaMetadataCompat.fileId: String? get() = id.toMediaId().value
 
 inline val MediaMetadataCompat.title: String? get() = getString(MediaMetadataCompat.METADATA_KEY_TITLE)
 

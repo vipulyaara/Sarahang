@@ -635,7 +635,7 @@ class SarahangPlayerImpl @Inject constructor(
         val player = this
         launch {
             val mediaMetadata = audio.toMediaMetadata(metadataBuilder).apply {
-                val artworkFromFile = audio.artworkFromFile(context)
+                val artworkFromFile = audio.artworkFromFile()
                 if (artworkFromFile != null) {
                     putBitmap(METADATA_KEY_ALBUM_ART, artworkFromFile)
                 }

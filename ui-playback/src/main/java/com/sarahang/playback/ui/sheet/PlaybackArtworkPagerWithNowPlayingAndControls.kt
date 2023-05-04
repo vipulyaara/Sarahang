@@ -7,16 +7,20 @@ package com.sarahang.playback.ui.sheet
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.sarahang.playback.ui.theme.Specs
 
 @Composable
 fun PlaybackArtworkPagerWithNowPlayingAndControls(
@@ -54,19 +58,21 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
                 modifier = pagerMod,
             )
         }
-        PlaybackNowPlayingWithControls(
-            nowPlaying = nowPlaying,
-            playbackState = playbackState,
-            color = color,
-            titleTextStyle = titleTextStyle,
-            artistTextStyle = artistTextStyle,
-            onTitleClick = onTitleClick,
-            onArtistClick = onArtistClick,
-            modifier = Modifier.constrainAs(nowPlayingControls) {
-                centerHorizontallyTo(parent)
-                bottom.linkTo(parent.bottom)
-                height = Dimension.fillToConstraints
-            }
-        )
+
+        CompositionLocalProvider(LocalContentColor provides color) {
+            PlaybackNowPlayingWithControls(
+                nowPlaying = nowPlaying,
+                playbackState = playbackState,
+                titleTextStyle = titleTextStyle,
+                artistTextStyle = artistTextStyle,
+                onTitleClick = onTitleClick,
+                onArtistClick = onArtistClick,
+                modifier = Modifier.constrainAs(nowPlayingControls) {
+                    centerHorizontallyTo(parent)
+                    bottom.linkTo(parent.bottom)
+                    height = Dimension.fillToConstraints
+                }
+            )
+        }
     }
 }

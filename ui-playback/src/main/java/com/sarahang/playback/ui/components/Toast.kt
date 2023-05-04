@@ -1,4 +1,4 @@
-package com.sarahang.playback.ui.audio
+package com.sarahang.playback.ui.components
 
 import android.content.Context
 import android.widget.Toast

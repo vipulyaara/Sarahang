@@ -6,16 +6,17 @@ buildscript {
     }
 
     dependencies {
-        classpath libs.android.gradlePlug
-        classpath libs.kotlin.gradlePlug
-
         classpath libs.hilt.gradlePlug
-        classpath libs.gradleMavenPublishPlugin
     }
 }
 
 plugins {
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.5.20' apply false
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.cacheFixPlugin) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.kapt) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
 }
 
 subprojects {

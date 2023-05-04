@@ -5,6 +5,10 @@
 package com.sarahang.playback.ui.sheet
 
 import android.support.v4.media.MediaMetadataCompat
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -16,14 +20,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.util.lerp
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.calculateCurrentOffsetForPage
-import com.google.accompanist.pager.rememberPagerState
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.toAudio
+import com.sarahang.playback.ui.theme.Specs
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -65,36 +66,34 @@ internal fun PlaybackPager(
                 }
             }
     }
+
     HorizontalPager(
-        count = playbackQueue.size,
+        pageCount = playbackQueue.size,
         modifier = modifier,
         state = pagerState,
+        contentPadding = PaddingValues(horizontal = Specs.paddingLarge),
         key = { playbackQueue.getOrNull(it)?.id ?: it },
         verticalAlignment = verticalAlignment,
     ) { page ->
         val currentAudio = playbackQueue.getOrNull(page) ?: Audio.unknown
 
-        val pagerMod = Modifier.graphicsLayer {
-            val pageOffset = calculateCurrentOffsetForPage(page).absoluteValue
-            // TODO: report to upstream if can be reproduced in isolation
-            if (pageOffset.isNaN()) {
-                return@graphicsLayer
-            }
+        val pagerMod = Modifier
+            .graphicsLayer {
+                // Calculate the absolute offset for the current page from the
+                // scroll position. We use the absolute value which allows us to mirror
+                // any effects for both directions
+                val pageOffset = (
+                        (pagerState.currentPage - page) + pagerState
+                            .currentPageOffsetFraction
+                        ).absoluteValue
 
-            lerp(
-                start = 0.85f,
-                stop = 1f,
-                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-            ).also { scale ->
-                scaleX = scale
-                scaleY = scale
+                // We animate the alpha, between 50% and 100%
+                alpha = lerp(
+                    start = 0.5f,
+                    stop = 1f,
+                    fraction = 1f - pageOffset.coerceIn(0f, 1f)
+                )
             }
-            alpha = lerp(
-                start = 0.5f,
-                stop = 1f,
-                fraction = 1f - pageOffset.coerceIn(0f, 1f)
-            )
-        }
         content(currentAudio, page, pagerMod)
     }
 }

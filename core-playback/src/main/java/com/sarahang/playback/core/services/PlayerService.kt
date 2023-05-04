@@ -93,7 +93,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
         }
         Timber.d("Stopping foreground service")
         becomingNoisyReceiver.unregister()
-        stopForeground(removeNotification)
+        stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
         IS_FOREGROUND = false
     }
 

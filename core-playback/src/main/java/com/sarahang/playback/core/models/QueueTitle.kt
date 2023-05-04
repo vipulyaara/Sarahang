@@ -15,7 +15,7 @@ data class QueueTitle(val type: Type = Type.UNKNOWN, val value: String? = null) 
         Type.DOWNLOADS -> context.getString(R.string.playback_queueTitle_downloads)
     }
 
-    fun localizeValue(context: Context): String = when (type) {
+    fun localizeValue(): String = when (type) {
         Type.UNKNOWN, Type.AUDIO, Type.DOWNLOADS -> ""
         Type.ARTIST, Type.ALBUM -> value ?: ""
         Type.SEARCH -> if (value != null) """"$value"""" else ""

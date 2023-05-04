@@ -8,7 +8,7 @@ import com.sarahang.playback.core.models.Audio
  * Tries to get bitmap from downloaded audio file.
  * Depends on [Audio.audioDownloadItem] already being there
  */
-fun Audio.artworkFromFile(context: Context): Bitmap? {
+fun Audio.artworkFromFile(): Bitmap? {
 //    try {
 //        val downloadUri = coverImage?.toUri() ?: return null
 //

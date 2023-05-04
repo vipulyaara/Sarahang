@@ -99,7 +99,6 @@ class PlaybackConnectionImpl(
         .distinctUntilChanged()
         .stateIn(this, SharingStarted.WhileSubscribed(5000), null)
 
-
     private var playbackProgressInterval: Job = Job()
     override val playbackProgress = MutableStateFlow(PlaybackProgressState())
 

@@ -2,6 +2,10 @@ package com.sarahang.playback.ui.audio
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.PlaybackConnection
@@ -29,9 +34,11 @@ import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue.NowPlayingAudio.Companion.isCurrentAudio
 import com.sarahang.playback.core.playPause
+import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.player.mini.PlaybackPlayPause
 
 object AudiosDefaults {
+    val imageSize: Dp = 48.dp
     const val maxLines = 1
 }
 
@@ -53,8 +60,8 @@ fun AudioRow(
     val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
 
     val containerColor by animateColorAsState(if (isCurrentAudio) adaptiveColor.color else Color.Transparent)
-    val contentColor =
-        if (isCurrentAudio) adaptiveColor.contentColor else MaterialTheme.colorScheme.onBackground
+    val contentColor = if (isCurrentAudio) adaptiveColor.contentColor
+    else MaterialTheme.colorScheme.onBackground
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -77,9 +84,12 @@ fun AudioRow(
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             AudioRowItem(audio = audio, modifier = Modifier.weight(1f)) {
-                AnimatedVisibility(isCurrentAudio) {
+                AnimatedVisibility(
+                    visible = isCurrentAudio,
+                    enter = fadeIn() + slideInHorizontally { it / 2 },
+                    exit = fadeOut() + slideOutHorizontally { it / 2 }
+                ) {
                     PlaybackPlayPause(
-                        modifier = Modifier.padding(start = 8.dp),
                         playbackState = playbackState,
                         onPlayPause = { playbackConnection.mediaController?.playPause() }
                     )
@@ -99,40 +109,50 @@ fun AudioRowItem(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier.fillMaxWidth()
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
     ) {
+        CoverImage(data = audio.coverImage, size = AudiosDefaults.imageSize)
+        Description(audio, maxLines, contentColor, Modifier.weight(1f, true))
         playPauseButton()
+    }
+}
 
-        Column(
-            verticalArrangement = Arrangement.spacedBy(2.dp),
-            modifier = Modifier.padding(horizontal = 16.dp)
-        ) {
+@Composable
+private fun Description(
+    audio: Audio,
+    maxLines: Int,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(2.dp), modifier = modifier) {
+        Text(
+            text = audio.title,
+            style = MaterialTheme.typography.titleSmall,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            color = contentColor,
+        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = audio.title,
-                style = MaterialTheme.typography.bodyMedium,
+                text = audio.artist.toString(),
+                style = MaterialTheme.typography.labelMedium,
+                color = contentColor.copy(alpha = 0.7f),
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
-                color = contentColor,
+                modifier = Modifier
+                    .alignByBaseline()
+                    .weight(1f, false)
             )
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = audio.artist.toString(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = contentColor.copy(alpha = 0.7f),
-                    maxLines = maxLines,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier
-                        .alignByBaseline()
-                        .weight(1f, false)
-                )
-                Text(
-                    text = " • " + audio.durationMillis().millisToDuration(),
-                    style = MaterialTheme.typography.labelMedium,
-                    color = contentColor.copy(alpha = 0.7f),
-                    maxLines = maxLines,
-                    modifier = Modifier.alignByBaseline()
-                )
-            }
+            Text(
+                text = " • " + audio.durationMillis().millisToDuration(),
+                style = MaterialTheme.typography.labelMedium,
+                color = contentColor.copy(alpha = 0.7f),
+                maxLines = maxLines,
+                modifier = Modifier.alignByBaseline()
+            )
         }
     }
 }

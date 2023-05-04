@@ -1,9 +1,10 @@
 plugins {
-    id 'com.android.application'
-    id 'org.jetbrains.kotlin.android'
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.cacheFixPlugin)
     id 'dagger.hilt.android.plugin'
+    id 'kotlin-kapt'
 }
-apply plugin: 'kotlin-kapt'
 
 android {
     namespace 'com.sarahang.sample'
@@ -25,18 +26,11 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
     buildFeatures {
         compose true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
+        kotlinCompilerExtensionVersion libs.versions.composecompiler.get()
     }
 }
 
@@ -65,7 +59,7 @@ dependencies {
 
     implementation(libs.dataStore)
 
-    implementation libs.hilt.library
+    implementation libs.hilt.android
     kapt libs.hilt.compiler
 
     implementation libs.androidx.hilt.navigation

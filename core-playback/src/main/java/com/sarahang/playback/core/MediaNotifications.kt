@@ -96,12 +96,12 @@ class MediaNotificationsImpl @Inject constructor(
         val style = NotificationMediaCompat.MediaStyle()
             .setMediaSession(mediaSession.sessionToken)
             .setShowCancelButton(true)
-            .setShowActionsInCompactView(0, 1, 2)
+            .setShowActionsInCompactView(0)
             .setCancelButtonIntent(buildMediaButtonPendingIntent(context, ACTION_STOP))
 
         val builder = NotificationCompat.Builder(context, CHANNEL_ID).apply {
             setStyle(style)
-            setSmallIcon(R.drawable.ic_player_logo)
+            setSmallIcon(R.drawable.ic_launcher_foreground)
             setLargeIcon(artwork)
             setContentIntent(clickIntent)
             setContentTitle(trackName)
@@ -170,7 +170,7 @@ class MediaNotificationsImpl @Inject constructor(
     private fun createEmptyNotification(): Notification {
         createNotificationChannel()
         return NotificationCompat.Builder(context, CHANNEL_ID).apply {
-            setSmallIcon(R.drawable.ic_play_arrow)
+            setSmallIcon(R.drawable.ic_launcher_foreground)
             setContentTitle(context.getString(R.string.player_name))
             setColorized(true)
             setShowWhen(false)

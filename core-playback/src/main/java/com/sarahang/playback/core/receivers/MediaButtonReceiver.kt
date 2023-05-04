@@ -22,6 +22,7 @@ import timber.log.Timber
  * Copy of androidx.media.session.MediaButtonReceiver to set FLAG_MUTABLE to pending intents.
  * Converted to Kotlin via Intellij
  */
+@Suppress("DEPRECATION")
 class MediaButtonReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_MEDIA_BUTTON != intent.action || !intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {

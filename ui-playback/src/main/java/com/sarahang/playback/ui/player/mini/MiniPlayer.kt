@@ -85,9 +85,8 @@ fun MiniPlayer(
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
 
-    val visible = (playbackState to nowPlaying).isActive
     AnimatedVisibility(
-        visible = visible,
+        visible = (playbackState to nowPlaying).isActive,
         modifier = modifier,
         enter = slideInVertically(initialOffsetY = { it / 2 }),
         exit = slideOutVertically(targetOffsetY = { it / 2 })
@@ -125,14 +124,6 @@ fun PlaybackMiniControls(
                 modifier = modifier
                     .animateContentSize()
                     .clickable { openPlaybackSheet() }
-//                    .combinedClickable(
-//                        enabled = true,
-//                        onClick = openPlaybackSheet,
-//                        onLongClick = onPlayPause,
-//                        onDoubleClick = onPlayPause,
-//                        indication = null,
-//                        interactionSource = remember { MutableInteractionSource() },
-//                    )
                     // open playback sheet on swipe up
                     .draggable(
                         orientation = Orientation.Vertical,
@@ -160,7 +151,6 @@ fun PlaybackMiniControls(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .height(height)
                                 .fillMaxWidth()
                                 .background(backgroundColor)
                                 .onGloballyPositioned {
@@ -240,14 +230,14 @@ private fun PlaybackNowPlaying(audio: Audio, modifier: Modifier = Modifier) {
             text = audio.title.orNa(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
+            style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.basicMarquee()
         )
         Text(
             text = audio.subtitle.orNa(),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.labelMedium,
+            style = MaterialTheme.typography.labelSmall,
             modifier = Modifier.basicMarquee()
         )
     }
@@ -282,7 +272,6 @@ private fun WidePlayerControls(
     playbackState: PlaybackStateCompat,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.background,
-    contentColor: Color = LocalContentColor.current,
     smallRippleRadius: Dp = 30.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ) {
@@ -296,14 +285,23 @@ private fun WidePlayerControls(
         PlayerPreviousControl(
             playbackConnection = playbackConnection,
             smallRippleRadius = smallRippleRadius,
-            size = 24.dp,
-            color = contentColor,
+            modifier = Modifier
+                .size(24.dp)
+                .weight(1f),
             playbackState = playbackState
         )
+
         Spacer(Modifier.width(Specs.padding))
-        PlayerPlayControl(playbackConnection, playbackState, contentColor, 44.dp)
+        PlayerPlayControl(playbackConnection, playbackState, Modifier.size(44.dp))
         Spacer(Modifier.width(Specs.padding))
-        PlayerNextControl(playbackConnection, smallRippleRadius, 24.dp, contentColor, playbackState)
+        PlayerNextControl(
+            playbackConnection = playbackConnection,
+            smallRippleRadius = smallRippleRadius,
+            modifier = Modifier
+                .size(24.dp)
+                .weight(1f),
+            playbackState = playbackState
+        )
         Spacer(Modifier.width(Specs.paddingLarge))
     }
 }

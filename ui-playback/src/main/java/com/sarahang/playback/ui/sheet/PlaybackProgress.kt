@@ -15,6 +15,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,24 +38,24 @@ import timber.log.Timber
 import kotlin.math.roundToLong
 
 @Composable
-internal fun PlaybackProgress(
+fun PlaybackProgress(
     playbackState: PlaybackStateCompat,
-    contentColor: Color,
     thumbRadius: Dp = 4.dp,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
+    modifier: Modifier = Modifier,
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     val progressState by playbackConnection.playbackProgress.collectAsStateWithLifecycle()
     val (draggingProgress, setDraggingProgress) = remember { mutableStateOf<Float?>(null) }
     val isDragging by derivedStateOf { draggingProgress != null }
 
-    Box {
+    Box(modifier) {
         PlaybackProgressSlider(
             playbackState = playbackState,
             progressState = progressState,
             draggingProgress = draggingProgress,
             setDraggingProgress = setDraggingProgress,
             thumbRadius = if (isDragging) thumbRadius * 3 else thumbRadius,
-            contentColor = contentColor
+            contentColor = contentColorFor(LocalContentColor.current)
         )
         PlaybackProgressDuration(progressState, draggingProgress, thumbRadius)
     }

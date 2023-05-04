@@ -34,6 +34,7 @@ interface AudioFocusHelper {
     fun setVolume(volume: Int)
 }
 
+@Suppress("DEPRECATION")
 class AudioFocusHelperImpl @Inject constructor(
     @ApplicationContext context: Context
 ) : AudioFocusHelper, OnAudioFocusChangeListener {

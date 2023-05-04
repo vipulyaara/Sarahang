@@ -7,7 +7,6 @@ package com.sarahang.playback.ui.components
 import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -36,9 +35,6 @@ import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.placeholder.shimmer
 
 @Composable
 fun CoverImage(
@@ -83,20 +79,6 @@ fun CoverImage(
                             .fillMaxSize()
                             .background(SnackbarDefaults.color)
                             .padding(iconPadding)
-                    )
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .placeholder(
-                                visible = state is State.Loading,
-                                color = Color.Transparent,
-                                shape = shape,
-                                highlight = PlaceholderHighlight.shimmer(
-                                    highlightColor = contentColor.copy(
-                                        alpha = .15f
-                                    )
-                                ),
-                            )
                     )
                 }
 

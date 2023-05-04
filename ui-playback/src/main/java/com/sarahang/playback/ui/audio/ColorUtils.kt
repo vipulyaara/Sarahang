@@ -13,6 +13,7 @@ import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
@@ -60,10 +61,7 @@ import android.graphics.Color as AColor
 val ADAPTIVE_COLOR_ANIMATION: AnimationSpec<Color> = tween(easing = FastOutSlowInEasing)
 
 @Immutable
-data class AdaptiveColorResult(val color: Color, val contentColor: Color, val gradient: Brush) {
-    val backgroundColor = color.copy(alpha = 0.10f)
-    val borderColor = color.copy(alpha = 0.4f)
-}
+data class AdaptiveColorResult(val color: Color, val contentColor: Color, val gradient: Brush)
 
 fun Color.toAdaptiveColor(
     isDarkColors: Boolean,
@@ -115,7 +113,7 @@ fun adaptiveColor(
     initial: Color = fallback,
     animationSpec: AnimationSpec<Color> = ADAPTIVE_COLOR_ANIMATION,
     gradientEndColor: Color = if (PlayerTheme.isLightTheme) Color.White else Color.Black,
-    isDarkColors: Boolean = !PlayerTheme.isLightTheme
+    isDarkColors: Boolean = isSystemInDarkTheme()
 ): State<AdaptiveColorResult> {
     val imageHash = imageSource.hashCode().toString()
     val initialAccent = adaptiveColorCache.getOrElse(imageHash) { initial }

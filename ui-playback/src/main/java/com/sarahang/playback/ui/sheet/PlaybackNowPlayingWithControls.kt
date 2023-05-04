@@ -6,7 +6,6 @@ import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.RepeatOneOn
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -64,7 +64,6 @@ object PlaybackNowPlayingDefaults {
 internal fun PlaybackNowPlayingWithControls(
     nowPlaying: MediaMetadataCompat,
     playbackState: PlaybackStateCompat,
-    color: Color,
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -83,17 +82,12 @@ internal fun PlaybackNowPlayingWithControls(
                 onArtistClick = onArtistClick,
                 titleTextStyle = titleTextStyle,
                 artistTextStyle = artistTextStyle,
-                contentColor = color,
             )
 
-        PlaybackProgress(
-            playbackState = playbackState,
-            contentColor = color
-        )
+        PlaybackProgress(playbackState = playbackState)
 
         PlaybackControls(
             playbackState = playbackState,
-            color = color,
             modifier = Modifier.padding(top = 12.dp)
         )
     }
@@ -108,10 +102,10 @@ internal fun PlaybackNowPlaying(
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
-    contentColor: Color = MaterialTheme.colorScheme.surface,
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ) {
     val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
+
     Column(
         horizontalAlignment = horizontalAlignment,
         modifier = modifier
@@ -131,7 +125,7 @@ internal fun PlaybackNowPlaying(
             style = artistTextStyle,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            color = MaterialTheme.colorScheme.secondary,
+            color = LocalContentColor.current.disabledAlpha(condition = true),
             modifier = Modifier
                 .simpleClickable(onClick = onArtistClick)
                 .basicMarquee()
@@ -141,20 +135,12 @@ internal fun PlaybackNowPlaying(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.End
         ) {
-            ShuffleButton(
-                playbackConnection = playbackConnection,
-                smallRippleRadius = 30.dp,
-                playbackMode = playbackMode,
-                contentColor = contentColor
-            )
-
             RepeatButton(
                 playbackConnection = playbackConnection,
                 smallRippleRadius = 30.dp,
-                playbackMode = playbackMode,
-                contentColor = contentColor
+                playbackMode = playbackMode
             )
         }
     }
@@ -163,7 +149,6 @@ internal fun PlaybackNowPlaying(
 @Composable
 internal fun PlaybackControls(
     playbackState: PlaybackStateCompat,
-    color: Color,
     modifier: Modifier = Modifier,
     smallRippleRadius: Dp = 30.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
@@ -173,10 +158,9 @@ internal fun PlaybackControls(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Rewind(
+        RewindControl(
             playbackConnection = playbackConnection,
             smallRippleRadius = smallRippleRadius,
-            color = color,
             modifier = Modifier
                 .size(20.dp)
                 .weight(2f)
@@ -187,8 +171,9 @@ internal fun PlaybackControls(
         PlayerPreviousControl(
             playbackConnection = playbackConnection,
             smallRippleRadius = smallRippleRadius,
-            size = 40.dp,
-            color = color,
+            modifier = Modifier
+                .size(40.dp)
+                .weight(4f),
             playbackState = playbackState
         )
 
@@ -197,8 +182,9 @@ internal fun PlaybackControls(
         PlayerPlayControl(
             playbackConnection = playbackConnection,
             playbackState = playbackState,
-            contentColor = color,
-            size = 80.dp
+            modifier = Modifier
+                .size(80.dp)
+                .weight(8f)
         )
 
         Spacer(Modifier.width(Specs.padding))
@@ -206,17 +192,17 @@ internal fun PlaybackControls(
         PlayerNextControl(
             playbackConnection = playbackConnection,
             smallRippleRadius = smallRippleRadius,
-            size = 40.dp,
-            color = color,
-            playbackState = playbackState
+            playbackState = playbackState,
+            modifier = Modifier
+                .size(40.dp)
+                .weight(4f)
         )
 
         Spacer(Modifier.width(Specs.paddingLarge))
 
-        FastForward(
+        FastForwardControl(
             playbackConnection = playbackConnection,
             smallRippleRadius = smallRippleRadius,
-            color = color,
             modifier = Modifier
                 .size(20.dp)
                 .weight(2f)
@@ -225,10 +211,30 @@ internal fun PlaybackControls(
 }
 
 @Composable
-private fun Rewind(
+internal fun PlayerPreviousControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    color: Color,
+    playbackState: PlaybackStateCompat,
+    modifier: Modifier = Modifier
+) {
+    IconButton(
+        onClick = { playbackConnection.transportControls?.skipToPrevious() },
+        rippleRadius = smallRippleRadius,
+        modifier = modifier
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.Previous),
+            tint = LocalContentColor.current.disabledAlpha(playbackState.hasPrevious),
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = null
+        )
+    }
+}
+
+@Composable
+private fun RewindControl(
+    playbackConnection: PlaybackConnection,
+    smallRippleRadius: Dp,
     modifier: Modifier = Modifier
 ) {
     IconButton(
@@ -238,7 +244,6 @@ private fun Rewind(
     ) {
         Icon(
             painter = rememberVectorPainter(PlayerIcons.Rewind),
-            tint = color,
             modifier = Modifier.fillMaxSize(),
             contentDescription = null
         )
@@ -246,10 +251,9 @@ private fun Rewind(
 }
 
 @Composable
-private fun FastForward(
+private fun FastForwardControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    color: Color,
     modifier: Modifier = Modifier
 ) {
     IconButton(
@@ -258,8 +262,7 @@ private fun FastForward(
         modifier = modifier
     ) {
         Icon(
-            painter = rememberVectorPainter(PlayerIcons.FasForward),
-            tint = color,
+            painter = rememberVectorPainter(PlayerIcons.FastForward),
             modifier = Modifier.fillMaxSize(),
             contentDescription = null
         )
@@ -267,47 +270,20 @@ private fun FastForward(
 }
 
 @Composable
-internal fun RowScope.PlayerPreviousControl(
+internal fun PlayerNextControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    size: Dp,
-    color: Color,
-    playbackState: PlaybackStateCompat
-) {
-    IconButton(
-        onClick = { playbackConnection.transportControls?.skipToPrevious() },
-        rippleRadius = smallRippleRadius,
-        modifier = Modifier
-            .size(size)
-            .weight(4f)
-    ) {
-        Icon(
-            painter = rememberVectorPainter(PlayerIcons.Previous),
-            tint = color.disabledAlpha(playbackState.hasPrevious),
-            modifier = Modifier.fillMaxSize(),
-            contentDescription = null
-        )
-    }
-}
-
-@Composable
-internal fun RowScope.PlayerNextControl(
-    playbackConnection: PlaybackConnection,
-    smallRippleRadius: Dp,
-    size: Dp,
-    color: Color,
-    playbackState: PlaybackStateCompat
+    playbackState: PlaybackStateCompat,
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.transportControls?.skipToNext() },
         rippleRadius = smallRippleRadius,
-        modifier = Modifier
-            .size(size)
-            .weight(4f)
+        modifier = modifier
     ) {
         Icon(
             painter = rememberVectorPainter(PlayerIcons.Next),
-            tint = color.disabledAlpha(playbackState.hasNext),
+            tint = LocalContentColor.current.disabledAlpha(playbackState.hasNext),
             modifier = Modifier.fillMaxSize(),
             contentDescription = null
         )
@@ -315,17 +291,14 @@ internal fun RowScope.PlayerNextControl(
 }
 
 @Composable
-internal fun RowScope.PlayerPlayControl(
+internal fun PlayerPlayControl(
     playbackConnection: PlaybackConnection,
     playbackState: PlaybackStateCompat,
-    contentColor: Color,
-    size: Dp
+    modifier: Modifier = Modifier
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.playPause() },
-        modifier = Modifier
-            .size(size)
-            .weight(8f),
+        modifier = modifier,
         rippleRadius = 35.dp,
     ) {
         val painter = rememberVectorPainter(
@@ -338,7 +311,6 @@ internal fun RowScope.PlayerPlayControl(
         )
         Icon(
             painter = painter,
-            tint = contentColor,
             modifier = Modifier.fillMaxSize(),
             contentDescription = null
         )
@@ -350,13 +322,12 @@ private fun RepeatButton(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
     playbackMode: PlaybackModeState,
-    contentColor: Color,
     modifier: Modifier = Modifier
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
         rippleRadius = smallRippleRadius,
-        modifier = modifier.size(20.dp)
+        modifier = modifier.size(24.dp)
     ) {
         Icon(
             painter = rememberVectorPainter(
@@ -366,7 +337,6 @@ private fun RepeatButton(
                     else -> Icons.Default.Repeat
                 }
             ),
-            tint = contentColor,
             modifier = Modifier.fillMaxSize(),
             contentDescription = null
         )
@@ -383,7 +353,7 @@ private fun ShuffleButton(
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.toggleShuffleMode() },
-        modifier = modifier.size(20.dp),
+        modifier = modifier.size(24.dp),
         rippleRadius = smallRippleRadius,
     ) {
         Icon(

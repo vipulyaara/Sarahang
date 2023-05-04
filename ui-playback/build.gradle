@@ -2,8 +2,8 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'dagger.hilt.android.plugin'
+    id 'kotlin-kapt'
 }
-apply plugin: 'kotlin-kapt'
 
 android {
     namespace 'com.sarahang.playback.ui'
@@ -23,18 +23,18 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+
     buildFeatures {
         compose true
     }
+
     composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.composeCompiler.get()
+        kotlinCompilerExtensionVersion libs.versions.composecompiler.get()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
@@ -55,7 +55,6 @@ dependencies {
     implementation(libs.compose.ui.util)
     implementation libs.compose.ui.textfonts
 
-    implementation(libs.accompanist.pager.core)
     implementation(libs.accompanist.placeholder)
 
     implementation libs.androidx.lifecycle.runtime
@@ -65,10 +64,10 @@ dependencies {
     implementation libs.androidx.palette
     implementation libs.exoplayer.core
     implementation libs.exoplayer.okhttp
-    implementation libs.hilt.library
+    implementation libs.hilt.android
     implementation libs.kotlin.serialization
 
-    implementation libs.hilt.library
+    implementation libs.hilt.android
     kapt libs.hilt.compiler
 
     implementation libs.androidx.hilt.navigation
@@ -86,5 +85,3 @@ dependencies {
 
     implementation libs.compose.runtime.runtime
 }
-
-//apply plugin: 'com.vanniktech.maven.publish'

@@ -1,5 +1,6 @@
 package com.sarahang.playback.core.injection
 
+import android.app.Application
 import android.content.ComponentName
 import android.content.Context
 import androidx.lifecycle.ProcessLifecycleOwner
@@ -38,6 +39,10 @@ abstract class PlaybackCoreModule {
         @Provides
         @Named("process")
         fun processScope(): CoroutineScope = ProcessLifecycleOwner.get().lifecycleScope
+
+        @Provides
+        @Singleton
+        fun okHttpCache(app: Application) = Cache(app.cacheDir, (10 * 1024 * 1024).toLong())
 
         @Provides
         @Named("player")

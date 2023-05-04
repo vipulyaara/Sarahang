@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -19,6 +21,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -48,7 +51,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.pager.rememberPagerState
 import com.sarahang.playback.core.NONE_PLAYBACK_STATE
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artwork
@@ -141,6 +143,8 @@ internal fun PlaybackSheet(
             ) { paddings ->
                 LazyColumn(
                     state = listState,
+                    modifier = Modifier
+                        .fillMaxWidth(),
                     contentPadding = paddings.copy(top = 0.dp),
                 ) {
                     if (onClose != null) {
@@ -164,6 +168,7 @@ internal fun PlaybackSheet(
                             artworkVerticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
                                 .fillParentMaxHeight(fraction = 0.70f)
+                                .fillParentMaxWidth()
                                 .padding(vertical = 12.dp),
                         )
                     }
@@ -175,6 +180,8 @@ internal fun PlaybackSheet(
                             adaptiveColor = adaptiveColor
                         )
                     }
+
+                    item { Spacer(Modifier.height(100.dp)) }
                 }
             }
         }
@@ -268,10 +275,9 @@ private fun PlaybackSheetTopBarTitle(
             .fillMaxWidth()
             .basicMarquee()
     ) {
-        val context = LocalContext.current
         val queueTitle = QueueTitle.from(playbackQueue.title.orEmpty())
         Text(
-            text = queueTitle.localizeValue(context).uppercase(),
+            text = queueTitle.localizeValue().uppercase(),
             style = MaterialTheme.typography.labelSmall,
             maxLines = 1,
             modifier = Modifier.simpleClickable { onTitleClick() },

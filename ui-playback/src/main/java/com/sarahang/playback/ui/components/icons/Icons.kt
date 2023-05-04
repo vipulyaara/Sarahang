@@ -29,7 +29,7 @@ object Icons {
         get() = FontAwesomeIcons.Solid.Forward
     val Previous: ImageVector
         get() = FontAwesomeIcons.Solid.Backward
-    val FasForward: ImageVector
+    val FastForward: ImageVector
         get() = FeatherIcons.RotateCw
     val Rewind: ImageVector
         get() = FeatherIcons.RotateCcw
