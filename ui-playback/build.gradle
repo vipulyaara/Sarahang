@@ -81,7 +81,6 @@ dependencies {
 
     implementation libs.timber
     implementation libs.dataStore
-    implementation libs.lottie.compose
 
     implementation libs.compose.runtime.runtime
 }
