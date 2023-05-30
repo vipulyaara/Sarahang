@@ -35,12 +35,13 @@ internal fun PlaybackPager(
     nowPlaying: MediaMetadataCompat,
     modifier: Modifier = Modifier,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    pagerState: PagerState = rememberPagerState(),
+    currentIndex: Int = 0,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     content: @Composable (Audio, Int, Modifier) -> Unit,
 ) {
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
     val playbackCurrentIndex = playbackQueue.currentIndex
+    val pagerState = rememberPagerState(currentIndex, pageCount =  { playbackQueue.size })
     var lastRequestedPage by remember(playbackQueue, nowPlaying) {
         mutableStateOf<Int?>(playbackCurrentIndex)
     }
@@ -68,7 +69,6 @@ internal fun PlaybackPager(
     }
 
     HorizontalPager(
-        pageCount = playbackQueue.size,
         modifier = modifier,
         state = pagerState,
         contentPadding = PaddingValues(horizontal = Specs.paddingLarge),

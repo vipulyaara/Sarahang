@@ -297,9 +297,14 @@ fun Int.toColors() = Color(this)
 
 
 @Composable
-fun Color.contrastComposite(alpha: Float = 0.1f) = contentColorFor(this).copy(alpha = alpha).compositeOver(this)
+fun Color.contrastComposite(alpha: Float = 0.1f) =
+    contentColorFor(this).copy(alpha = alpha).compositeOver(this)
 
-suspend fun Context.getBitmap(data: Any?, size: Int = Int.MAX_VALUE, allowHardware: Boolean = true): Bitmap? {
+suspend fun Context.getBitmap(
+    data: Any?,
+    size: Int = Int.MAX_VALUE,
+    allowHardware: Boolean = true
+): Bitmap? {
     val request = ImageRequest.Builder(this)
         .data(data)
         .size(size)
@@ -316,11 +321,28 @@ suspend fun Context.getBitmap(data: Any?, size: Int = Int.MAX_VALUE, allowHardwa
     }
 }
 
-
 @Composable
 fun nowPlayingArtworkAdaptiveColor(
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ): State<AdaptiveColorResult> {
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
     return adaptiveColor(nowPlaying.artwork, initial = MaterialTheme.colorScheme.background)
+}
+
+@Composable
+fun materialYouAdaptiveColor(): State<AdaptiveColorResult> {
+    val primary = MaterialTheme.colorScheme.primary
+    val onPrimary = MaterialTheme.colorScheme.onPrimary
+
+    val adaptiveColor = remember {
+        mutableStateOf(
+            AdaptiveColorResult(
+                primary,
+                onPrimary,
+                Brush.verticalGradient(listOf(primary, Color.Transparent))
+            )
+        )
+    }
+
+    return adaptiveColor
 }

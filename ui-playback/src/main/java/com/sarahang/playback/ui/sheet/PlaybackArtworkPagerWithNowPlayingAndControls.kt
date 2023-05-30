@@ -31,7 +31,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
     artworkVerticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
-    pagerState: PagerState = rememberPagerState(),
+    currentIndex: Int = 0,
     onArtworkClick: (() -> Unit)? = null,
     onTitleClick: () -> Unit = {},
     onArtistClick: () -> Unit = {},
@@ -40,7 +40,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
         val (pager, nowPlayingControls) = createRefs()
         PlaybackPager(
             nowPlaying = nowPlaying,
-            pagerState = pagerState,
+            currentIndex = currentIndex,
             modifier = Modifier
                 .constrainAs(pager) {
                     centerHorizontallyTo(parent)

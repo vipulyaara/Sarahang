@@ -21,7 +21,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -44,7 +43,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -100,7 +98,6 @@ internal fun PlaybackSheet(
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(playbackQueue.currentIndex)
 
     val adaptiveColor by adaptiveColor(
         image = nowPlaying.artwork,
@@ -161,7 +158,7 @@ internal fun PlaybackSheet(
                         PlaybackArtworkPagerWithNowPlayingAndControls(
                             nowPlaying = nowPlaying,
                             playbackState = playbackState,
-                            pagerState = pagerState,
+                            currentIndex = playbackQueue.currentIndex,
                             color = color,
                             onTitleClick = goToItem,
                             onArtistClick = goToCreator,

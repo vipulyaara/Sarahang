@@ -138,7 +138,7 @@ private fun Description(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = audio.artist.toString(),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 color = contentColor.copy(alpha = 0.7f),
                 maxLines = maxLines,
                 overflow = TextOverflow.Ellipsis,
@@ -148,7 +148,7 @@ private fun Description(
             )
             Text(
                 text = " • " + audio.durationMillis().millisToDuration(),
-                style = MaterialTheme.typography.labelMedium,
+                style = MaterialTheme.typography.labelSmall,
                 color = contentColor.copy(alpha = 0.7f),
                 maxLines = maxLines,
                 modifier = Modifier.alignByBaseline()

@@ -40,13 +40,13 @@ import kotlin.math.roundToLong
 @Composable
 fun PlaybackProgress(
     playbackState: PlaybackStateCompat,
-    thumbRadius: Dp = 4.dp,
     modifier: Modifier = Modifier,
+    thumbRadius: Dp = 4.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     val progressState by playbackConnection.playbackProgress.collectAsStateWithLifecycle()
     val (draggingProgress, setDraggingProgress) = remember { mutableStateOf<Float?>(null) }
-    val isDragging by derivedStateOf { draggingProgress != null }
+    val isDragging by remember { derivedStateOf { draggingProgress != null } }
 
     Box(modifier) {
         PlaybackProgressSlider(
