@@ -72,7 +72,11 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 
 @Composable
-fun PlaybackSheet(onClose: (() -> Unit)?, goToItem: () -> Unit = {}, goToCreator: () -> Unit = {}) {
+fun PlaybackSheet(
+    onClose: (() -> Unit)?,
+    goToItem: () -> Unit = {},
+    goToCreator: () -> Unit = {}
+) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
@@ -248,7 +252,7 @@ private fun PlaybackSheetTopBar(
                     Icon(
                         painter = rememberVectorPainter(Icons.Default.KeyboardArrowDown),
                         modifier = Modifier.size(Specs.iconSize),
-                        contentDescription = null,
+                        contentDescription = stringResource(R.string.cd_minimize_player),
                     )
                 }
             },

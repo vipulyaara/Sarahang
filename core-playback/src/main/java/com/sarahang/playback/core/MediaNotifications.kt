@@ -30,6 +30,7 @@ import androidx.media.app.NotificationCompat as NotificationMediaCompat
 const val NOTIFICATION_ID = 2000
 const val CHANNEL_ID = "audio-player"
 
+const val APP_PACKAGE_NAME = "com.kafka.user"
 const val PREVIOUS = "action_previous"
 const val NEXT = "action_next"
 const val STOP_PLAYBACK = "action_stop"
@@ -46,6 +47,7 @@ const val PLAY_ACTION = "action_play"
 const val PAUSE_ACTION = "action_pause"
 const val SWAP_ACTION = "swap_action"
 const val BY_UI_KEY = "by_ui_key"
+const val ACTION_QUIT = "$APP_PACKAGE_NAME.quitService"
 
 interface MediaNotifications {
     fun updateNotification(mediaSession: MediaSessionCompat)

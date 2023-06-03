@@ -2,11 +2,11 @@ package com.sarahang.playback.ui.sheet
 
 import android.support.v4.media.MediaMetadataCompat
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -28,7 +28,7 @@ internal fun PlaybackArtwork(
 ) {
     CoverImage(
         data = artwork?.toUri(),
-        shape = RectangleShape,
+        shape = RoundedCornerShape(8.dp),
         containerColor = Color.Transparent,
         contentColor = contentColor,
         bitmapPlaceholder = nowPlaying.artwork,
@@ -36,12 +36,13 @@ internal fun PlaybackArtwork(
             .padding(horizontal = 32.dp)
             .then(modifier),
         imageModifier = Modifier
-            .coloredRippleClickable(onClick = {
-                if (onClick != null) onClick.invoke()
-                else playbackConnection.mediaController?.playPause()
-            },
-            color = contentColor,
-            rippleRadius = Dp.Unspecified,
-        ),
+            .coloredRippleClickable(
+                onClick = {
+                    if (onClick != null) onClick.invoke()
+                    else playbackConnection.mediaController?.playPause()
+                },
+                color = contentColor,
+                rippleRadius = Dp.Unspecified,
+            ),
     )
 }

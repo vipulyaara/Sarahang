@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
+import com.sarahang.playback.core.ACTION_QUIT
 import com.sarahang.playback.core.MediaNotificationsImpl
 import com.sarahang.playback.core.NEXT
 import com.sarahang.playback.core.NOTIFICATION_ID
@@ -39,7 +40,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
     }
 
     @Inject
-    protected lateinit var rekhtaPlayer: SarahangPlayerImpl
+    protected lateinit var player: SarahangPlayerImpl
 
     @Inject
     protected lateinit var audioDataSource: AudioDataSource
@@ -52,11 +53,11 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
     override fun onCreate() {
         super.onCreate()
 
-        sessionToken = rekhtaPlayer.getSession().sessionToken
+        sessionToken = player.getSession().sessionToken
         becomingNoisyReceiver = BecomingNoisyReceiver(this, sessionToken!!)
 
-        rekhtaPlayer.onPlayingState { isPlaying, byUi ->
-            val isIdle = rekhtaPlayer.getSession().controller.playbackState.isIdle
+        player.onPlayingState { isPlaying, byUi ->
+            val isIdle = player.getSession().controller.playbackState.isIdle
             if (!isPlaying && isIdle) {
                 pauseForeground(byUi)
                 mediaNotifications.clearNotifications()
@@ -67,7 +68,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             mediaNotifications.updateNotification(getSession())
         }
 
-        rekhtaPlayer.onMetaDataChanged {
+        player.onMetaDataChanged {
             mediaNotifications.updateNotification(getSession())
         }
     }
@@ -80,7 +81,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
         Timber.d("Starting foreground service")
         startForeground(
             NOTIFICATION_ID,
-            mediaNotifications.buildNotification(rekhtaPlayer.getSession())
+            mediaNotifications.buildNotification(player.getSession())
         )
         becomingNoisyReceiver.register()
         IS_FOREGROUND = true
@@ -102,7 +103,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             return START_STICKY
         }
 
-        val mediaSession = rekhtaPlayer.getSession()
+        val mediaSession = player.getSession()
         val controller = mediaSession.controller
 
         when (intent.action) {
@@ -110,6 +111,11 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             NEXT -> controller.transportControls.skipToNext()
             PREVIOUS -> controller.transportControls.skipToPrevious()
             STOP_PLAYBACK -> controller.transportControls.stop()
+            ACTION_QUIT -> {
+                Timber.d("Quitting service by request")
+                controller.transportControls.pause()
+                pauseForeground(true)
+            }
         }
 
         MediaButtonReceiver.handleIntent(mediaSession, intent)
@@ -146,17 +152,17 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
     override fun onTaskRemoved(rootIntent: Intent) {
         launch {
-            rekhtaPlayer.pause()
-            rekhtaPlayer.saveQueueState()
-            rekhtaPlayer.stop(false)
+            player.pause()
+            player.saveQueueState()
+            player.stop(false)
         }
         super.onTaskRemoved(rootIntent)
     }
 
     override fun onDestroy() {
         launch {
-            rekhtaPlayer.saveQueueState()
-            rekhtaPlayer.release()
+            player.saveQueueState()
+            player.release()
         }
     }
 }

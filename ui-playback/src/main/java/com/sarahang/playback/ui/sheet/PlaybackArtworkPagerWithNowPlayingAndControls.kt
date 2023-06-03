@@ -34,7 +34,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
     currentIndex: Int = 0,
     onArtworkClick: (() -> Unit)? = null,
     onTitleClick: () -> Unit = {},
-    onArtistClick: () -> Unit = {},
+    onArtistClick: () -> Unit = {}
 ) {
     ConstraintLayout(modifier = modifier.fillMaxSize()) {
         val (pager, nowPlayingControls) = createRefs()

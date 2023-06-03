@@ -161,7 +161,9 @@ class PlaybackConnectionImpl(
             // if not, try to override current index by finding audio via now playing id
             when (synced) {
                 true -> it
-                else -> it.copy(isIndexValid = false, currentIndex = it.indexOfFirst { a -> a.id == nowPlayingId })
+                else -> it.copy(
+                    isIndexValid = false,
+                    currentIndex = it.indexOfFirst { a -> a.id == nowPlayingId })
             }
         }
     }
@@ -176,7 +178,8 @@ class PlaybackConnectionImpl(
         }
     }
 
-    override fun playAudio(audio: Audio, title: QueueTitle) = playAudios(audios = listOf(audio), index = 0, title = title)
+    override fun playAudio(audio: Audio, title: QueueTitle) =
+        playAudios(audios = listOf(audio), index = 0, title = title)
 
     override fun playAudios(audios: List<Audio>, index: Int, title: QueueTitle) {
         val audiosIds = audios.map { it.id }.toTypedArray()
@@ -191,7 +194,10 @@ class PlaybackConnectionImpl(
     }
 
     override fun playAlbum(albumId: String, index: Int) {
-        transportControls?.playFromMediaId(MediaId(MEDIA_TYPE_ALBUM, albumId, index).toString(), null)
+        transportControls?.playFromMediaId(
+            MediaId(MEDIA_TYPE_ALBUM, albumId, index).toString(),
+            null
+        )
     }
 
     override fun playNextAudio(audio: Audio) {

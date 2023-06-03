@@ -26,10 +26,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -48,11 +52,13 @@ import com.sarahang.playback.core.playPause
 import com.sarahang.playback.core.title
 import com.sarahang.playback.core.toggleRepeatMode
 import com.sarahang.playback.core.toggleShuffleMode
+import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.IconButton
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.disabledAlpha
 import com.sarahang.playback.ui.theme.orNa
 import com.sarahang.playback.ui.theme.simpleClickable
+import com.sarahang.playback.ui.timer.SleepTimer
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
@@ -135,13 +141,10 @@ internal fun PlaybackNowPlaying(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            RepeatButton(
-                playbackConnection = playbackConnection,
-                smallRippleRadius = 30.dp,
-                playbackMode = playbackMode
-            )
+            RepeatButton(playbackConnection = playbackConnection, playbackMode = playbackMode)
+            SleepTimerButton()
         }
     }
 }
@@ -150,7 +153,7 @@ internal fun PlaybackNowPlaying(
 internal fun PlaybackControls(
     playbackState: PlaybackStateCompat,
     modifier: Modifier = Modifier,
-    smallRippleRadius: Dp = 30.dp,
+    smallRippleRadius: Dp = SmallRippleRadius,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ) {
     Row(
@@ -226,7 +229,7 @@ internal fun PlayerPreviousControl(
             painter = rememberVectorPainter(PlayerIcons.Previous),
             tint = LocalContentColor.current.disabledAlpha(playbackState.hasPrevious),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = stringResource(R.string.cd_previous)
         )
     }
 }
@@ -245,7 +248,7 @@ private fun RewindControl(
         Icon(
             painter = rememberVectorPainter(PlayerIcons.Rewind),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = stringResource(R.string.cd_rewind)
         )
     }
 }
@@ -264,7 +267,7 @@ private fun FastForwardControl(
         Icon(
             painter = rememberVectorPainter(PlayerIcons.FastForward),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = stringResource(R.string.cd_fast_forward)
         )
     }
 }
@@ -285,7 +288,7 @@ internal fun PlayerNextControl(
             painter = rememberVectorPainter(PlayerIcons.Next),
             tint = LocalContentColor.current.disabledAlpha(playbackState.hasNext),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = stringResource(R.string.cd_next)
         )
     }
 }
@@ -312,7 +315,30 @@ internal fun PlayerPlayControl(
         Icon(
             painter = painter,
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = when {
+                playbackState.isError -> stringResource(R.string.cd_play_error)
+                playbackState.isPlaying -> stringResource(R.string.cd_pause)
+                playbackState.isPlayEnabled -> stringResource(R.string.cd_play)
+                else -> stringResource(R.string.cd_play)
+            }
+        )
+    }
+}
+
+@Composable
+private fun SleepTimerButton(modifier: Modifier = Modifier) {
+    var showTimer by remember { mutableStateOf(false) }
+    if (showTimer) { SleepTimer { showTimer = false } }
+
+    IconButton(
+        onClick = { showTimer = true },
+        rippleRadius = SmallRippleRadius,
+        modifier = modifier.size(24.dp)
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.TimerOff),
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = stringResource(R.string.cd_sleep_timer)
         )
     }
 }
@@ -320,13 +346,12 @@ internal fun PlayerPlayControl(
 @Composable
 private fun RepeatButton(
     playbackConnection: PlaybackConnection,
-    smallRippleRadius: Dp,
     playbackMode: PlaybackModeState,
     modifier: Modifier = Modifier
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
-        rippleRadius = smallRippleRadius,
+        rippleRadius = SmallRippleRadius,
         modifier = modifier.size(24.dp)
     ) {
         Icon(
@@ -338,7 +363,11 @@ private fun RepeatButton(
                 }
             ),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = when (playbackMode.repeatMode) {
+                PlaybackStateCompat.REPEAT_MODE_ONE -> stringResource(R.string.cd_repeat_one_on)
+                PlaybackStateCompat.REPEAT_MODE_ALL -> stringResource(R.string.cd_repeat_all_on)
+                else -> stringResource(R.string.cd_repeat_off)
+            }
         )
     }
 }
@@ -366,7 +395,9 @@ private fun ShuffleButton(
             ),
             tint = contentColor,
             modifier = Modifier.fillMaxSize(),
-            contentDescription = null
+            contentDescription = stringResource(R.string.cd_shuffle)
         )
     }
 }
+
+private val SmallRippleRadius = 30.dp

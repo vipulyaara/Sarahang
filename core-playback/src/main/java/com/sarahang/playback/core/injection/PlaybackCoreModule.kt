@@ -15,6 +15,8 @@ import com.sarahang.playback.core.players.AudioPlayerImpl
 import com.sarahang.playback.core.players.SarahangPlayer
 import com.sarahang.playback.core.players.SarahangPlayerImpl
 import com.sarahang.playback.core.services.PlayerService
+import com.sarahang.playback.core.timer.SleepTimer
+import com.sarahang.playback.core.timer.SleepTimerImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -76,6 +78,9 @@ abstract class PlaybackCoreModule {
 
     @Binds
     abstract fun provideSarahangPlayer(bind: SarahangPlayerImpl): SarahangPlayer
+
+    @Binds
+    abstract fun provideSleepTimer(bind: SleepTimerImpl): SleepTimer
 }
 
 private val PLAYER_TIMEOUT = 2.minutes.inWholeMilliseconds

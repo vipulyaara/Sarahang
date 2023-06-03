@@ -26,5 +26,19 @@
     <string name="playback.queueTitle.album" translatable="false">Playing from album</string>
     <string name="playback.queueTitle.playlist" translatable="false">Playing from playlist</string>
     <string name="playback.queueTitle.search" translatable="false">Playing from search</string>
+    <string name="cd_open_player">Open player</string>
+    <string name="cd_minimize_player">Minimize Player</string>
+    <string name="cd_shuffle">Shuffle</string>
+    <string name="cd_repeat_one_on">Repeat one on</string>
+    <string name="cd_repeat_all_on">Repeat all on</string>
+    <string name="cd_repeat_off">Repeat off</string>
+    <string name="cd_sleep_timer">Sleep timer</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_play_error">Play error</string>
+    <string name="cd_next">Next</string>
+    <string name="cd_fast_forward">Fast forward</string>
+    <string name="cd_rewind">Rewind</string>
+    <string name="cd_previous">Previous</string>
 
 </resources>
