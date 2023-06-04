@@ -3,6 +3,7 @@ package com.sarahang.playback.ui.sheet
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artist
@@ -53,12 +55,17 @@ import com.sarahang.playback.core.title
 import com.sarahang.playback.core.toggleRepeatMode
 import com.sarahang.playback.core.toggleShuffleMode
 import com.sarahang.playback.ui.R
+import com.sarahang.playback.ui.audio.AdaptiveColorResult
+import com.sarahang.playback.ui.audio.toAdaptiveColor
+import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.disabledAlpha
 import com.sarahang.playback.ui.theme.orNa
 import com.sarahang.playback.ui.theme.simpleClickable
 import com.sarahang.playback.ui.timer.SleepTimer
+import com.sarahang.playback.ui.timer.SleepTimerViewModel
+import com.sarahang.playback.ui.timer.widget.AnimatedClock
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
@@ -73,6 +80,8 @@ internal fun PlaybackNowPlayingWithControls(
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
+    adaptiveColor: AdaptiveColorResult = LocalContentColor.current
+        .toAdaptiveColor(isSystemInDarkTheme()),
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     onlyControls: Boolean = false,
@@ -88,6 +97,7 @@ internal fun PlaybackNowPlayingWithControls(
                 onArtistClick = onArtistClick,
                 titleTextStyle = titleTextStyle,
                 artistTextStyle = artistTextStyle,
+                adaptiveColor = adaptiveColor
             )
 
         PlaybackProgress(playbackState = playbackState)
@@ -105,6 +115,8 @@ internal fun PlaybackNowPlaying(
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
+    adaptiveColor: AdaptiveColorResult = LocalContentColor.current
+        .toAdaptiveColor(isSystemInDarkTheme()),
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
@@ -144,7 +156,7 @@ internal fun PlaybackNowPlaying(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             RepeatButton(playbackConnection = playbackConnection, playbackMode = playbackMode)
-            SleepTimerButton()
+            SleepTimerButton(adaptiveColor)
         }
     }
 }
@@ -326,20 +338,38 @@ internal fun PlayerPlayControl(
 }
 
 @Composable
-private fun SleepTimerButton(modifier: Modifier = Modifier) {
+private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
+    val timerViewModel = hiltViewModel<SleepTimerViewModel>()
+    val timerViewState by timerViewModel.state.collectAsStateWithLifecycle()
+
     var showTimer by remember { mutableStateOf(false) }
-    if (showTimer) { SleepTimer { showTimer = false } }
+    if (showTimer) {
+        SleepTimer(timerViewModel) { showTimer = false }
+    }
 
     IconButton(
         onClick = { showTimer = true },
+        onClickLabel = stringResource(R.string.cd_open_sleep_timer),
         rippleRadius = SmallRippleRadius,
         modifier = modifier.size(24.dp)
     ) {
-        Icon(
-            painter = rememberVectorPainter(PlayerIcons.TimerOff),
-            modifier = Modifier.fillMaxSize(),
-            contentDescription = stringResource(R.string.cd_sleep_timer)
-        )
+        AnimatedVisibilityFade(timerViewState.isTimerRunning) {
+            AnimatedClock(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(1.5.dp),
+                color = adaptiveColor.color,
+                contentColor = adaptiveColor.contentColor,
+            )
+        }
+
+        AnimatedVisibilityFade(!timerViewState.isTimerRunning) {
+            Icon(
+                painter = rememberVectorPainter(PlayerIcons.TimerOff),
+                modifier = Modifier.fillMaxSize(),
+                contentDescription = stringResource(R.string.cd_sleep_timer)
+            )
+        }
     }
 }
 

@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.sheet
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -57,7 +56,6 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.ADAPTIVE_COLOR_ANIMATION
 import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import com.sarahang.playback.ui.audio.AudioRow
 import com.sarahang.playback.ui.audio.LocalAudioActionHandler
@@ -108,7 +106,6 @@ internal fun PlaybackSheet(
         initial = colorScheme.onBackground,
         gradientEndColor = colorScheme.background,
     )
-    val color by animateColorAsState(adaptiveColor.color, ADAPTIVE_COLOR_ANIMATION)
 
     LaunchedEffect(playbackConnection) {
         playbackConnection.playbackState
@@ -163,7 +160,7 @@ internal fun PlaybackSheet(
                             nowPlaying = nowPlaying,
                             playbackState = playbackState,
                             currentIndex = playbackQueue.currentIndex,
-                            color = color,
+                            adaptiveColor = adaptiveColor,
                             onTitleClick = goToItem,
                             onArtistClick = goToCreator,
                             artworkVerticalAlignment = Alignment.CenterVertically,

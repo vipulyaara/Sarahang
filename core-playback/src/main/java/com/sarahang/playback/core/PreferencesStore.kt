@@ -46,6 +46,11 @@ class PreferencesStore @Inject constructor(@ApplicationContext private val conte
         }
     }
 
+    fun <T> data(key: Preferences.Key<T>): Flow<T?> =
+        context.dataStore.data.map { preferences ->
+            preferences[key]
+        }
+
     fun <T> get(key: String, serializer: KSerializer<T>, defaultValue: T): Flow<T> {
         return context.dataStore.data
             .map { preferences ->
@@ -74,6 +79,22 @@ class PreferencesStore @Inject constructor(@ApplicationContext private val conte
             state.value = get(keyName, initialValue).first()
             state.debounce(saveDebounce)
                 .collectLatest { save(keyName, it) }
+        }
+        return state
+    }
+
+    fun <T> getStateFlow(
+        keyName: String,
+        serializer: KSerializer<T>,
+        scope: CoroutineScope,
+        initialValue: T,
+        saveDebounce: Long = 0,
+    ): MutableStateFlow<T> {
+        val state = MutableStateFlow(initialValue)
+        scope.launch {
+            state.value = get(keyName, serializer, initialValue).first()
+            state.debounce(saveDebounce)
+                .collectLatest { save(keyName, it, serializer) }
         }
         return state
     }

@@ -23,6 +23,7 @@ import com.sarahang.playback.core.models.toMediaItems
 import com.sarahang.playback.core.playPause
 import com.sarahang.playback.core.players.SarahangPlayerImpl
 import com.sarahang.playback.core.receivers.BecomingNoisyReceiver
+import com.sarahang.playback.core.timer.SleepTimer
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +45,9 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
     @Inject
     protected lateinit var audioDataSource: AudioDataSource
+
+    @Inject
+    protected lateinit var timer: SleepTimer
 
     @Inject
     protected lateinit var mediaNotifications: MediaNotificationsImpl
@@ -114,6 +118,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             ACTION_QUIT -> {
                 Timber.d("Quitting service by request")
                 controller.transportControls.pause()
+                timer.cancelAlarm()
                 pauseForeground(true)
             }
         }

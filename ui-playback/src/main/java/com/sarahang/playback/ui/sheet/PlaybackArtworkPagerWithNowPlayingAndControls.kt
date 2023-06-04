@@ -6,28 +6,30 @@ package com.sarahang.playback.ui.sheet
 
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.sarahang.playback.ui.theme.Specs
+import com.sarahang.playback.ui.audio.ADAPTIVE_COLOR_ANIMATION
+import com.sarahang.playback.ui.audio.AdaptiveColorResult
+import com.sarahang.playback.ui.audio.toAdaptiveColor
 
 @Composable
 fun PlaybackArtworkPagerWithNowPlayingAndControls(
     nowPlaying: MediaMetadataCompat,
     playbackState: PlaybackStateCompat,
     modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.onSurface,
+    adaptiveColor: AdaptiveColorResult = MaterialTheme.colorScheme.background
+        .toAdaptiveColor(isSystemInDarkTheme()),
     artworkVerticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
@@ -36,6 +38,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
     onTitleClick: () -> Unit = {},
     onArtistClick: () -> Unit = {}
 ) {
+    val color by animateColorAsState(adaptiveColor.color, ADAPTIVE_COLOR_ANIMATION)
     ConstraintLayout(modifier = modifier.fillMaxSize()) {
         val (pager, nowPlayingControls) = createRefs()
         PlaybackPager(
@@ -62,6 +65,7 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
         CompositionLocalProvider(LocalContentColor provides color) {
             PlaybackNowPlayingWithControls(
                 nowPlaying = nowPlaying,
+                adaptiveColor = adaptiveColor,
                 playbackState = playbackState,
                 titleTextStyle = titleTextStyle,
                 artistTextStyle = artistTextStyle,

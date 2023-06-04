@@ -68,6 +68,12 @@ abstract class PlaybackCoreModule {
             audioPlayer = audioPlayer,
             audioDataSource = audioDataSource
         )
+
+        @Provides
+        @ProcessLifetime
+        fun provideLongLifetimeScope(): CoroutineScope {
+            return ProcessLifecycleOwner.get().lifecycleScope
+        }
     }
 
     @Binds

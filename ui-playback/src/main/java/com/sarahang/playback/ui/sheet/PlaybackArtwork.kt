@@ -7,6 +7,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
@@ -14,6 +15,7 @@ import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artwork
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.playPause
+import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.theme.coloredRippleClickable
 
@@ -41,6 +43,7 @@ internal fun PlaybackArtwork(
                     if (onClick != null) onClick.invoke()
                     else playbackConnection.mediaController?.playPause()
                 },
+                onClickLabel = stringResource(R.string.cd_play_pause),
                 color = contentColor,
                 rippleRadius = Dp.Unspecified,
             ),

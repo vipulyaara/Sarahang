@@ -33,6 +33,7 @@
     <string name="cd_repeat_all_on">Repeat all on</string>
     <string name="cd_repeat_off">Repeat off</string>
     <string name="cd_sleep_timer">Sleep timer</string>
+    <string name="cd_open_sleep_timer">Open sleep timer</string>
     <string name="cd_play">Play</string>
     <string name="cd_pause">Pause</string>
     <string name="cd_play_error">Play error</string>
@@ -40,5 +41,14 @@
     <string name="cd_fast_forward">Fast forward</string>
     <string name="cd_rewind">Rewind</string>
     <string name="cd_previous">Previous</string>
+    <string name="cd_decrease_sleep_timer">Decrease sleep timer</string>
+    <string name="cd_increase_sleep_timer">Increase sleep timer</string>
+    <string name="sleep_timer">Sleep Timer</string>
+    <string name="start_timer">Start</string>
+    <string name="stop_timer">Stop Timer</string>
+    <string name="x_mins_left">%1$s mins left</string>
+    <string name="cd_play_pause">Play/Pause</string>
+    <string name="cd_set_timer">Set timer</string>
+    <string name="cd_stop_timer">Stop timer</string>
 
 </resources>

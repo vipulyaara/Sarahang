@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 
 fun Modifier.coloredRippleClickable(
     onClick: () -> Unit,
+    onClickLabel: String? = null,
     color: Color? = null,
     bounded: Boolean = false,
     interactionSource: MutableInteractionSource? = null,
@@ -22,8 +23,13 @@ fun Modifier.coloredRippleClickable(
 ) = composed {
     clickable(
         onClick = onClick,
+        onClickLabel = onClickLabel,
         role = Role.Button,
-        indication = rememberRipple(color = color ?: MaterialTheme.colorScheme.secondary, bounded = bounded, radius = rippleRadius),
+        indication = rememberRipple(
+            color = color ?: MaterialTheme.colorScheme.secondary,
+            bounded = bounded,
+            radius = rippleRadius
+        ),
         interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     )
 }

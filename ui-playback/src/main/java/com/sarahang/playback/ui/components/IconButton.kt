@@ -23,6 +23,7 @@ fun IconButton(
     enabled: Boolean = true,
     rippleColor: Color = Color.Unspecified,
     rippleRadius: Dp = RippleRadius,
+    onClickLabel: String? = null,
     onLongClickLabel: String? = null,
     onLongClick: (() -> Unit)? = null,
     onDoubleClick: (() -> Unit)? = null,
@@ -33,6 +34,7 @@ fun IconButton(
         modifier = modifier
             .combinedClickable(
                 onClick = onClick,
+                onClickLabel = onClickLabel,
                 onLongClickLabel = onLongClickLabel,
                 onLongClick = onLongClick,
                 onDoubleClick = onDoubleClick,
