@@ -37,6 +37,10 @@ class SleepTimerImpl @Inject constructor(
 ) : SleepTimer {
     private val alarmManager by lazy { context.getSystemService<AlarmManager>() }
 
+    init {
+        setRunningStatus()
+    }
+
     override fun start(time: Long, timeUnit: TimeUnit) {
         cancelAlarm()
         val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)

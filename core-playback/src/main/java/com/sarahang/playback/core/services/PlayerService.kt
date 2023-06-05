@@ -119,7 +119,6 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
                 Timber.d("Quitting service by request")
                 controller.transportControls.pause()
                 timer.cancelAlarm()
-                pauseForeground(true)
             }
         }
 
