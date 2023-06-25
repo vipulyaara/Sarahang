@@ -4,6 +4,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sarahang.playback.core.PreferencesStore
+import com.sarahang.playback.core.apis.PlayerEventLogger
 import com.sarahang.playback.core.timer.SleepTimer
 import com.sarahang.playback.core.timer.TimerInterval
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SleepTimerViewModel @Inject constructor(
     private val sleepTimer: SleepTimer,
+    private val playerEventLogger: PlayerEventLogger,
     preferences: PreferencesStore,
 ) : ViewModel() {
     private val currentTimerInterval = preferences.getStateFlow(
@@ -38,10 +40,15 @@ class SleepTimerViewModel @Inject constructor(
     )
 
     fun startTimer(timerInterval: TimerInterval) {
+        playerEventLogger.logEvent(
+            event = "player_timer_started",
+            data = mapOf("duration" to timerInterval.formattedTime())
+        )
         sleepTimer.start(timerInterval.time, timerInterval.timeUnit)
     }
 
     fun stopTimer() {
+        playerEventLogger.logEvent("player_timer_stopped")
         sleepTimer.cancelAlarm()
     }
 }

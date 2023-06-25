@@ -1,6 +1,7 @@
 package com.sarahang.playback.core.timer
 
 import com.sarahang.playback.core.BuildConfig
+import com.sarahang.playback.core.millisToDuration
 import java.util.concurrent.TimeUnit
 
 sealed class TimerInterval(val time: Long, val timeUnit: TimeUnit, val text: String) {
@@ -14,6 +15,8 @@ sealed class TimerInterval(val time: Long, val timeUnit: TimeUnit, val text: Str
     object TwoHours : TimerInterval(120, TimeUnit.MINUTES, "120 minutes")
 
     fun millis() = timeUnit.toMillis(time)
+
+    fun formattedTime() = timeUnit.toMillis(time).millisToDuration()
 
     companion object {
         fun find(timeInMillis: Long) = all().first { it.millis() == timeInMillis }

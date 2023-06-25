@@ -44,7 +44,7 @@ open class ResizableLayoutViewModel @Inject constructor(
             dragOffsetState
                 .debounce(2000)
                 .collectLatest {
-                    logger.logEvent("$analyticsPrefix.resize", mapOf("offset" to it.toString()))
+                    logger.logEvent("${analyticsPrefix}_resize", mapOf("offset" to it.toString()))
                 }
         }
     }

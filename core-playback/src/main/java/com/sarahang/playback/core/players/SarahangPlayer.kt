@@ -653,5 +653,5 @@ class SarahangPlayerImpl @Inject constructor(
     }
 
     private fun logEvent(event: String, mediaId: String = queueManager.currentAudioId) =
-        playerEventLogger.logEvent("player.$event", mapOf("mediaId" to mediaId))
+        playerEventLogger.logEvent("player_$event", mapOf("mediaId" to mediaId))
 }
