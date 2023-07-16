@@ -24,12 +24,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.ui.R
+import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import com.sarahang.playback.ui.components.toast
 import kotlinx.coroutines.launch
 
 @Composable
 fun SleepTimer(
     viewModel: SleepTimerViewModel,
+    adaptiveColor: AdaptiveColorResult,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -74,6 +76,7 @@ fun SleepTimer(
             item {
                 AnimatedVisibility(viewState.isTimerRunning) {
                     StopTimerItem(
+                        adaptiveColor = adaptiveColor,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(onClickLabel = stringResource(R.string.cd_stop_timer)) {
@@ -89,7 +92,7 @@ fun SleepTimer(
 }
 
 @Composable
-private fun StopTimerItem(modifier: Modifier = Modifier) {
+private fun StopTimerItem(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
@@ -98,7 +101,7 @@ private fun StopTimerItem(modifier: Modifier = Modifier) {
         Text(
             text = stringResource(id = R.string.stop_timer),
             style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.error,
+            color = adaptiveColor.primary,
         )
     }
 }

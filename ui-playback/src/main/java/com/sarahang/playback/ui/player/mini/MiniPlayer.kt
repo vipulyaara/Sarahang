@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
@@ -98,7 +99,8 @@ fun MiniPlayer(
             playbackState = playbackState,
             nowPlaying = nowPlaying,
             onPlayPause = { playbackConnection.mediaController?.playPause() },
-            openPlaybackSheet = openPlaybackSheet
+            openPlaybackSheet = openPlaybackSheet,
+            modifier = Modifier.testTag("mini_player")
         )
     }
 }
@@ -114,8 +116,8 @@ fun PlaybackMiniControls(
     openPlaybackSheet: () -> Unit
 ) {
     val adaptiveColor by nowPlayingArtworkAdaptiveColor()
-    val backgroundColor = adaptiveColor.color
-    val contentColor = adaptiveColor.contentColor
+    val backgroundColor = adaptiveColor.primary
+    val contentColor = adaptiveColor.onPrimary
 
     BoxWithConstraints {
         val isWideLayout = isWideScreen()

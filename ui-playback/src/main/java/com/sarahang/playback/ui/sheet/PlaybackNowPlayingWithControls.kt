@@ -344,7 +344,7 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
 
     var showTimer by remember { mutableStateOf(false) }
     if (showTimer) {
-        SleepTimer(timerViewModel) { showTimer = false }
+        SleepTimer(timerViewModel, adaptiveColor) { showTimer = false }
     }
 
     IconButton(
@@ -358,8 +358,8 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(1.5.dp),
-                color = adaptiveColor.color,
-                contentColor = adaptiveColor.contentColor,
+                color = adaptiveColor.primary,
+                contentColor = adaptiveColor.onPrimary,
             )
         }
 

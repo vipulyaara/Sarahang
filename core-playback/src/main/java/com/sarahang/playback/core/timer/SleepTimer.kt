@@ -44,11 +44,13 @@ class SleepTimerImpl @Inject constructor(
     override fun start(time: Long, timeUnit: TimeUnit) {
         cancelAlarm()
         val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)
-        alarmManager?.setExact(
-            /* type = */ AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            /* triggerAtMillis = */ alarmTime,
-            /* operation = */ makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)
-        )
+        makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)?.let {
+            alarmManager?.setExact(
+                /* type = */ AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                /* triggerAtMillis = */ alarmTime,
+                /* operation = */ it
+            )
+        }
 
         setRunningStatus()
     }

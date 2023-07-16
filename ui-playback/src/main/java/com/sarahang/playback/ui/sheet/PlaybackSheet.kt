@@ -42,6 +42,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
@@ -64,6 +65,7 @@ import com.sarahang.playback.ui.audio.audioActionHandler
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
+import com.sarahang.playback.ui.test.testTagUi
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.simpleClickable
 import kotlinx.coroutines.flow.collectLatest
@@ -118,7 +120,10 @@ internal fun PlaybackSheet(
         return
     }
 
-    BoxWithConstraints(Modifier.fillMaxSize()) {
+    BoxWithConstraints(
+        Modifier
+            .fillMaxSize()
+            .testTagUi("playback_sheet")) {
         val isWideLayout = isWideLayout()
         val maxWidth = maxWidth
 
@@ -136,6 +141,7 @@ internal fun PlaybackSheet(
                 containerColor = Color.Transparent,
                 contentColor = colorScheme.onSurface,
                 modifier = Modifier
+                    .testTag("playback_sheet")
                     .background(adaptiveColor.gradient)
                     .weight(1f)
             ) { paddings ->

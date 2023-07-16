@@ -59,8 +59,8 @@ fun AudioRow(
     val nowPlayingAudio by playbackConnection.nowPlayingAudio.collectAsStateWithLifecycle()
     val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
 
-    val containerColor by animateColorAsState(if (isCurrentAudio) adaptiveColor.color else Color.Transparent)
-    val contentColor = if (isCurrentAudio) adaptiveColor.contentColor
+    val containerColor by animateColorAsState(if (isCurrentAudio) adaptiveColor.primary else Color.Transparent)
+    val contentColor = if (isCurrentAudio) adaptiveColor.onPrimary
     else MaterialTheme.colorScheme.onBackground
 
     Row(

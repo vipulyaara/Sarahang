@@ -61,14 +61,14 @@ import android.graphics.Color as AColor
 val ADAPTIVE_COLOR_ANIMATION: AnimationSpec<Color> = tween(easing = FastOutSlowInEasing)
 
 @Immutable
-data class AdaptiveColorResult(val color: Color, val contentColor: Color, val gradient: Brush)
+data class AdaptiveColorResult(val primary: Color, val onPrimary: Color, val gradient: Brush)
 
 fun Color.toAdaptiveColor(
     isDarkColors: Boolean,
     gradientEndColor: Color = if (isDarkColors) Color.White else Color.Black,
 ) = AdaptiveColorResult(
-    color = this,
-    contentColor = this.contentColor(),
+    primary = this,
+    onPrimary = this.contentColor(),
     gradient = backgroundGradient(this, gradientEndColor, isDarkColors)
 )
 
