@@ -1,5 +1,6 @@
 package com.sarahang.playback.ui.audio
 
+import android.graphics.Color
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn
@@ -36,6 +37,7 @@ import com.sarahang.playback.core.models.PlaybackQueue.NowPlayingAudio.Companion
 import com.sarahang.playback.core.playPause
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.player.mini.PlaybackPlayPause
+import com.sarahang.playback.ui.theme.orNa
 
 object AudiosDefaults {
     val imageSize: Dp = 48.dp
@@ -137,7 +139,7 @@ private fun Description(
         )
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
-                text = audio.artist.toString(),
+                text = audio.artist.orNa(),
                 style = MaterialTheme.typography.labelSmall,
                 color = contentColor.copy(alpha = 0.7f),
                 maxLines = maxLines,

@@ -65,6 +65,7 @@ import com.sarahang.playback.core.models.toAudio
 import com.sarahang.playback.core.playPause
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.audio.Dismissable
+import com.sarahang.playback.ui.audio.materialYouAdaptiveColor
 import com.sarahang.playback.ui.audio.nowPlayingArtworkAdaptiveColor
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.components.animatePlaybackProgress
