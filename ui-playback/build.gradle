@@ -7,6 +7,7 @@ plugins {
 
 android {
     namespace 'com.sarahang.playback.ui'
+    compileSdk 34
 
     defaultConfig {
         minSdk 24

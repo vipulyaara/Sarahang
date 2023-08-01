@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.audio
 
-import android.graphics.Color
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.fadeIn

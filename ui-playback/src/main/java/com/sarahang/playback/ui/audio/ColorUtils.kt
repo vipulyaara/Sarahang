@@ -65,7 +65,7 @@ data class AdaptiveColorResult(val primary: Color, val onPrimary: Color, val gra
 
 fun Color.toAdaptiveColor(
     isDarkColors: Boolean,
-    gradientEndColor: AColor = if (isDarkColors) Color.White else Color.Black,
+    gradientEndColor: Color = if (isDarkColors) Color.White else Color.Black,
 ) = AdaptiveColorResult(
     primary = this,
     onPrimary = this.contentColor(),
@@ -78,9 +78,9 @@ private val adaptiveColorCache = mutableMapOf<String, Color>()
 fun adaptiveColor(
     imageData: Any?,
     fallback: Color = MaterialTheme.colorScheme.secondary.contrastComposite(),
-    initial: AColor = fallback,
-    animationSpec: AnimationSpec<AColor> = ADAPTIVE_COLOR_ANIMATION,
-    gradientEndColor: AColor = if (PlayerTheme.isLightTheme) Color.White else Color.Black,
+    initial: Color = fallback,
+    animationSpec: AnimationSpec<Color> = ADAPTIVE_COLOR_ANIMATION,
+    gradientEndColor: Color = if (PlayerTheme.isLightTheme) Color.White else Color.Black,
 ): State<AdaptiveColorResult> {
     val context = LocalContext.current
 
@@ -110,8 +110,8 @@ fun adaptiveColor(
     image: Bitmap? = null,
     imageSource: Any? = image,
     fallback: Color = MaterialTheme.colorScheme.secondary.contrastComposite(),
-    initial: AColor = fallback,
-    animationSpec: AnimationSpec<AColor> = ADAPTIVE_COLOR_ANIMATION,
+    initial: Color = fallback,
+    animationSpec: AnimationSpec<Color> = ADAPTIVE_COLOR_ANIMATION,
     gradientEndColor: Color = if (PlayerTheme.isLightTheme) Color.White else Color.Black,
     isDarkColors: Boolean = isSystemInDarkTheme()
 ): State<AdaptiveColorResult> {

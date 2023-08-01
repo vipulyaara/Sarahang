@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.theme
 
-import android.graphics.Color
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable

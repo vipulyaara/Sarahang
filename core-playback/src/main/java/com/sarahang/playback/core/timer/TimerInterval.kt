@@ -1,6 +1,6 @@
 package com.sarahang.playback.core.timer
 
-import com.sarahang.playback.core.BuildConfig
+import com.google.android.exoplayer2.common.BuildConfig
 import com.sarahang.playback.core.millisToDuration
 import java.util.concurrent.TimeUnit
 

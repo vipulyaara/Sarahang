@@ -8,7 +8,7 @@ plugins {
 
 android {
     namespace 'com.sarahang.sample'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.sarahang.sample"
@@ -31,6 +31,10 @@ android {
     }
     composeOptions {
         kotlinCompilerExtensionVersion libs.versions.composecompiler.get()
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 
