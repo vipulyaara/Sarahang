@@ -14,7 +14,6 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -74,6 +73,7 @@ import com.sarahang.playback.ui.components.isWideScreen
 import com.sarahang.playback.ui.sheet.PlayerNextControl
 import com.sarahang.playback.ui.sheet.PlayerPlayControl
 import com.sarahang.playback.ui.sheet.PlayerPreviousControl
+import com.sarahang.playback.ui.sheet.materialYouPlayerTheme
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.orNa
 
@@ -84,6 +84,7 @@ object PlaybackMiniControlsDefaults {
 @Composable
 fun MiniPlayer(
     modifier: Modifier = Modifier,
+    playerTheme: String = materialYouPlayerTheme,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     openPlaybackSheet: () -> Unit = {}
 ) {
@@ -101,101 +102,101 @@ fun MiniPlayer(
             nowPlaying = nowPlaying,
             onPlayPause = { playbackConnection.mediaController?.playPause() },
             openPlaybackSheet = openPlaybackSheet,
-            modifier = Modifier.testTag("mini_player")
+            modifier = Modifier.testTag("mini_player"),
+            playerTheme = playerTheme,
         )
     }
 }
 
 @Composable
-fun PlaybackMiniControls(
+private fun PlaybackMiniControls(
     playbackState: PlaybackStateCompat,
     nowPlaying: MediaMetadataCompat,
     onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
+    playerTheme: String,
     height: Dp = PlaybackMiniControlsDefaults.Height,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     openPlaybackSheet: () -> Unit
 ) {
-    val adaptiveColor by nowPlayingArtworkAdaptiveColor()
+    val adaptiveColor by if (playerTheme == materialYouPlayerTheme) materialYouAdaptiveColor() else nowPlayingArtworkAdaptiveColor()
     val backgroundColor = adaptiveColor.primary
     val contentColor = adaptiveColor.onPrimary
 
-    BoxWithConstraints {
-        val isWideLayout = isWideScreen()
-        Dismissable(onDismiss = { playbackConnection.transportControls?.stop() }) {
-            var dragOffset by remember { mutableFloatStateOf(0f) }
-            Surface(
-                color = Color.Transparent,
-                shape = MaterialTheme.shapes.small,
-                modifier = modifier
-                    .animateContentSize()
-                    .semantics(mergeDescendants = true) {}
-                    .clickable(onClickLabel = stringResource(R.string.cd_open_player)) { openPlaybackSheet() }
-                    // open playback sheet on swipe up
-                    .draggable(
-                        orientation = Orientation.Vertical,
-                        state = rememberDraggableState(
-                            onDelta = {
-                                dragOffset = it.coerceAtMost(0f)
-                            }
-                        ),
-                        onDragStarted = {
-                            if (dragOffset < 0) openPlaybackSheet()
-                        },
-                    )
-            ) {
-                Column {
-                    var aspectRatio by remember { mutableFloatStateOf(0f) }
-                    var controlsVisible by remember { mutableStateOf(true) }
-                    var nowPlayingVisible by remember { mutableStateOf(true) }
-                    var controlsEndPadding by remember { mutableStateOf(0.dp) }
-                    val controlsEndPaddingAnimated by animateDpAsState(controlsEndPadding)
-                    val smallPadding = 8.dp
-                    val tinyPadding = 4.dp
+    val isWideLayout = isWideScreen()
+    Dismissable(onDismiss = { playbackConnection.transportControls?.stop() }) {
+        var dragOffset by remember { mutableFloatStateOf(0f) }
+        Surface(
+            color = Color.Transparent,
+            shape = MaterialTheme.shapes.small,
+            modifier = modifier
+                .animateContentSize()
+                .semantics(mergeDescendants = true) {}
+                .clickable(onClickLabel = stringResource(R.string.cd_open_player)) { openPlaybackSheet() }
+                // open playback sheet on swipe up
+                .draggable(
+                    orientation = Orientation.Vertical,
+                    state = rememberDraggableState(
+                        onDelta = {
+                            dragOffset = it.coerceAtMost(0f)
+                        }
+                    ),
+                    onDragStarted = {
+                        if (dragOffset < 0) openPlaybackSheet()
+                    },
+                )
+        ) {
+            Column {
+                var aspectRatio by remember { mutableFloatStateOf(0f) }
+                var controlsVisible by remember { mutableStateOf(true) }
+                var nowPlayingVisible by remember { mutableStateOf(true) }
+                var controlsEndPadding by remember { mutableStateOf(0.dp) }
+                val controlsEndPaddingAnimated by animateDpAsState(controlsEndPadding)
+                val smallPadding = 8.dp
+                val tinyPadding = 4.dp
 
-                    CompositionLocalProvider(LocalContentColor provides contentColor) {
-                        Row(
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(backgroundColor)
-                                .onGloballyPositioned {
-                                    aspectRatio = it.size.height.toFloat() / it.size.width.toFloat()
-                                    controlsVisible = aspectRatio < 0.9
-                                    nowPlayingVisible = aspectRatio < 0.5
-                                    controlsEndPadding = when (aspectRatio) {
-                                        in 0.0..0.15 -> 0.dp
-                                        in 0.15..0.35 -> tinyPadding
-                                        else -> smallPadding
-                                    }
+                CompositionLocalProvider(LocalContentColor provides contentColor) {
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(backgroundColor)
+                            .onGloballyPositioned {
+                                aspectRatio = it.size.height.toFloat() / it.size.width.toFloat()
+                                controlsVisible = aspectRatio < 0.9
+                                nowPlayingVisible = aspectRatio < 0.5
+                                controlsEndPadding = when (aspectRatio) {
+                                    in 0.0..0.15 -> 0.dp
+                                    in 0.15..0.35 -> tinyPadding
+                                    else -> smallPadding
                                 }
-                                .padding(if (controlsVisible) PaddingValues(end = controlsEndPaddingAnimated) else PaddingValues())
-                        ) {
-                            PlaybackNowPlaying(
-                                nowPlaying = nowPlaying,
-                                maxHeight = height,
-                                coverOnly = !nowPlayingVisible
-                            )
-                            if (controlsVisible && !isWideLayout)
-                                PlaybackPlayPause(
-                                    playbackState = playbackState,
-                                    onPlayPause = onPlayPause
-                                )
-                        }
-
-                        if (isWideLayout) {
-                            WidePlayerControls(
+                            }
+                            .padding(if (controlsVisible) PaddingValues(end = controlsEndPaddingAnimated) else PaddingValues())
+                    ) {
+                        PlaybackNowPlaying(
+                            nowPlaying = nowPlaying,
+                            maxHeight = height,
+                            coverOnly = !nowPlayingVisible
+                        )
+                        if (controlsVisible && !isWideLayout)
+                            PlaybackPlayPause(
                                 playbackState = playbackState,
-                                color = backgroundColor
+                                onPlayPause = onPlayPause
                             )
-                        }
+                    }
 
-                        PlaybackProgress(
+                    if (isWideLayout) {
+                        WidePlayerControls(
                             playbackState = playbackState,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = backgroundColor
                         )
                     }
+
+                    PlaybackProgress(
+                        playbackState = playbackState,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         }

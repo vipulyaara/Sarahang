@@ -59,13 +59,15 @@ import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import com.sarahang.playback.ui.audio.toAdaptiveColor
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
+import com.sarahang.playback.ui.playback.speed.PlaybackSpeed
+import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.disabledAlpha
 import com.sarahang.playback.ui.theme.orNa
 import com.sarahang.playback.ui.theme.simpleClickable
-import com.sarahang.playback.ui.timer.SleepTimer
-import com.sarahang.playback.ui.timer.SleepTimerViewModel
-import com.sarahang.playback.ui.timer.widget.AnimatedClock
+import com.sarahang.playback.ui.playback.timer.SleepTimer
+import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
+import com.sarahang.playback.ui.playback.timer.widget.AnimatedClock
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
@@ -156,7 +158,11 @@ internal fun PlaybackNowPlaying(
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             RepeatButton(playbackConnection = playbackConnection, playbackMode = playbackMode)
-            SleepTimerButton(adaptiveColor)
+
+            Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
+//                PlaybackSpeedButton(adaptiveColor = adaptiveColor)
+                SleepTimerButton(adaptiveColor)
+            }
         }
     }
 }
@@ -370,6 +376,29 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
                 contentDescription = stringResource(R.string.cd_sleep_timer)
             )
         }
+    }
+}
+
+@Composable
+private fun PlaybackSpeedButton(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
+    val timerViewModel = hiltViewModel<PlaybackSpeedViewModel>()
+
+    var showTimer by remember { mutableStateOf(false) }
+    if (showTimer) {
+        PlaybackSpeed(timerViewModel, adaptiveColor) { showTimer = false }
+    }
+
+    IconButton(
+        onClick = { showTimer = true },
+        onClickLabel = stringResource(R.string.cd_open_sleep_timer),
+        rippleRadius = SmallRippleRadius,
+        modifier = modifier.size(24.dp)
+    ) {
+        Icon(
+            painter = rememberVectorPainter(PlayerIcons.PlaybackSpeed),
+            modifier = Modifier.fillMaxSize(),
+            contentDescription = stringResource(R.string.cd_sleep_timer)
+        )
     }
 }
 

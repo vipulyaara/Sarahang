@@ -1,4 +1,4 @@
-package com.sarahang.playback.ui.timer.widget
+package com.sarahang.playback.ui.playback.timer.widget
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode

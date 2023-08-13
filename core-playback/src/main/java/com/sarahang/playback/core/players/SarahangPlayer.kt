@@ -97,6 +97,7 @@ interface SarahangPlayer {
     fun swapQueueAudios(from: Int, to: Int)
     fun stop(byUser: Boolean)
     fun release()
+    fun setPlaybackSpeed(speed: Float)
     fun onPlayingState(playing: OnIsPlaying<SarahangPlayer>)
     fun onPrepared(prepared: OnPrepared<SarahangPlayer>)
     fun onError(error: OnError<SarahangPlayer>)
@@ -422,6 +423,10 @@ class SarahangPlayerImpl @Inject constructor(
         }
         audioPlayer.release()
         queueManager.clear()
+    }
+
+    override fun setPlaybackSpeed(speed: Float) {
+        audioPlayer.setPlaybackSpeed(speed)
     }
 
     override fun onPlayingState(playing: OnIsPlaying<SarahangPlayer>) {

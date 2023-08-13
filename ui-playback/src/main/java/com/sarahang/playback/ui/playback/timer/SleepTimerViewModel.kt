@@ -1,4 +1,4 @@
-package com.sarahang.playback.ui.timer
+package com.sarahang.playback.ui.playback.timer
 
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel

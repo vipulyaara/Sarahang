@@ -64,6 +64,7 @@ import com.sarahang.playback.ui.audio.AudioRow
 import com.sarahang.playback.ui.audio.LocalAudioActionHandler
 import com.sarahang.playback.ui.audio.adaptiveColor
 import com.sarahang.playback.ui.audio.audioActionHandler
+import com.sarahang.playback.ui.audio.materialYouAdaptiveColor
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
@@ -75,6 +76,7 @@ import kotlinx.coroutines.flow.filter
 @Composable
 fun PlaybackSheet(
     onClose: (() -> Unit)?,
+    playerTheme: String = materialYouPlayerTheme,
     goToItem: () -> Unit = {},
     goToCreator: () -> Unit = {}
 ) {
@@ -85,6 +87,7 @@ fun PlaybackSheet(
             onClose = onClose,
             goToItem = goToItem,
             goToCreator = goToCreator,
+            playerTheme = playerTheme,
             listState = listState,
             queueListState = rememberLazyListState()
         )
@@ -96,6 +99,7 @@ internal fun PlaybackSheet(
     onClose: (() -> Unit)?,
     goToItem: () -> Unit,
     goToCreator: () -> Unit,
+    playerTheme: String,
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
@@ -104,7 +108,7 @@ internal fun PlaybackSheet(
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
 
-    val adaptiveColor by adaptiveColor(
+    val adaptiveColor by if (playerTheme == materialYouPlayerTheme) materialYouAdaptiveColor() else adaptiveColor(
         image = nowPlaying.artwork,
         initial = colorScheme.onBackground,
         gradientEndColor = colorScheme.background,
@@ -321,3 +325,4 @@ private fun LazyListScope.playbackQueue(
     }
 }
 
+const val materialYouPlayerTheme = "materialYou"
