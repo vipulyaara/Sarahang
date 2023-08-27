@@ -1,32 +1,30 @@
 package com.sarahang.playback.ui.playback.speed
 
-import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel
-import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.apis.PlayerEventLogger
 import com.sarahang.playback.core.players.SarahangPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 @HiltViewModel
 class PlaybackSpeedViewModel @Inject constructor(
     private val sarahangPlayer: SarahangPlayer,
     private val playerEventLogger: PlayerEventLogger,
-    preferences: PreferencesStore,
 ) : ViewModel() {
-    val currentSpeed = MutableStateFlow(1f)
+    val currentSpeed = sarahangPlayer.playbackSpeed
 
-    init {
-        currentSpeed.onEach {
-            sarahangPlayer.setPlaybackSpeed(it)
-        }
+    fun setSpeedRaw(speed: Float) {
+        setSpeed(speed.roundToInt().toFloat() / 10)
     }
 
     fun setSpeed(speed: Float) {
-        currentSpeed.value = speed
-    }
-}
+        playerEventLogger.logEvent("set_playback_speed", mapOf("speed" to speed.toString()))
 
-private val defaultSpeedIntervalKey = longPreferencesKey("playback_speed")
+        if (speed > 0) { // UI slider can return negative values if swiped too fast
+            sarahangPlayer.setPlaybackSpeed(speed)
+        }
+    }
+
+    val quickSpeedIntervals = listOf(0.5f, 0.8f, 1.0f, 1.2f, 1.5f, 2.0f, 2.5f, 3.0f, 5.0f)
+}

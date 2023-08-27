@@ -3,8 +3,10 @@ package com.sarahang.playback.ui.sheet
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -21,6 +23,7 @@ import androidx.compose.material.icons.filled.RepeatOn
 import androidx.compose.material.icons.filled.RepeatOneOn
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ShuffleOn
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -39,6 +42,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.PlaybackConnection
@@ -61,13 +65,13 @@ import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeed
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
+import com.sarahang.playback.ui.playback.timer.SleepTimer
+import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
+import com.sarahang.playback.ui.playback.timer.widget.AnimatedClock
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.disabledAlpha
 import com.sarahang.playback.ui.theme.orNa
 import com.sarahang.playback.ui.theme.simpleClickable
-import com.sarahang.playback.ui.playback.timer.SleepTimer
-import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
-import com.sarahang.playback.ui.playback.timer.widget.AnimatedClock
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
@@ -155,12 +159,16 @@ internal fun PlaybackNowPlaying(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RepeatButton(playbackConnection = playbackConnection, playbackMode = playbackMode)
 
-            Row(horizontalArrangement = Arrangement.spacedBy(24.dp)) {
-//                PlaybackSpeedButton(adaptiveColor = adaptiveColor)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                PlaybackSpeedButton(adaptiveColor = adaptiveColor)
                 SleepTimerButton(adaptiveColor)
             }
         }
@@ -381,23 +389,25 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
 
 @Composable
 private fun PlaybackSpeedButton(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
-    val timerViewModel = hiltViewModel<PlaybackSpeedViewModel>()
+    val viewModel = hiltViewModel<PlaybackSpeedViewModel>()
+    val currentSpeed by viewModel.currentSpeed.collectAsStateWithLifecycle()
 
-    var showTimer by remember { mutableStateOf(false) }
-    if (showTimer) {
-        PlaybackSpeed(timerViewModel, adaptiveColor) { showTimer = false }
+    var showPlaybackSpeed by remember { mutableStateOf(false) }
+    if (showPlaybackSpeed) {
+        PlaybackSpeed(viewModel, adaptiveColor) { showPlaybackSpeed = false }
     }
 
-    IconButton(
-        onClick = { showTimer = true },
-        onClickLabel = stringResource(R.string.cd_open_sleep_timer),
-        rippleRadius = SmallRippleRadius,
-        modifier = modifier.size(24.dp)
+    Box(
+        modifier.simpleClickable(
+            indication = rememberRipple(bounded = false),
+            label = stringResource(R.string.cd_open_sleep_timer)
+        ) { showPlaybackSpeed = true }
     ) {
-        Icon(
-            painter = rememberVectorPainter(PlayerIcons.PlaybackSpeed),
-            modifier = Modifier.fillMaxSize(),
-            contentDescription = stringResource(R.string.cd_sleep_timer)
+        val speed = if ((currentSpeed * 10) % 10f == 0f) currentSpeed.toInt().toString() else currentSpeed.toString()
+        Text(
+            text = "${speed}x",
+            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+            modifier = Modifier.padding(4.dp)
         )
     }
 }

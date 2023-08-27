@@ -68,7 +68,7 @@ fun SleepTimer(
                 ) {
                     Text(
                         text = stringResource(id = R.string.sleep_timer),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
                     )

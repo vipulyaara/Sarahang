@@ -82,6 +82,7 @@ fun PlaybackSheet(
 ) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
+
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
         PlaybackSheet(
             onClose = onClose,

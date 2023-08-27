@@ -37,11 +37,13 @@ fun Modifier.coloredRippleClickable(
 fun Modifier.simpleClickable(
     interactionSource: MutableInteractionSource? = null,
     indication: Indication? = null,
+    label: String? = null,
     onClick: () -> Unit,
 ) = composed {
     clickable(
         onClick = onClick,
         role = Role.Button,
+        onClickLabel = label,
         indication = indication,
         interactionSource = interactionSource ?: remember { MutableInteractionSource() }
     )

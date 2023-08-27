@@ -9,6 +9,7 @@ import com.google.android.exoplayer2.DefaultRenderersFactory.EXTENSION_RENDERER_
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.PlaybackParameters
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
@@ -46,6 +47,7 @@ interface AudioPlayer {
     fun onIsPlaying(playing: OnIsPlaying<AudioPlayer>)
     fun onReady(ready: OnReady<AudioPlayer>)
     fun onCompletion(completion: OnCompletion<AudioPlayer>)
+    fun onPlaybackParamsChanged(playbackParameters: OnPlaybackParametersChanged<AudioPlayer>)
     fun playWhenReady(): Boolean
 }
 
@@ -73,6 +75,7 @@ class AudioPlayerImpl @Inject constructor(
         { playing, byUi -> Timber.d("$playing $byUi") }
     private var onReady: OnReady<AudioPlayer> = {}
     private var onCompletion: OnCompletion<AudioPlayer> = {}
+    private var onPlaybackParamsChanged: OnPlaybackParametersChanged<AudioPlayer> = {}
 
     override fun play(startAtPosition: Long?) {
         if (startAtPosition == null) {
@@ -185,6 +188,15 @@ class AudioPlayerImpl @Inject constructor(
         }
     }
 
+    override fun onPlaybackParamsChanged(playbackParameters: OnPlaybackParametersChanged<AudioPlayer>) {
+        this.onPlaybackParamsChanged = playbackParameters
+    }
+
+    override fun onPlaybackParametersChanged(playbackParameters: PlaybackParameters) {
+        super.onPlaybackParametersChanged(playbackParameters)
+        this.onPlaybackParamsChanged(playbackParameters)
+    }
+
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         onIsPlaying(isPlaying, false)
     }
@@ -195,19 +207,14 @@ class AudioPlayerImpl @Inject constructor(
     }
 
     private fun createPlayer(owner: AudioPlayerImpl): ExoPlayer {
-        return ExoPlayer.Builder(
-            context,
-            DefaultRenderersFactory(context).apply {
-                setExtensionRendererMode(EXTENSION_RENDERER_MODE_PREFER)
-            }
-        )
-            .setLoadControl(object : DefaultLoadControl() {
+        return ExoPlayer.Builder(context, DefaultRenderersFactory(context).apply {
+            setExtensionRendererMode(EXTENSION_RENDERER_MODE_PREFER)
+        }).setLoadControl(object : DefaultLoadControl() {
                 override fun onPrepared() {
                     isPrepared = true
                     onPrepared(owner)
                 }
-            })
-            .build().apply {
+            }).build().apply {
                 val attr = AudioAttributes.Builder().apply {
                     setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
                     setUsage(C.USAGE_MEDIA)

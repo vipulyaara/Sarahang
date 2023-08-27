@@ -26,6 +26,7 @@ import android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
 import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import com.google.android.exoplayer2.PlaybackParameters
 import com.sarahang.playback.core.BY_UI_KEY
 import com.sarahang.playback.core.MediaQueueBuilder
 import com.sarahang.playback.core.PreferencesStore
@@ -54,6 +55,9 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -67,6 +71,7 @@ typealias OnBuffering<T> = T.() -> Unit
 typealias OnReady<T> = T.() -> Unit
 typealias OnMetaDataChanged = SarahangPlayer.() -> Unit
 typealias OnIsPlaying<T> = T.(playing: Boolean, byUi: Boolean) -> Unit
+typealias OnPlaybackParametersChanged<T> = T.(params: PlaybackParameters) -> Unit
 
 const val REPEAT_MODE = "repeat_mode"
 const val SHUFFLE_MODE = "shuffle_mode"
@@ -97,7 +102,6 @@ interface SarahangPlayer {
     fun swapQueueAudios(from: Int, to: Int)
     fun stop(byUser: Boolean)
     fun release()
-    fun setPlaybackSpeed(speed: Float)
     fun onPlayingState(playing: OnIsPlaying<SarahangPlayer>)
     fun onPrepared(prepared: OnPrepared<SarahangPlayer>)
     fun onError(error: OnError<SarahangPlayer>)
@@ -114,6 +118,8 @@ interface SarahangPlayer {
     fun clearRandomAudioPlayed()
     fun setCurrentAudioId(audioId: String, index: Int? = null)
     fun shuffleQueue(isShuffle: Boolean)
+    val playbackSpeed: StateFlow<Float>
+    fun setPlaybackSpeed(speed: Float)
 }
 
 @Singleton
@@ -142,6 +148,8 @@ class SarahangPlayerImpl @Inject constructor(
 
     private val metadataBuilder = MediaMetadataCompat.Builder()
     private val stateBuilder = createDefaultPlaybackState()
+
+    override val playbackSpeed = MutableStateFlow(1f)
 
     private val pendingIntent =
         PendingIntent.getBroadcast(context, 0, Intent(Intent.ACTION_MEDIA_BUTTON), FLAG_IMMUTABLE)
@@ -220,6 +228,10 @@ class SarahangPlayerImpl @Inject constructor(
             updatePlaybackState {
                 setState(STATE_ERROR, 0, 1F)
             }
+        }
+
+        audioPlayer.onPlaybackParamsChanged {
+            playbackSpeed.value = it.speed
         }
     }
 
