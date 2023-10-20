@@ -35,7 +35,6 @@ import com.sarahang.playback.core.REPEAT_ALL
 import com.sarahang.playback.core.REPEAT_ONE
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.apis.PlayerEventLogger
-import com.sarahang.playback.core.artworkFromFile
 import com.sarahang.playback.core.audio.AudioFocusHelperImpl
 import com.sarahang.playback.core.audio.AudioQueueManagerImpl
 import com.sarahang.playback.core.createDefaultPlaybackState
@@ -55,7 +54,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
@@ -648,11 +646,12 @@ class SarahangPlayerImpl @Inject constructor(
         }
     }
 
+    @Suppress("SENSELESS_COMPARISON")
     private fun setMetaData(audio: Audio) {
         val player = this
         launch {
             val mediaMetadata = audio.toMediaMetadata(metadataBuilder).apply {
-                val artworkFromFile = audio.artworkFromFile()
+                val artworkFromFile = null
                 if (artworkFromFile != null) {
                     putBitmap(METADATA_KEY_ALBUM_ART, artworkFromFile)
                 }

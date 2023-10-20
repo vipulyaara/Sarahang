@@ -1,3 +1,4 @@
+@file:Suppress("ktlint:standard:filename")
 package com.sarahang.playback.core.injection
 
 import javax.inject.Qualifier
