@@ -85,7 +85,7 @@ fun MediaSessionCompat.position(): Long {
 }
 
 fun MediaSessionCompat.isPlaying(): Boolean {
-    return controller.playbackState.state == PlaybackStateCompat.STATE_PLAYING
+    return controller?.playbackState?.state == PlaybackStateCompat.STATE_PLAYING
 }
 
 fun MediaSessionCompat.isBuffering(): Boolean {
