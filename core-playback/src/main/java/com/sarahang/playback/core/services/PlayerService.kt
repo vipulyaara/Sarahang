@@ -41,16 +41,16 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
     }
 
     @Inject
-    protected lateinit var player: SarahangPlayerImpl
+    lateinit var player: SarahangPlayerImpl
 
     @Inject
-    protected lateinit var audioDataSource: AudioDataSource
+    lateinit var audioDataSource: AudioDataSource
 
     @Inject
-    protected lateinit var timer: SleepTimer
+    lateinit var timer: SleepTimer
 
     @Inject
-    protected lateinit var mediaNotifications: MediaNotificationsImpl
+    lateinit var mediaNotifications: MediaNotificationsImpl
 
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
 
