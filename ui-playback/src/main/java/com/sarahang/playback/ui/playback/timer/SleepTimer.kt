@@ -23,12 +23,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.audio.AdaptiveColorResult
-import com.sarahang.playback.ui.components.toast
 import kotlinx.coroutines.launch
 
 @Composable
@@ -84,8 +82,7 @@ fun SleepTimer(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable(onClickLabel = stringResource(R.string.cd_set_timer)) {
-                            viewModel.startTimer(interval)
-                            context.toast("Timer set for ${interval.text}")
+                            viewModel.startTimer(timerInterval = interval, context = context)
                             dismissSheet()
                         }
                         .padding(horizontal = 24.dp, vertical = 16.dp)

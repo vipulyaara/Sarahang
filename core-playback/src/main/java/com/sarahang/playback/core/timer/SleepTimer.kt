@@ -7,10 +7,13 @@ import android.content.Intent
 import android.os.Build
 import android.os.SystemClock
 import android.provider.Settings
+import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.sarahang.playback.core.ACTION_QUIT
 import com.sarahang.playback.core.PreferencesStore
+import com.sarahang.playback.core.R
 import com.sarahang.playback.core.injection.ProcessLifetime
 import com.sarahang.playback.core.services.PlayerService
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -23,7 +26,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface SleepTimer {
-    fun start(time: Long, timeUnit: TimeUnit)
+    fun start(time: Long, timeUnit: TimeUnit, context: Context, isExactAlarmEnabled: Boolean)
 
     // alarm PendingIntent, if an alarm is set, or null if no alarm is set
     fun alarmIntent(): PendingIntent?
@@ -43,28 +46,72 @@ class SleepTimerImpl @Inject constructor(
         setRunningStatus()
     }
 
-    override fun start(time: Long, timeUnit: TimeUnit) {
+    override fun start(
+        time: Long,
+        timeUnit: TimeUnit,
+        context: Context,
+        isExactAlarmEnabled: Boolean
+    ) {
         cancelAlarm()
         val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)
 
-        makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)?.let {
+        makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)?.let { pendingIntent ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (alarmManager?.canScheduleExactAlarms() == false) {
-                    Intent().also { intent ->
-                        intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-                        context.startActivity(intent)
+                if (isExactAlarmEnabled) {
+                    if (alarmManager?.canScheduleExactAlarms() == false) {
+                        setExactAlarmWithExplicitPermission(context)
+                    } else {
+                        setExactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
+                        onAlarmSet()
                     }
                 } else {
-                    alarmManager?.setExact(
-                        /* type = */ AlarmManager.ELAPSED_REALTIME_WAKEUP,
-                        /* triggerAtMillis = */ alarmTime,
-                        /* operation = */ it
-                    )
+                    setInexactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
+                    onAlarmSet()
                 }
+            } else {
+                setExactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
+                onAlarmSet()
             }
         }
 
+    }
+
+    private fun setExactAlarm(alarmTime: Long, pendingIntent: PendingIntent) {
+        alarmManager?.setExact(
+            /* type = */ AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            /* triggerAtMillis = */ alarmTime,
+            /* operation = */ pendingIntent
+        )
+    }
+
+    private fun setInexactAlarm(alarmTime: Long, pendingIntent: PendingIntent) {
+        alarmManager?.set(
+            /* type = */ AlarmManager.ELAPSED_REALTIME_WAKEUP,
+            /* triggerAtMillis = */ alarmTime,
+            /* operation = */ pendingIntent
+        )
+    }
+
+    @RequiresApi(Build.VERSION_CODES.S)
+    private fun setExactAlarmWithExplicitPermission(context: Context) {
+        Toast.makeText(
+            /* context = */ context,
+            /* text = */ context.getString(R.string.enable_alarm_permission_text),
+            /* duration = */ Toast.LENGTH_SHORT
+        ).show()
+        Intent().also { intent ->
+            intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
+            context.startActivity(intent)
+        }
+    }
+
+    private fun onAlarmSet() {
         setRunningStatus()
+        Toast.makeText(
+            /* context = */ context,
+            /* text = */ context.getString(R.string.timer_is_set),
+            /* duration = */ Toast.LENGTH_SHORT
+        ).show()
     }
 
     override fun cancelAlarm() {

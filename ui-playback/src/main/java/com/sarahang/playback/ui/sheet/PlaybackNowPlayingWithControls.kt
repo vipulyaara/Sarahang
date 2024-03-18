@@ -3,7 +3,6 @@ package com.sarahang.playback.ui.sheet
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -358,7 +357,7 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
 
     var showTimer by remember { mutableStateOf(false) }
     if (showTimer) {
-        SleepTimer(timerViewModel, adaptiveColor) { showTimer = false }
+        SleepTimer(viewModel = timerViewModel, adaptiveColor = adaptiveColor) { showTimer = false }
     }
 
     IconButton(
@@ -403,7 +402,12 @@ private fun PlaybackSpeedButton(adaptiveColor: AdaptiveColorResult, modifier: Mo
             label = stringResource(R.string.cd_open_sleep_timer)
         ) { showPlaybackSpeed = true }
     ) {
-        val speed = if ((currentSpeed * 10) % 10f == 0f) currentSpeed.toInt().toString() else currentSpeed.toString()
+        val speed = if ((currentSpeed * 10) % 10f == 0f) {
+            currentSpeed.toInt().toString()
+        } else {
+            currentSpeed.toString()
+        }
+
         Text(
             text = "${speed}x",
             style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
