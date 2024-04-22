@@ -7,6 +7,7 @@ data class Audio(
     val title: String,
     val playbackUrl: String,
     val duration: Long,
+    val albumId: String,
     val artist: String? = null,
     val album: String? = null,
     val coverImage: String? = null,
@@ -34,6 +35,7 @@ data class Audio(
             artist = "unknown",
             album = "unknown",
             coverImage = "unknown",
+            albumId = "unknown"
         )
     }
 }

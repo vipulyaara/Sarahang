@@ -8,6 +8,7 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import com.sarahang.playback.core.models.METADATA_KEY_ALBUM_ID
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.players.QUEUE_CURRENT_INDEX
 import com.sarahang.playback.core.players.QUEUE_HAS_NEXT
@@ -148,6 +149,8 @@ inline val MediaMetadataCompat.artist: String? get() = getString(MediaMetadataCo
 inline val MediaMetadataCompat.duration: Long get() = getLong(MediaMetadataCompat.METADATA_KEY_DURATION)
 
 inline val MediaMetadataCompat.album: String? get() = getString(MediaMetadataCompat.METADATA_KEY_ALBUM)
+
+inline val MediaMetadataCompat.albumId: String? get() = getString(METADATA_KEY_ALBUM_ID)
 
 inline val MediaMetadataCompat.displayDescription: String? get() = getString(MediaMetadataCompat.METADATA_KEY_DISPLAY_DESCRIPTION)
 
