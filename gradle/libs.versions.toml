@@ -1,20 +1,20 @@
 [versions]
 accompanist = "0.34.0"
 agp = "8.2.2"
-androidxhilt = "1.1.0"
+androidxhilt = "1.2.0"
 androidxlifecycle = "2.7.0"
-coil = "2.5.0"
+coil = "2.6.0"
 composecompiler = "1.5.8"
-compose-bom = "2024.01.00"
+compose-bom = "2024.04.01"
 constraintlayout = "1.1.0-alpha13"
 coroutines = "1.8.0-rc2"
 dagger = "2.48"
-hilt = "2.48"
-kotlin = "1.9.22"
-material3 = "1.2.0-beta02"
+hilt = "2.51"
+kotlin = "1.9.23"
+material3 = "1.2.1"
 room = "2.6.1"
 icons = "1.0.0"
-serialization = "1.5.0"
+serialization = "1.6.3"
 exoplayer = "2.19.1"
 
 [plugins]
@@ -34,10 +34,10 @@ exoplayer-okhttp = { module = "com.google.android.exoplayer:extension-okhttp", v
 
 media = "androidx.media:media:1.7.0"
 
-androidx-activity-compose = "androidx.activity:activity-compose:1.8.2"
+androidx-activity-compose = "androidx.activity:activity-compose:1.9.0"
 
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "androidxhilt" }
-androidx-hilt-compose = "androidx.hilt:hilt-navigation-compose:1.1.0"
+androidx-hilt-compose = "androidx.hilt:hilt-navigation-compose:1.2.0"
 androidx-hilt-navigation = { module = "androidx.hilt:hilt-navigation", version.ref = "androidxhilt" }
 
 hilt-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
@@ -80,4 +80,4 @@ icons-tabler = { module = "br.com.devsrsouza.compose.icons.android:tabler-icons"
 
 timber = "com.jakewharton.timber:timber:5.0.1"
 
-dataStore = "androidx.datastore:datastore-preferences:1.0.0"
+dataStore = "androidx.datastore:datastore-preferences:1.1.0"
