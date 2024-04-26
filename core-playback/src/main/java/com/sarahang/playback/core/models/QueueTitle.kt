@@ -43,7 +43,7 @@ data class QueueTitle(val type: Type = Type.UNKNOWN, val value: String? = null) 
         UNKNOWN, AUDIO, ALBUM, ARTIST, SEARCH, DOWNLOADS;
 
         companion object {
-            private val map = values().associateBy { it.name }
+            private val map = entries.associateBy { it.name }
 
             fun from(value: String?) = map[value] ?: UNKNOWN
         }
