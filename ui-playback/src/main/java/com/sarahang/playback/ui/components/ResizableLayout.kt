@@ -18,7 +18,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -45,17 +46,16 @@ fun RowScope.ResizableLayout(
     maxWeight: Float,
     dragOffset: State<Float>,
     setDragOffset: (Float) -> Unit,
-    analyticsPrefix: String,
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.(Modifier) -> Unit,
 ) {
-    var weight by remember { mutableStateOf(initialWeight) }
+    var weight by remember { mutableFloatStateOf(initialWeight) }
     Box(modifier.weight(weight.coerceIn(minWeight, maxWeight))) {
         val availableWidthValue = availableWidth.value
         val dragRange = (-availableWidthValue / 3f)..(availableWidthValue / 3f)
         val dragSnapAnchors = listOf(0f, dragRange.endInclusive, dragRange.start)
         val dragOffsetWeight by remember { derivedStateOf { (dragOffset.value / availableWidthValue) * maxWeight } }
-        var dragSnapCurrentAnchor by remember { mutableStateOf(0) }
+        var dragSnapCurrentAnchor by remember { mutableIntStateOf(0) }
         weight = initialWeight + dragOffsetWeight
 
         val resizableModifier = Modifier.resizableArea(
@@ -64,8 +64,7 @@ fun RowScope.ResizableLayout(
             setDividerDragOffset = setDragOffset,
             dragSnapAnchors = dragSnapAnchors,
             dragSnapCurrentAnchor = dragSnapCurrentAnchor,
-            setDragSnapCurrentAnchor = { dragSnapCurrentAnchor = it },
-            analyticsPrefix = analyticsPrefix
+            setDragSnapCurrentAnchor = { dragSnapCurrentAnchor = it }
         )
 
         content(resizableModifier)
@@ -80,7 +79,6 @@ fun Modifier.resizableArea(
     dragSnapAnchors: List<Float>,
     dragSnapCurrentAnchor: Int,
     setDragSnapCurrentAnchor: (Int) -> Unit,
-    analyticsPrefix: String,
     orientation: Orientation = Orientation.Horizontal,
 ) = composed {
     val haptic = LocalHapticFeedback.current

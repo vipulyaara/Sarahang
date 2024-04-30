@@ -178,7 +178,6 @@ internal fun PlaybackSheet(
                             onArtistClick = goToCreator,
                             artworkVerticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .fillParentMaxHeight(fraction = 0.70f)
                                 .fillParentMaxWidth()
                                 .padding(vertical = 12.dp),
                         )
@@ -219,7 +218,6 @@ private fun RowScope.ResizablePlaybackQueue(
         maxWeight = 1.25f,
         dragOffset = dragOffset,
         setDragOffset = setDragOffset,
-        analyticsPrefix = "playbackSheet.layout",
         modifier = modifier,
     ) { resizableModifier ->
         val labelMod = Modifier.padding(top = Specs.padding)

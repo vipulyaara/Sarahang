@@ -8,6 +8,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
@@ -16,12 +17,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.text.TextStyle
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import com.sarahang.playback.ui.audio.ADAPTIVE_COLOR_ANIMATION
 import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import com.sarahang.playback.ui.audio.toAdaptiveColor
@@ -41,19 +37,16 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
     onTitleClick: () -> Unit = {},
     onArtistClick: () -> Unit = {}
 ) {
-    val color by animateColorAsState(adaptiveColor.primary, ADAPTIVE_COLOR_ANIMATION)
-    ConstraintLayout(modifier = modifier.fillMaxSize()) {
-        val (pager, nowPlayingControls) = createRefs()
+    val color by animateColorAsState(
+        adaptiveColor.primary,
+        ADAPTIVE_COLOR_ANIMATION,
+        label = "color"
+    )
+    Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         PlaybackPager(
             nowPlaying = nowPlaying,
             currentIndex = currentIndex,
-            modifier = Modifier
-                .constrainAs(pager) {
-                    centerHorizontallyTo(parent)
-                    top.linkTo(parent.top)
-                    bottom.linkTo(nowPlayingControls.top)
-                    height = Dimension.fillToConstraints
-                },
+            modifier = Modifier,
             verticalAlignment = artworkVerticalAlignment,
         ) { audio, _, pagerMod ->
             PlaybackArtwork(
@@ -74,11 +67,6 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
                 artistTextStyle = artistTextStyle,
                 onTitleClick = onTitleClick,
                 onArtistClick = onArtistClick,
-                modifier = Modifier.constrainAs(nowPlayingControls) {
-                    centerHorizontallyTo(parent)
-                    bottom.linkTo(parent.bottom)
-                    height = Dimension.fillToConstraints
-                }
             )
         }
     }
