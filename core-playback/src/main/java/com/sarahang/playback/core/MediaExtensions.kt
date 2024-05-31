@@ -65,7 +65,6 @@ fun MediaControllerCompat.toggleRepeatMode() {
     )
 }
 
-
 fun createDefaultPlaybackState(): PlaybackStateCompat.Builder {
     return PlaybackStateCompat.Builder().setActions(
         PlaybackStateCompat.ACTION_PLAY
@@ -82,7 +81,7 @@ fun createDefaultPlaybackState(): PlaybackStateCompat.Builder {
 }
 
 fun MediaSessionCompat.position(): Long {
-    return controller.playbackState.position
+    return controller?.playbackState?.position ?: 0
 }
 
 fun MediaSessionCompat.isPlaying(): Boolean {
