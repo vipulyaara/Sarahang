@@ -32,9 +32,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.graphics.ColorUtils
-import androidx.core.math.MathUtils
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import coil.imageLoader
@@ -46,9 +44,7 @@ import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artwork
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.ui.theme.PlayerTheme
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.math.PI
 import kotlin.math.cos
@@ -73,37 +69,6 @@ fun Color.toAdaptiveColor(
 )
 
 private val adaptiveColorCache = mutableMapOf<String, Color>()
-
-@Composable
-fun adaptiveColor(
-    imageData: Any?,
-    fallback: Color = MaterialTheme.colorScheme.secondary.contrastComposite(),
-    initial: Color = fallback,
-    animationSpec: AnimationSpec<Color> = ADAPTIVE_COLOR_ANIMATION,
-    gradientEndColor: Color = if (PlayerTheme.isLightTheme) Color.White else Color.Black,
-): State<AdaptiveColorResult> {
-    val context = LocalContext.current
-
-    var bitmap by remember { mutableStateOf<Bitmap?>(null) }
-    if (imageData != null)
-        LaunchedEffect(imageData) {
-            launch(Dispatchers.Unconfined) {
-                val result = context.getBitmap(imageData, size = 300, allowHardware = false)
-                if (result is Bitmap) {
-                    bitmap = result
-                }
-            }
-        }
-
-    return adaptiveColor(
-        image = bitmap,
-        imageSource = imageData,
-        fallback = fallback,
-        initial = initial,
-        animationSpec = animationSpec,
-        gradientEndColor = gradientEndColor
-    )
-}
 
 @Composable
 fun adaptiveColor(
@@ -230,30 +195,6 @@ fun getContrastColor(@ColorInt color: Int): Int {
     return if (a < 0.5) AColor.BLACK else AColor.WHITE
 }
 
-private fun desaturate(isDarkMode: Boolean, color: Int): Int {
-    if (!isDarkMode) {
-        return color
-    }
-
-    if (color == AColor.TRANSPARENT) {
-        // can't desaturate transparent color
-        return color
-    }
-    val amount = .25f
-    val minDesaturation = .75f
-
-    val hsl = floatArrayOf(0f, 0f, 0f)
-    ColorUtils.colorToHSL(color, hsl)
-    if (hsl[1] > minDesaturation) {
-        hsl[1] = MathUtils.clamp(
-            hsl[1] - amount,
-            minDesaturation - 0.1f,
-            1f
-        )
-    }
-    return ColorUtils.HSLToColor(hsl)
-}
-
 fun shiftColor(@ColorInt color: Int, @FloatRange(from = 0.0, to = 2.0) by: Float): Int {
     return if (by == 1.0f) {
         color
@@ -266,31 +207,12 @@ fun shiftColor(@ColorInt color: Int, @FloatRange(from = 0.0, to = 2.0) by: Float
     }
 }
 
-private fun Pair<Color, Color>.mergeColors(): Color {
-    val a = first
-    val b = second
-    var r = Color.Black
-
-    r = r.copy(alpha = 1 - (1 - b.alpha) * (1 - a.alpha))
-    r = r.copy(red = b.red * b.alpha / r.alpha + a.red * a.alpha * (1 - b.alpha) / r.alpha)
-    r = r.copy(green = b.green * b.alpha / r.alpha + a.green * a.alpha * (1 - b.alpha) / r.alpha)
-    r = r.copy(blue = b.blue * b.alpha / r.alpha + a.blue * a.alpha * (1 - b.alpha) / r.alpha)
-    return r
-}
-
 fun blendColors(
     @ColorInt color: Int,
     @ColorInt otherColor: Int,
     @FloatRange(from = 0.0, to = 1.0) percentage: Float
 ): Int {
     return ColorUtils.blendARGB(color, otherColor, percentage)
-}
-
-fun Color.blendWith(
-    otherColor: Color,
-    @FloatRange(from = 0.0, to = 1.0) percentage: Float
-): Color {
-    return blendColors(toArgb(), otherColor.toArgb(), percentage).toColors()
 }
 
 fun Int.toColors() = Color(this)

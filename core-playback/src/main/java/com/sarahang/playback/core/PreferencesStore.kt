@@ -29,12 +29,6 @@ class PreferencesStore @Inject constructor(@ApplicationContext private val conte
         coerceInputValues = true
     }
 
-    suspend fun <T> remove(key: Preferences.Key<T>) {
-        context.dataStore.edit { settings ->
-            settings.remove(key)
-        }
-    }
-
     suspend fun <T> save(keyName: String, value: T, serializer: KSerializer<T>) {
         val key = stringPreferencesKey(keyName)
         save(key, json.encodeToString(serializer, value))

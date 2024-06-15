@@ -82,7 +82,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -593,7 +592,6 @@ private fun RangeSliderImpl(
     }
 }
 
-@OptIn(InternalCoroutinesApi::class)
 @Composable
 private fun SliderThumb(
     modifier: Modifier,

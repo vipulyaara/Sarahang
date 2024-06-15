@@ -6,7 +6,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 object Specs {
-    val paddingTiny = 4.dp
     val padding = 12.dp
     val paddingSmall = 8.dp
     val paddingLarge = 24.dp

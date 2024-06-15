@@ -139,7 +139,7 @@ inline val MediaMetadataCompat.mediaId: String get() = getString(MediaMetadataCo
 
 inline val MediaMetadataCompat.id: String? get() = getString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID)
 
-inline val MediaMetadataCompat.fileId: String? get() = id.toMediaId().value
+inline val MediaMetadataCompat.fileId: String get() = id.toMediaId().value
 
 inline val MediaMetadataCompat.title: String? get() = getString(MediaMetadataCompat.METADATA_KEY_TITLE)
 

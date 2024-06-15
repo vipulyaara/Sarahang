@@ -11,7 +11,7 @@ internal object TypeScale {
     val BodyMediumLineHeight = 20.0.sp
     val BodySmallWeight = Typeface.WeightMedium
     val DisplayLargeLineHeight = 48.0.sp
-    val DisplayLargeTracking = -0.2.sp
+    val DisplayLargeTracking = (-0.2).sp
 
     val DisplaySmallLineHeight = 44.0.sp
     val DisplaySmallSize = 24.sp

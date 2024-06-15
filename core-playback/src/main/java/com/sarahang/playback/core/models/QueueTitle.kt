@@ -1,19 +1,8 @@
 package com.sarahang.playback.core.models
 
-import android.content.Context
-import com.sarahang.playback.core.R
-
 data class QueueTitle(val type: Type = Type.UNKNOWN, val value: String? = null) {
 
     override fun toString() = type.name + separator + (value ?: "")
-
-    fun localizeType(context: Context): String = when (type) {
-        Type.UNKNOWN, Type.AUDIO -> context.getString(R.string.playback_queueTitle_audio)
-        Type.ARTIST -> context.getString(R.string.playback_queueTitle_artist)
-        Type.ALBUM -> context.getString(R.string.playback_queueTitle_album)
-        Type.SEARCH -> context.getString(R.string.playback_queueTitle_search)
-        Type.DOWNLOADS -> context.getString(R.string.playback_queueTitle_downloads)
-    }
 
     fun localizeValue(): String = when (type) {
         Type.UNKNOWN, Type.AUDIO, Type.DOWNLOADS -> ""

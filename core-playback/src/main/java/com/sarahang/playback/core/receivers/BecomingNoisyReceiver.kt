@@ -8,7 +8,6 @@ import android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.content.ContextCompat
-import androidx.core.content.ContextCompat.RECEIVER_EXPORTED
 import androidx.core.content.ContextCompat.RECEIVER_NOT_EXPORTED
 
 class BecomingNoisyReceiver(
@@ -23,7 +22,7 @@ class BecomingNoisyReceiver(
 
     fun register() {
         if (!registered) {
-            ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+            ContextCompat.registerReceiver(context, this, filter, RECEIVER_NOT_EXPORTED)
             registered = true
         }
     }

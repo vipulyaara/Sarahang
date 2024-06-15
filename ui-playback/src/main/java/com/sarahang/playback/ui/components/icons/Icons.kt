@@ -12,7 +12,6 @@ import compose.icons.fontawesomeicons.solid.Forward
 import compose.icons.fontawesomeicons.solid.Hourglass
 import compose.icons.fontawesomeicons.solid.PauseCircle
 import compose.icons.fontawesomeicons.solid.PlayCircle
-import compose.icons.tablericons.BoxMultiple1
 import compose.icons.tablericons.Clock
 
 object Icons {
@@ -34,6 +33,4 @@ object Icons {
         get() = FeatherIcons.RotateCcw
     val TimerOff: ImageVector
         get() = TablerIcons.Clock
-    val PlaybackSpeed: ImageVector
-        get() = TablerIcons.BoxMultiple1
 }
