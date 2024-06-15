@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -50,8 +49,7 @@ fun SleepTimer(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = MaterialTheme.shapes.large,
-        containerColor = MaterialTheme.colorScheme.background,
-        windowInsets = WindowInsets(0)
+        containerColor = MaterialTheme.colorScheme.background
     ) {
         LazyColumn(
             modifier = Modifier

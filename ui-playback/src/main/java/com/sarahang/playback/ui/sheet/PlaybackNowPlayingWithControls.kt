@@ -27,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -398,7 +399,7 @@ private fun PlaybackSpeedButton(adaptiveColor: AdaptiveColorResult, modifier: Mo
 
     Box(
         modifier.simpleClickable(
-            indication = rememberRipple(bounded = false),
+            indication = ripple(bounded = false),
             label = stringResource(R.string.cd_open_sleep_timer)
         ) { showPlaybackSpeed = true }
     ) {

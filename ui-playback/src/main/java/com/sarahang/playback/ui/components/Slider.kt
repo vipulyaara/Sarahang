@@ -41,6 +41,7 @@ import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Slider
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
@@ -626,7 +627,7 @@ private fun SliderThumb(
                 .size(thumbSize, thumbSize)
                 .indication(
                     interactionSource = interactionSource,
-                    indication = rememberRipple(bounded = false, radius = thumbSize * 1.2f)
+                    indication = ripple(bounded = false, radius = thumbSize * 1.2f)
                 )
                 .shadow(if (enabled) elevation else 0.dp, CircleShape, clip = false)
                 .background(colors.thumbColor(enabled).value, CircleShape)
