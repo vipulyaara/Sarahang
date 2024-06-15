@@ -1,8 +1,9 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'dagger.hilt.android.plugin'
-    id 'kotlin-kapt'
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.cacheFixPlugin)
+    alias(libs.plugins.kotlin.compose.compiler)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -25,10 +26,6 @@ android {
 
     buildFeatures {
         compose true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion libs.versions.composecompiler.get()
     }
 
     compileOptions {
