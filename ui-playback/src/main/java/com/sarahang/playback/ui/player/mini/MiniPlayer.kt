@@ -341,7 +341,7 @@ private fun PlaybackProgress(
         else -> {
             val progress by animatePlaybackProgress(progressState.progress)
             LinearProgressIndicator(
-                progress = progress,
+                progress = { progress },
                 color = color,
                 trackColor = color.copy(alpha = 0.24f),
                 modifier = sizeModifier.then(modifier)

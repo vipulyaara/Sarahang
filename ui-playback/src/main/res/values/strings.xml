@@ -11,20 +11,11 @@
 
 
     <string name="playback.queue.title" translatable="false">Next up</string>
-    <string name="playback.queue.empty" translatable="false">Nothing in queue :(</string>
-    <string name="playback.queue.addQueueToPlaylist" translatable="false">Add queue to playlist</string>
-    <string name="playback.queue.saveAsPlaylist" translatable="false">Save queue as playlist</string>
-    <string name="playback.queue.saveAsPlaylist.saved" translatable="false">Saved as %1$s</string>
-    <string name="playback.queue.saveAsPlaylist.open" translatable="false">Open</string>
-
-    <string name="playback.queue.removeFromQueue" translatable="false">Remove from queue</string>
 
     <string name="playback.queueTitle.audio" translatable="false">Playing from queue</string>
     <string name="playback.queueTitle.downloads" translatable="false">Playing from downloads</string>
     <string name="playback.queueTitle.artist" translatable="false">Playing from artist</string>
-    <string name="playback.queueTitle.artist.value" translatable="false">Playing from artist</string>
     <string name="playback.queueTitle.album" translatable="false">Playing from album</string>
-    <string name="playback.queueTitle.playlist" translatable="false">Playing from playlist</string>
     <string name="playback.queueTitle.search" translatable="false">Playing from search</string>
     <string name="cd_open_player">Open player</string>
     <string name="cd_minimize_player">Minimize Player</string>
@@ -41,13 +32,9 @@
     <string name="cd_fast_forward">Fast forward</string>
     <string name="cd_rewind">Rewind</string>
     <string name="cd_previous">Previous</string>
-    <string name="cd_decrease_sleep_timer">Decrease sleep timer</string>
-    <string name="cd_increase_sleep_timer">Increase sleep timer</string>
     <string name="sleep_timer">Sleep Timer</string>
     <string name="playback_speed">Playback Speed</string>
-    <string name="start_timer">Start</string>
     <string name="stop_timer">Stop Timer</string>
-    <string name="x_mins_left">%1$s mins left</string>
     <string name="cd_play_pause">Play/Pause</string>
     <string name="cd_set_timer">Set timer</string>
     <string name="cd_stop_timer">Stop timer</string>

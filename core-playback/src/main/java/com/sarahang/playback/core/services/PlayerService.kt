@@ -167,6 +167,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
         launch {
             player.saveQueueState()
             player.release()
+            super.onDestroy()
         }
     }
 }

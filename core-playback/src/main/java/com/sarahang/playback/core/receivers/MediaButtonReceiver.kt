@@ -6,7 +6,6 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
@@ -200,13 +199,11 @@ class MediaButtonReceiver : BroadcastReceiver() {
             val intent = Intent(Intent.ACTION_MEDIA_BUTTON)
             intent.component = mbrComponent
             intent.putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(KeyEvent.ACTION_DOWN, keyCode))
-            if (Build.VERSION.SDK_INT >= 16) {
-                intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
-            }
+            intent.addFlags(Intent.FLAG_RECEIVER_FOREGROUND)
             return PendingIntent.getBroadcast(context, keyCode, intent, PendingIntent.FLAG_MUTABLE)
         }
 
-        fun getMediaButtonReceiverComponent(context: Context): ComponentName? {
+        private fun getMediaButtonReceiverComponent(context: Context): ComponentName? {
             val queryIntent = Intent(Intent.ACTION_MEDIA_BUTTON)
             queryIntent.setPackage(context.packageName)
             val pm = context.packageManager
