@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.session.MediaControllerCompat
-import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.support.v4.media.session.PlaybackStateCompat.MediaKeyAction
 import android.util.Log
@@ -94,30 +93,6 @@ class MediaButtonReceiver : BroadcastReceiver() {
 
     companion object {
         private const val TAG = "MediaButtonReceiver"
-
-        /**
-         * Extracts any available [KeyEvent] from an [Intent.ACTION_MEDIA_BUTTON]
-         * intent, passing it onto the [MediaSessionCompat] using
-         * [MediaControllerCompat.dispatchMediaButtonEvent], which in turn
-         * will trigger callbacks to the [MediaSessionCompat.Callback] registered via
-         * [MediaSessionCompat.setCallback].
-         *
-         * @param mediaSessionCompat A [MediaSessionCompat] that has a
-         * [MediaSessionCompat.Callback] set.
-         * @param intent             The intent to parse.
-         * @return The extracted [KeyEvent] if found, or null.
-         */
-        fun handleIntent(mediaSessionCompat: MediaSessionCompat?, intent: Intent?): KeyEvent? {
-            if (mediaSessionCompat == null || intent == null || Intent.ACTION_MEDIA_BUTTON != intent.action ||
-                !intent.hasExtra(Intent.EXTRA_KEY_EVENT)
-            ) {
-                return null
-            }
-            val ke = intent.getParcelableExtra<KeyEvent>(Intent.EXTRA_KEY_EVENT)
-            val mediaController = mediaSessionCompat.controller
-            mediaController.dispatchMediaButtonEvent(ke)
-            return ke
-        }
 
         /**
          * Creates a broadcast pending intent that will send a media button event. The `action`

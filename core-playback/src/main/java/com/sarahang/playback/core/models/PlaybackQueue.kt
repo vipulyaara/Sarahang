@@ -12,7 +12,6 @@ data class PlaybackQueue(
     val currentIndex: Int = 0,
     val isIndexValid: Boolean = true
 ) : List<Audio> by audios {
-    val isLastAudio = currentIndex == lastIndex
     val isValid = ids.isNotEmpty() && audios.isNotEmpty() && currentIndex >= 0
     val currentAudio get() = get(currentIndex)
 

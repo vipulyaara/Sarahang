@@ -2,11 +2,6 @@
 <resources>
     <string name="player_name" translatable="false">Sarahang</string>
 
-    <string name="playback.queueTitle.audio" translatable="false">Playing from queue</string>
-    <string name="playback.queueTitle.downloads" translatable="false">Playing from downloads</string>
-    <string name="playback.queueTitle.artist" translatable="false">Playing from artist</string>
-    <string name="playback.queueTitle.album" translatable="false">Playing from album</string>
-    <string name="playback.queueTitle.search" translatable="false">Playing from search</string>
     <string name="enable_alarm_permission_text" translatable="false">Select Kafka from the list</string>
     <string name="timer_is_set" translatable="false">Timer is set</string>
 </resources>

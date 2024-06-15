@@ -2,7 +2,6 @@
 <resources>
     <string name="generic.clipboard.copied" translatable="false">Copied</string>
 
-    <string name="audio.menu.cd" translatable="false">Audio menu</string>
     <string name="audio.menu.play" translatable="false">Play</string>
     <string name="audio.menu.playNext" translatable="false">Play next</string>
     <string name="audio.menu.download" translatable="false">Download</string>
@@ -12,11 +11,6 @@
 
     <string name="playback.queue.title" translatable="false">Next up</string>
 
-    <string name="playback.queueTitle.audio" translatable="false">Playing from queue</string>
-    <string name="playback.queueTitle.downloads" translatable="false">Playing from downloads</string>
-    <string name="playback.queueTitle.artist" translatable="false">Playing from artist</string>
-    <string name="playback.queueTitle.album" translatable="false">Playing from album</string>
-    <string name="playback.queueTitle.search" translatable="false">Playing from search</string>
     <string name="cd_open_player">Open player</string>
     <string name="cd_minimize_player">Minimize Player</string>
     <string name="cd_shuffle">Shuffle</string>

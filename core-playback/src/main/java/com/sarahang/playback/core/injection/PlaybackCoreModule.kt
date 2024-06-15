@@ -28,7 +28,6 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 import javax.inject.Named
-import javax.inject.Qualifier
 import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -97,8 +96,3 @@ private fun getBaseBuilder(cache: Cache): OkHttpClient.Builder {
         .cache(cache)
         .retryOnConnectionFailure(true)
 }
-
-@Retention(AnnotationRetention.RUNTIME)
-@Qualifier
-@MustBeDocumented
-annotation class Player
