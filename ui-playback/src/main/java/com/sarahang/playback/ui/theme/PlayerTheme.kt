@@ -1,7 +1,6 @@
 package com.sarahang.playback.ui.theme
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.ContentAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -23,7 +22,7 @@ fun String?.orNa() = this ?: "N/A"
 
 @Composable
 fun Color.disabledAlpha(condition: Boolean): Color =
-    copy(alpha = if (condition) alpha else ContentAlpha.disabled)
+    copy(alpha = if (condition) alpha else 0.38f)
 
 @Composable
 fun plainSurfaceColor() = if (isSystemInDarkTheme()) Color.Black else Color.White

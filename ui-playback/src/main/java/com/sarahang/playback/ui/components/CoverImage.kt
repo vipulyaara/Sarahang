@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ContentAlpha
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
@@ -73,7 +72,7 @@ fun CoverImage(
                 is State.Error, State.Empty, is State.Loading -> {
                     Icon(
                         painter = icon,
-                        tint = contentColor.copy(alpha = ContentAlpha.disabled),
+                        tint = contentColor.copy(alpha = 0.38f),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize()
