@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.sarahang.playback.core.PlayerRemoteConfig
 import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.apis.PlayerEventLogger
 import com.sarahang.playback.core.timer.SleepTimer
@@ -22,7 +21,6 @@ import javax.inject.Inject
 class SleepTimerViewModel @Inject constructor(
     private val sleepTimer: SleepTimer,
     private val playerEventLogger: PlayerEventLogger,
-    private val playerRemoteConfig: PlayerRemoteConfig,
     preferences: PreferencesStore,
 ) : ViewModel() {
     private val currentTimerInterval = preferences.getStateFlow(
@@ -30,8 +28,6 @@ class SleepTimerViewModel @Inject constructor(
         scope = viewModelScope,
         initialValue = TimerInterval.FifteenMinutes.millis()
     )
-
-    private val isExactAlarmEnabled by lazy { playerRemoteConfig.isExactAlarmEnabled() }
 
     val state: StateFlow<SleepTimerViewState> = combine(
         flowOf(TimerInterval.all()),
@@ -52,8 +48,7 @@ class SleepTimerViewModel @Inject constructor(
         sleepTimer.start(
             time = timerInterval.time,
             timeUnit = timerInterval.timeUnit,
-            context = context,
-            isExactAlarmEnabled = isExactAlarmEnabled
+            context = context
         )
     }
 

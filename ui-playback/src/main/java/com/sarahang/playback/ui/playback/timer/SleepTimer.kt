@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.playback.timer
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -88,7 +87,7 @@ fun SleepTimer(
             }
 
             item {
-                AnimatedVisibility(viewState.isTimerRunning) {
+                if (viewState.isTimerRunning) {
                     StopTimerItem(
                         adaptiveColor = adaptiveColor,
                         modifier = Modifier

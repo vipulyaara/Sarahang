@@ -4,11 +4,8 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.os.SystemClock
-import android.provider.Settings
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.core.content.getSystemService
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.sarahang.playback.core.ACTION_QUIT
@@ -26,7 +23,7 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 interface SleepTimer {
-    fun start(time: Long, timeUnit: TimeUnit, context: Context, isExactAlarmEnabled: Boolean)
+    fun start(time: Long, timeUnit: TimeUnit, context: Context)
 
     // alarm PendingIntent, if an alarm is set, or null if no alarm is set
     fun alarmIntent(): PendingIntent?
@@ -49,39 +46,15 @@ class SleepTimerImpl @Inject constructor(
     override fun start(
         time: Long,
         timeUnit: TimeUnit,
-        context: Context,
-        isExactAlarmEnabled: Boolean
+        context: Context
     ) {
         cancelAlarm()
         val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)
 
         makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)?.let { pendingIntent ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                if (isExactAlarmEnabled) {
-                    if (alarmManager?.canScheduleExactAlarms() == false) {
-                        setExactAlarmWithExplicitPermission(context)
-                    } else {
-                        setExactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
-                        onAlarmSet()
-                    }
-                } else {
-                    setInexactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
-                    onAlarmSet()
-                }
-            } else {
-                setExactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
-                onAlarmSet()
-            }
+            setInexactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)
+            onAlarmSet()
         }
-
-    }
-
-    private fun setExactAlarm(alarmTime: Long, pendingIntent: PendingIntent) {
-        alarmManager?.setExact(
-            /* type = */ AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            /* triggerAtMillis = */ alarmTime,
-            /* operation = */ pendingIntent
-        )
     }
 
     private fun setInexactAlarm(alarmTime: Long, pendingIntent: PendingIntent) {
@@ -92,31 +65,16 @@ class SleepTimerImpl @Inject constructor(
         )
     }
 
-    @RequiresApi(Build.VERSION_CODES.S)
-    private fun setExactAlarmWithExplicitPermission(context: Context) {
-        Toast.makeText(
-            /* context = */ context,
-            /* text = */ context.getString(R.string.enable_alarm_permission_text),
-            /* duration = */ Toast.LENGTH_SHORT
-        ).show()
-        Intent().also { intent ->
-            intent.action = Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM
-            context.startActivity(intent)
-        }
-    }
-
     private fun onAlarmSet() {
         setRunningStatus()
-        Toast.makeText(
-            /* context = */ context,
-            /* text = */ context.getString(R.string.timer_is_set),
-            /* duration = */ Toast.LENGTH_SHORT
-        ).show()
+        Toast.makeText(context, context.getString(R.string.timer_is_set), Toast.LENGTH_SHORT).show()
     }
 
     override fun cancelAlarm() {
-        alarmIntent()?.let { alarmManager?.cancel(it) }
-        alarmIntent()?.cancel()
+        alarmIntent()?.let { alarmIntent ->
+            alarmManager?.cancel(alarmIntent)
+            alarmIntent.cancel()
+        }
         setRunningStatus()
     }
 
