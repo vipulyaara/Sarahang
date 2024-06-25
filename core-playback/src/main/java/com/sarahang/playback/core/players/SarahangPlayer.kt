@@ -26,7 +26,7 @@ import android.support.v4.media.session.PlaybackStateCompat.STATE_PLAYING
 import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
-import com.google.android.exoplayer2.PlaybackParameters
+import androidx.media3.common.PlaybackParameters
 import com.sarahang.playback.core.BY_UI_KEY
 import com.sarahang.playback.core.MediaQueueBuilder
 import com.sarahang.playback.core.PreferencesStore

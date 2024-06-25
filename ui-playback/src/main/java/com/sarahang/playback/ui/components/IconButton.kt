@@ -4,8 +4,6 @@ import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -50,12 +48,9 @@ fun IconButton(
             .then(IconButtonSizeModifier),
         contentAlignment = Alignment.Center
     ) {
-        val contentAlpha = if (enabled) LocalContentAlpha.current else ContentAlpha.disabled
         content()
     }
 }
 
 private val RippleRadius = 24.dp
 private val IconButtonSizeModifier = Modifier.size(48.dp)
-
-val IconRippleRadiusMedium = 32.dp

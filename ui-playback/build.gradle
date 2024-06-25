@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.compose.ui.tooling)
     implementation(libs.compose.ui.ui)
     implementation(libs.compose.ui.util)
-    implementation libs.compose.ui.textfonts
+    implementation(libs.compose.ui.textfonts)
 
     implementation(libs.accompanist.placeholder)
 
@@ -60,8 +60,6 @@ dependencies {
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.androidx.lifecycle.viewmodel.ktx
     implementation libs.androidx.palette
-    implementation libs.exoplayer.core
-    implementation libs.exoplayer.okhttp
     implementation libs.hilt.android
     implementation libs.kotlin.serialization
 

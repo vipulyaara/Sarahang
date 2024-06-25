@@ -1,9 +1,10 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.cacheFixPlugin)
+    alias(libs.plugins.kotlin.compose.compiler)
     id 'dagger.hilt.android.plugin'
-    id 'kotlin-kapt'
 }
 
 android {
@@ -55,7 +56,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.room.ktx)
 
-    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.compose.animation.animation)
     implementation(libs.compose.foundation.foundation)
     implementation(libs.compose.foundation.layout)
