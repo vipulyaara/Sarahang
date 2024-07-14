@@ -152,7 +152,13 @@ internal fun PlaybackSheet(
                 modifier = Modifier
                     .testTag("playback_sheet")
                     .background(
-                        Brush.verticalGradient(listOf(colorScheme.primary, colorScheme.background, colorScheme.background))
+                        Brush.verticalGradient(
+                            listOf(
+                                colorScheme.primary,
+                                colorScheme.background,
+                                colorScheme.background
+                            )
+                        )
                     )
                     .weight(1f)
             ) { paddings ->
