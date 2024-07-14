@@ -87,6 +87,7 @@ fun MiniPlayer(
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
+    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.artworkUri
 
     AnimatedVisibility(
         visible = (playbackState to nowPlaying).isActive,
@@ -94,7 +95,7 @@ fun MiniPlayer(
         enter = slideInVertically(initialOffsetY = { it / 2 }),
         exit = slideOutVertically(targetOffsetY = { it / 2 })
     ) {
-        DynamicTheme(model = nowPlaying.artworkUri, useDarkTheme = useDarkTheme) {
+        DynamicTheme(model = themeArtwork, useDarkTheme = useDarkTheme) {
             PlaybackMiniControls(
                 playbackState = playbackState,
                 nowPlaying = nowPlaying,

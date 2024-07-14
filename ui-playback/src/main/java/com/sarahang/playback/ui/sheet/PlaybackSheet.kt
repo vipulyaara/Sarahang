@@ -86,9 +86,10 @@ fun PlaybackSheet(
 
     val playbackConnection = LocalPlaybackConnection.current
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
+    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.artworkUri
 
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
-        DynamicTheme(model = nowPlaying.artworkUri, useDarkTheme = useDarkTheme) {
+        DynamicTheme(model = themeArtwork, useDarkTheme = useDarkTheme) {
             PlaybackSheet(
                 onClose = onClose,
                 goToItem = goToItem,
