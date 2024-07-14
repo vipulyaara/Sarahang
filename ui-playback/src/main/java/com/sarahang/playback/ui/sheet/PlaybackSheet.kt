@@ -1,5 +1,6 @@
 package com.sarahang.playback.ui.sheet
 
+import android.support.v4.media.MediaMetadataCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -40,6 +41,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -53,18 +55,16 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.NONE_PLAYBACK_STATE
 import com.sarahang.playback.core.PlaybackConnection
-import com.sarahang.playback.core.artwork
+import com.sarahang.playback.core.artworkUri
 import com.sarahang.playback.core.isIdle
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import com.sarahang.playback.ui.audio.AudioRow
 import com.sarahang.playback.ui.audio.LocalAudioActionHandler
-import com.sarahang.playback.ui.audio.adaptiveColor
 import com.sarahang.playback.ui.audio.audioActionHandler
-import com.sarahang.playback.ui.audio.materialYouAdaptiveColor
+import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
@@ -75,6 +75,7 @@ import kotlinx.coroutines.flow.filter
 
 @Composable
 fun PlaybackSheet(
+    useDarkTheme: Boolean,
     onClose: (() -> Unit)?,
     playerTheme: String = materialYouPlayerTheme,
     goToItem: () -> Unit = {},
@@ -83,15 +84,22 @@ fun PlaybackSheet(
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
 
+    val playbackConnection = LocalPlaybackConnection.current
+    val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
+
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
-        PlaybackSheet(
-            onClose = onClose,
-            goToItem = goToItem,
-            goToCreator = goToCreator,
-            playerTheme = playerTheme,
-            listState = listState,
-            queueListState = rememberLazyListState()
-        )
+        DynamicTheme(model = nowPlaying.artworkUri, useDarkTheme = useDarkTheme) {
+            PlaybackSheet(
+                onClose = onClose,
+                goToItem = goToItem,
+                goToCreator = goToCreator,
+                playerTheme = playerTheme,
+                listState = listState,
+                queueListState = rememberLazyListState(),
+                playbackConnection = playbackConnection,
+                nowPlaying = nowPlaying
+            )
+        }
     }
 }
 
@@ -104,16 +112,10 @@ internal fun PlaybackSheet(
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
+    nowPlaying: MediaMetadataCompat
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
-    val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
-
-    val adaptiveColor by if (playerTheme == materialYouPlayerTheme) materialYouAdaptiveColor() else adaptiveColor(
-        image = nowPlaying.artwork,
-        initial = colorScheme.onBackground,
-        gradientEndColor = colorScheme.background,
-    )
 
     LaunchedEffect(playbackConnection) {
         playbackConnection.playbackState
@@ -139,8 +141,7 @@ internal fun PlaybackSheet(
                 ResizablePlaybackQueue(
                     maxWidth = maxWidth,
                     playbackQueue = playbackQueue,
-                    queueListState = queueListState,
-                    adaptiveColor = adaptiveColor
+                    queueListState = queueListState
                 )
             }
 
@@ -149,7 +150,9 @@ internal fun PlaybackSheet(
                 contentColor = colorScheme.onSurface,
                 modifier = Modifier
                     .testTag("playback_sheet")
-                    .background(adaptiveColor.gradient)
+                    .background(
+                        Brush.verticalGradient(listOf(colorScheme.primary, colorScheme.background, colorScheme.background))
+                    )
                     .weight(1f)
             ) { paddings ->
                 LazyColumn(
@@ -173,7 +176,6 @@ internal fun PlaybackSheet(
                             nowPlaying = nowPlaying,
                             playbackState = playbackState,
                             currentIndex = playbackQueue.currentIndex,
-                            adaptiveColor = adaptiveColor,
                             onTitleClick = goToItem,
                             onArtistClick = goToCreator,
                             artworkVerticalAlignment = Alignment.CenterVertically,
@@ -186,8 +188,7 @@ internal fun PlaybackSheet(
                     if (!isWideLayout && playbackQueue.isNotEmpty()) {
                         playbackQueue(
                             playbackQueue = playbackQueue,
-                            playbackConnection = playbackConnection,
-                            adaptiveColor = adaptiveColor
+                            playbackConnection = playbackConnection
                         )
                     }
 
@@ -208,8 +209,7 @@ private fun RowScope.ResizablePlaybackQueue(
     resizableLayoutViewModel: ResizablePlaybackSheetLayoutViewModel = hiltViewModel(),
     dragOffset: State<Float> = resizableLayoutViewModel.dragOffset.collectAsStateWithLifecycle(),
     setDragOffset: (Float) -> Unit = resizableLayoutViewModel::setDragOffset,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
-    adaptiveColor: AdaptiveColorResult
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
 ) {
     ResizableLayout(
         availableWidth = maxWidth,
@@ -231,8 +231,7 @@ private fun RowScope.ResizablePlaybackQueue(
 
                 playbackQueue(
                     playbackQueue = playbackQueue,
-                    playbackConnection = playbackConnection,
-                    adaptiveColor = adaptiveColor
+                    playbackConnection = playbackConnection
                 )
             }
             Divider(
@@ -260,6 +259,7 @@ private fun PlaybackSheetTopBar(
                     Icon(
                         painter = rememberVectorPainter(Icons.Default.KeyboardArrowDown),
                         modifier = Modifier.size(Specs.iconSize),
+                        tint = colorScheme.onPrimary,
                         contentDescription = stringResource(R.string.cd_minimize_player),
                     )
                 }
@@ -288,6 +288,7 @@ private fun PlaybackSheetTopBarTitle(
         Text(
             text = queueTitle.localizeValue().uppercase(),
             style = MaterialTheme.typography.labelSmall,
+            color = colorScheme.onPrimary,
             maxLines = 1,
             modifier = Modifier.simpleClickable { onTitleClick() },
         )
@@ -308,14 +309,12 @@ private fun LazyListScope.playbackQueueLabel(modifier: Modifier = Modifier) {
 
 private fun LazyListScope.playbackQueue(
     playbackQueue: PlaybackQueue,
-    playbackConnection: PlaybackConnection,
-    adaptiveColor: AdaptiveColorResult
+    playbackConnection: PlaybackConnection
 ) {
     itemsIndexed(playbackQueue, key = { _, a -> a.id }) { index, audio ->
         AudioRow(
             audio = audio,
             audioIndex = index,
-            adaptiveColor = adaptiveColor,
             onPlayAudio = {
                 playbackConnection.transportControls?.skipToQueueItem(index.toLong())
             },

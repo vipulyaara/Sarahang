@@ -8,7 +8,6 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -51,8 +50,6 @@ fun AudioRow(
     onClick: ((Audio) -> Unit)? = null,
     onPlayAudio: ((Audio) -> Unit)? = null,
     audioIndex: Int = 0,
-    adaptiveColor: AdaptiveColorResult = MaterialTheme.colorScheme.background
-        .toAdaptiveColor(isSystemInDarkTheme()),
     actionHandler: AudioActionHandler = LocalAudioActionHandler.current,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
@@ -60,8 +57,8 @@ fun AudioRow(
     val nowPlayingAudio by playbackConnection.nowPlayingAudio.collectAsStateWithLifecycle()
     val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
 
-    val containerColor by animateColorAsState(if (isCurrentAudio) adaptiveColor.primary else Color.Transparent)
-    val contentColor = if (isCurrentAudio) adaptiveColor.onPrimary
+    val containerColor by animateColorAsState(if (isCurrentAudio) MaterialTheme.colorScheme.primary else Color.Transparent)
+    val contentColor = if (isCurrentAudio) MaterialTheme.colorScheme.onPrimary
     else MaterialTheme.colorScheme.onBackground
 
     Row(

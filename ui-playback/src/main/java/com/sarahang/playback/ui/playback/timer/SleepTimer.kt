@@ -4,9 +4,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
@@ -24,13 +28,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import kotlinx.coroutines.launch
 
 @Composable
 fun SleepTimer(
     viewModel: SleepTimerViewModel,
-    adaptiveColor: AdaptiveColorResult,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -48,7 +50,8 @@ fun SleepTimer(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = MaterialTheme.shapes.large,
-        containerColor = MaterialTheme.colorScheme.background
+        containerColor = MaterialTheme.colorScheme.background,
+        windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Top)
     ) {
         LazyColumn(
             modifier = Modifier
@@ -89,7 +92,6 @@ fun SleepTimer(
             item {
                 if (viewState.isTimerRunning) {
                     StopTimerItem(
-                        adaptiveColor = adaptiveColor,
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable(onClickLabel = stringResource(R.string.cd_stop_timer)) {
@@ -105,7 +107,7 @@ fun SleepTimer(
 }
 
 @Composable
-private fun StopTimerItem(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
+private fun StopTimerItem(modifier: Modifier = Modifier) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier,
@@ -114,7 +116,7 @@ private fun StopTimerItem(adaptiveColor: AdaptiveColorResult, modifier: Modifier
         Text(
             text = stringResource(id = R.string.stop_timer),
             style = MaterialTheme.typography.titleMedium,
-            color = adaptiveColor.primary,
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }

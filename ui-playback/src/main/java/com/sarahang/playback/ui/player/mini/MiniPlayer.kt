@@ -27,12 +27,10 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -46,7 +44,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -64,8 +61,7 @@ import com.sarahang.playback.core.models.toAudio
 import com.sarahang.playback.core.playPause
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.audio.Dismissable
-import com.sarahang.playback.ui.audio.materialYouAdaptiveColor
-import com.sarahang.playback.ui.audio.nowPlayingArtworkAdaptiveColor
+import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.components.animatePlaybackProgress
 import com.sarahang.playback.ui.components.icons.Icons
@@ -83,6 +79,7 @@ object PlaybackMiniControlsDefaults {
 
 @Composable
 fun MiniPlayer(
+    useDarkTheme: Boolean,
     modifier: Modifier = Modifier,
     playerTheme: String = materialYouPlayerTheme,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
@@ -97,14 +94,16 @@ fun MiniPlayer(
         enter = slideInVertically(initialOffsetY = { it / 2 }),
         exit = slideOutVertically(targetOffsetY = { it / 2 })
     ) {
-        PlaybackMiniControls(
-            playbackState = playbackState,
-            nowPlaying = nowPlaying,
-            onPlayPause = { playbackConnection.mediaController?.playPause() },
-            openPlaybackSheet = openPlaybackSheet,
-            modifier = Modifier.testTag("mini_player"),
-            playerTheme = playerTheme,
-        )
+        DynamicTheme(model = nowPlaying.artworkUri, useDarkTheme = useDarkTheme) {
+            PlaybackMiniControls(
+                playbackState = playbackState,
+                nowPlaying = nowPlaying,
+                onPlayPause = { playbackConnection.mediaController?.playPause() },
+                openPlaybackSheet = openPlaybackSheet,
+                modifier = Modifier.testTag("mini_player"),
+                playerTheme = playerTheme,
+            )
+        }
     }
 }
 
@@ -119,10 +118,6 @@ private fun PlaybackMiniControls(
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     openPlaybackSheet: () -> Unit
 ) {
-    val adaptiveColor by if (playerTheme == materialYouPlayerTheme) materialYouAdaptiveColor() else nowPlayingArtworkAdaptiveColor()
-    val backgroundColor = adaptiveColor.primary
-    val contentColor = adaptiveColor.onPrimary
-
     val isWideLayout = isWideScreen()
     Dismissable(onDismiss = { playbackConnection.transportControls?.stop() }) {
         var dragOffset by remember { mutableFloatStateOf(0f) }
@@ -155,49 +150,47 @@ private fun PlaybackMiniControls(
                 val smallPadding = 8.dp
                 val tinyPadding = 4.dp
 
-                CompositionLocalProvider(LocalContentColor provides contentColor) {
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(backgroundColor)
-                            .onGloballyPositioned {
-                                aspectRatio = it.size.height.toFloat() / it.size.width.toFloat()
-                                controlsVisible = aspectRatio < 0.9
-                                nowPlayingVisible = aspectRatio < 0.5
-                                controlsEndPadding = when (aspectRatio) {
-                                    in 0.0..0.15 -> 0.dp
-                                    in 0.15..0.35 -> tinyPadding
-                                    else -> smallPadding
-                                }
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primary)
+                        .onGloballyPositioned {
+                            aspectRatio = it.size.height.toFloat() / it.size.width.toFloat()
+                            controlsVisible = aspectRatio < 0.9
+                            nowPlayingVisible = aspectRatio < 0.5
+                            controlsEndPadding = when (aspectRatio) {
+                                in 0.0..0.15 -> 0.dp
+                                in 0.15..0.35 -> tinyPadding
+                                else -> smallPadding
                             }
-                            .padding(if (controlsVisible) PaddingValues(end = controlsEndPaddingAnimated) else PaddingValues())
-                    ) {
-                        PlaybackNowPlaying(
-                            nowPlaying = nowPlaying,
-                            maxHeight = height,
-                            coverOnly = !nowPlayingVisible
-                        )
-                        if (controlsVisible && !isWideLayout)
-                            PlaybackPlayPause(
-                                playbackState = playbackState,
-                                onPlayPause = onPlayPause
-                            )
-                    }
-
-                    if (isWideLayout) {
-                        WidePlayerControls(
+                        }
+                        .padding(if (controlsVisible) PaddingValues(end = controlsEndPaddingAnimated) else PaddingValues())
+                ) {
+                    PlaybackNowPlaying(
+                        nowPlaying = nowPlaying,
+                        maxHeight = height,
+                        coverOnly = !nowPlayingVisible
+                    )
+                    if (controlsVisible && !isWideLayout)
+                        PlaybackPlayPause(
                             playbackState = playbackState,
-                            color = backgroundColor
+                            onPlayPause = onPlayPause
                         )
-                    }
+                }
 
-                    PlaybackProgress(
+                if (isWideLayout) {
+                    WidePlayerControls(
                         playbackState = playbackState,
-                        color = MaterialTheme.colorScheme.onBackground
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
+
+                PlaybackProgress(
+                    playbackState = playbackState,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
             }
         }
     }
@@ -239,6 +232,7 @@ private fun PlaybackNowPlaying(audio: Audio, modifier: Modifier = Modifier) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.basicMarquee()
         )
         Text(
@@ -246,6 +240,7 @@ private fun PlaybackNowPlaying(audio: Audio, modifier: Modifier = Modifier) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onPrimary,
             modifier = Modifier.basicMarquee()
         )
     }
@@ -270,6 +265,7 @@ internal fun RowScope.PlaybackPlayPause(
                 else -> Icons.Hourglass
             },
             modifier = Modifier.size(size),
+            tint = MaterialTheme.colorScheme.onPrimary,
             contentDescription = when {
                 playbackState.isError -> stringResource(R.string.cd_play_error)
                 playbackState.isPlaying -> stringResource(R.string.cd_pause)
@@ -348,10 +344,4 @@ private fun PlaybackProgress(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun PlaybackMiniControlsPreview() {
-    MiniPlayer(Modifier.fillMaxWidth())
 }

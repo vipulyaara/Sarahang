@@ -8,10 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -32,13 +36,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.AdaptiveColorResult
 import kotlinx.coroutines.launch
 
 @Composable
 fun PlaybackSpeed(
     viewModel: PlaybackSpeedViewModel,
-    adaptiveColor: AdaptiveColorResult,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
@@ -55,7 +57,8 @@ fun PlaybackSpeed(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
         shape = MaterialTheme.shapes.large,
-        containerColor = colorScheme.background
+        containerColor = colorScheme.background,
+        windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Top)
     ) {
         Column(
             modifier = Modifier
@@ -78,7 +81,7 @@ fun PlaybackSpeed(
 
             val sliderState = rememberPodcastSliderState(currentValue = currentSpeed * 10)
 
-            PodcastSlider(state = sliderState, primaryColor = adaptiveColor.primary)
+            PodcastSlider(state = sliderState)
 
             LaunchedEffect(sliderState.currentValue) {
                 viewModel.setSpeedRaw(sliderState.currentValue)
@@ -88,8 +91,7 @@ fun PlaybackSpeed(
 
             QuickSpeedRow(
                 intervals = viewModel.quickSpeedIntervals,
-                currentSpeed = currentSpeed,
-                adaptiveColor = adaptiveColor
+                currentSpeed = currentSpeed
             ) {
                 viewModel.setSpeed(it)
                 dismissSheet()
@@ -102,7 +104,6 @@ fun PlaybackSpeed(
 private fun QuickSpeedRow(
     intervals: List<Float>,
     currentSpeed: Float,
-    adaptiveColor: AdaptiveColorResult,
     modifier: Modifier = Modifier,
     onSpeedChanged: (Float) -> Unit
 ) {
@@ -114,11 +115,11 @@ private fun QuickSpeedRow(
     ) {
         items(intervals) { speed ->
             val background by animateColorAsState(
-                targetValue = if (speed == currentSpeed) adaptiveColor.primary else colorScheme.surfaceVariant,
+                targetValue = if (speed == currentSpeed) colorScheme.primary else colorScheme.surfaceVariant,
                 label = "background"
             )
             val contentColor by animateColorAsState(
-                targetValue = if (speed == currentSpeed) adaptiveColor.onPrimary else colorScheme.onSurfaceVariant,
+                targetValue = if (speed == currentSpeed) colorScheme.onPrimary else colorScheme.onSurfaceVariant,
                 label = "content"
             )
 

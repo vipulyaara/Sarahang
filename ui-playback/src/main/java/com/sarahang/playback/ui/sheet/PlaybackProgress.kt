@@ -17,7 +17,6 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -60,7 +59,7 @@ fun PlaybackProgress(
             draggingProgress = draggingProgress,
             setDraggingProgress = setDraggingProgress,
             thumbRadius = if (isDragging) thumbRadius * 3 else thumbRadius,
-            contentColor = contentColorFor(LocalContentColor.current)
+            contentColor = MaterialTheme.colorScheme.primary
         )
         PlaybackProgressDuration(progressState, draggingProgress, thumbRadius)
     }

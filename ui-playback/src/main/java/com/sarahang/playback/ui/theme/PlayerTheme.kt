@@ -12,11 +12,6 @@ object Specs {
     val iconSize = 32.dp
 }
 
-object PlayerTheme {
-    val isLightTheme
-        @Composable get() = !isSystemInDarkTheme()
-}
-
 fun String?.orNa() = this ?: "N/A"
 
 @Composable

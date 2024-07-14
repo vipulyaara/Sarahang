@@ -3,7 +3,6 @@ package com.sarahang.playback.ui.sheet
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.basicMarquee
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -58,8 +56,6 @@ import com.sarahang.playback.core.title
 import com.sarahang.playback.core.toggleRepeatMode
 import com.sarahang.playback.core.toggleShuffleMode
 import com.sarahang.playback.ui.R
-import com.sarahang.playback.ui.audio.AdaptiveColorResult
-import com.sarahang.playback.ui.audio.toAdaptiveColor
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeed
@@ -85,8 +81,6 @@ internal fun PlaybackNowPlayingWithControls(
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
-    adaptiveColor: AdaptiveColorResult = LocalContentColor.current
-        .toAdaptiveColor(isSystemInDarkTheme()),
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     onlyControls: Boolean = false,
@@ -101,8 +95,7 @@ internal fun PlaybackNowPlayingWithControls(
                 onTitleClick = onTitleClick,
                 onArtistClick = onArtistClick,
                 titleTextStyle = titleTextStyle,
-                artistTextStyle = artistTextStyle,
-                adaptiveColor = adaptiveColor
+                artistTextStyle = artistTextStyle
             )
 
         PlaybackProgress(playbackState = playbackState)
@@ -120,8 +113,6 @@ internal fun PlaybackNowPlaying(
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
-    adaptiveColor: AdaptiveColorResult = LocalContentColor.current
-        .toAdaptiveColor(isSystemInDarkTheme()),
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
@@ -136,6 +127,7 @@ internal fun PlaybackNowPlaying(
         Text(
             text = nowPlaying.title.orNa(),
             style = titleTextStyle,
+            color = MaterialTheme.colorScheme.primary,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
             modifier = Modifier
@@ -148,7 +140,7 @@ internal fun PlaybackNowPlaying(
             style = artistTextStyle,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
-            color = LocalContentColor.current.disabledAlpha(condition = true),
+            color = MaterialTheme.colorScheme.primary.disabledAlpha(condition = true),
             modifier = Modifier
                 .simpleClickable(onClick = onArtistClick)
                 .basicMarquee()
@@ -167,8 +159,8 @@ internal fun PlaybackNowPlaying(
                 horizontalArrangement = Arrangement.spacedBy(24.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                PlaybackSpeedButton(adaptiveColor = adaptiveColor)
-                SleepTimerButton(adaptiveColor)
+                PlaybackSpeedButton()
+                SleepTimerButton()
             }
         }
     }
@@ -252,7 +244,7 @@ internal fun PlayerPreviousControl(
     ) {
         Icon(
             painter = rememberVectorPainter(PlayerIcons.Previous),
-            tint = LocalContentColor.current.disabledAlpha(playbackState.hasPrevious),
+            tint = MaterialTheme.colorScheme.primary.disabledAlpha(playbackState.hasPrevious),
             modifier = Modifier.fillMaxSize(),
             contentDescription = stringResource(R.string.cd_previous)
         )
@@ -273,6 +265,7 @@ private fun RewindControl(
         Icon(
             painter = rememberVectorPainter(PlayerIcons.Rewind),
             modifier = Modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = stringResource(R.string.cd_rewind)
         )
     }
@@ -292,6 +285,7 @@ private fun FastForwardControl(
         Icon(
             painter = rememberVectorPainter(PlayerIcons.FastForward),
             modifier = Modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = stringResource(R.string.cd_fast_forward)
         )
     }
@@ -311,7 +305,7 @@ internal fun PlayerNextControl(
     ) {
         Icon(
             painter = rememberVectorPainter(PlayerIcons.Next),
-            tint = LocalContentColor.current.disabledAlpha(playbackState.hasNext),
+            tint = MaterialTheme.colorScheme.primary.disabledAlpha(playbackState.hasNext),
             modifier = Modifier.fillMaxSize(),
             contentDescription = stringResource(R.string.cd_next)
         )
@@ -340,6 +334,7 @@ internal fun PlayerPlayControl(
         Icon(
             painter = painter,
             modifier = Modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = when {
                 playbackState.isError -> stringResource(R.string.cd_play_error)
                 playbackState.isPlaying -> stringResource(R.string.cd_pause)
@@ -351,13 +346,13 @@ internal fun PlayerPlayControl(
 }
 
 @Composable
-private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
+private fun SleepTimerButton(modifier: Modifier = Modifier) {
     val timerViewModel = hiltViewModel<SleepTimerViewModel>()
     val timerViewState by timerViewModel.state.collectAsStateWithLifecycle()
 
     var showTimer by remember { mutableStateOf(false) }
     if (showTimer) {
-        SleepTimer(viewModel = timerViewModel, adaptiveColor = adaptiveColor) { showTimer = false }
+        SleepTimer(viewModel = timerViewModel) { showTimer = false }
     }
 
     IconButton(
@@ -371,8 +366,8 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(1.5.dp),
-                color = adaptiveColor.primary,
-                contentColor = adaptiveColor.onPrimary,
+                color = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary,
             )
         }
 
@@ -380,6 +375,7 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
             Icon(
                 painter = rememberVectorPainter(PlayerIcons.TimerOff),
                 modifier = Modifier.fillMaxSize(),
+                tint = MaterialTheme.colorScheme.primary,
                 contentDescription = stringResource(R.string.cd_sleep_timer)
             )
         }
@@ -387,13 +383,13 @@ private fun SleepTimerButton(adaptiveColor: AdaptiveColorResult, modifier: Modif
 }
 
 @Composable
-private fun PlaybackSpeedButton(adaptiveColor: AdaptiveColorResult, modifier: Modifier = Modifier) {
+private fun PlaybackSpeedButton(modifier: Modifier = Modifier) {
     val viewModel = hiltViewModel<PlaybackSpeedViewModel>()
     val currentSpeed by viewModel.currentSpeed.collectAsStateWithLifecycle()
 
     var showPlaybackSpeed by remember { mutableStateOf(false) }
     if (showPlaybackSpeed) {
-        PlaybackSpeed(viewModel, adaptiveColor) { showPlaybackSpeed = false }
+        PlaybackSpeed(viewModel) { showPlaybackSpeed = false }
     }
 
     Box(
@@ -411,6 +407,7 @@ private fun PlaybackSpeedButton(adaptiveColor: AdaptiveColorResult, modifier: Mo
         Text(
             text = "${speed}x",
             style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+            color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(4.dp)
         )
     }
@@ -436,6 +433,7 @@ private fun RepeatButton(
                 }
             ),
             modifier = Modifier.fillMaxSize(),
+            tint = MaterialTheme.colorScheme.primary,
             contentDescription = when (playbackMode.repeatMode) {
                 PlaybackStateCompat.REPEAT_MODE_ONE -> stringResource(R.string.cd_repeat_one_on)
                 PlaybackStateCompat.REPEAT_MODE_ALL -> stringResource(R.string.cd_repeat_all_on)
