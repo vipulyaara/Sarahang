@@ -12,7 +12,7 @@ object Specs {
     val iconSize = 32.dp
 }
 
-fun String?.orNa() = this ?: "N/A"
+fun String?.orNa() = this ?: "unknown"
 
 @Composable
 fun Color.disabledAlpha(condition: Boolean): Color =
