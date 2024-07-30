@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -25,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -48,7 +47,6 @@ import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -227,23 +225,20 @@ private fun RowScope.ResizablePlaybackQueue(
         setDragOffset = setDragOffset,
         modifier = modifier,
     ) { resizableModifier ->
-        val labelMod = Modifier.padding(top = Specs.padding)
         Surface {
             LazyColumn(
                 state = queueListState,
                 contentPadding = contentPadding,
                 modifier = Modifier.fillMaxHeight()
             ) {
-                playbackQueueLabel(resizableModifier.then(labelMod))
-
                 playbackQueue(
                     playbackQueue = playbackQueue,
                     playbackConnection = playbackConnection
                 )
             }
-            Divider(
+
+            VerticalDivider(
                 modifier = Modifier
-                    .width(1.dp)
                     .fillMaxHeight()
                     .align(Alignment.CenterEnd)
                     .then(resizableModifier)
@@ -299,18 +294,6 @@ private fun PlaybackSheetTopBarTitle(
             maxLines = 1,
             modifier = Modifier.simpleClickable { onTitleClick() },
         )
-    }
-}
-
-private fun LazyListScope.playbackQueueLabel(modifier: Modifier = Modifier) {
-    item {
-        Row(modifier = modifier.fillMaxWidth()) {
-            Text(
-                text = stringResource(R.string.playback_queue_title),
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
-                modifier = Modifier.padding(Specs.padding)
-            )
-        }
     }
 }
 
