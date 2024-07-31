@@ -1,6 +1,8 @@
 package com.sarahang.playback.core.services
 
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+import android.os.Build
 import android.os.Bundle
 import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
@@ -83,10 +85,18 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             return
         }
         Timber.d("Starting foreground service")
-        startForeground(
-            NOTIFICATION_ID,
-            mediaNotifications.buildNotification(player.getSession())
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            startForeground(
+                NOTIFICATION_ID,
+                mediaNotifications.buildNotification(player.getSession()),
+                FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
+            )
+        } else {
+            startForeground(
+                NOTIFICATION_ID,
+                mediaNotifications.buildNotification(player.getSession())
+            )
+        }
         becomingNoisyReceiver.register()
         IS_FOREGROUND = true
     }
@@ -98,7 +108,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
         }
         Timber.d("Stopping foreground service")
         becomingNoisyReceiver.unregister()
-        stopForeground(if (removeNotification) STOP_FOREGROUND_REMOVE else STOP_FOREGROUND_DETACH)
+        stopForeground(removeNotification)
         IS_FOREGROUND = false
     }
 
