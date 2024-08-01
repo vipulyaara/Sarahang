@@ -20,13 +20,13 @@ import com.sarahang.playback.core.REPEAT_ONE
 import com.sarahang.playback.core.SET_MEDIA_STATE
 import com.sarahang.playback.core.SWAP_ACTION
 import com.sarahang.playback.core.UPDATE_QUEUE
+import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.models.toMediaIdList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 const val SEEK_TO = "action_seek_to"
 
@@ -41,11 +41,12 @@ class MediaSessionCallback(
     private val mediaSession: MediaSessionCompat,
     private val sarahangPlayer: SarahangPlayer,
     private val audioFocusHelper: AudioFocusHelper,
+    private val logger: Logger,
 ) : MediaSessionCompat.Callback(), CoroutineScope by MainScope() {
 
     init {
         audioFocusHelper.onAudioFocusGain {
-            Timber.d("onAudioFocusGain")
+            logger.d("onAudioFocusGain")
             if (isAudioFocusGranted && !sarahangPlayer.getSession().isPlaying()) {
                 sarahangPlayer.playAudio()
             } else {
@@ -60,7 +61,7 @@ class MediaSessionCallback(
         }
 
         audioFocusHelper.onAudioFocusLossTransient {
-            Timber.d("TRANSIENT")
+            logger.d("TRANSIENT")
             if (sarahangPlayer.getSession().isPlaying()) {
                 isAudioFocusGranted = true
                 sarahangPlayer.pause()
@@ -68,23 +69,23 @@ class MediaSessionCallback(
         }
 
         audioFocusHelper.onAudioFocusLossTransientCanDuck {
-            Timber.d("TRANSIENT_CAN_DUCK")
+            logger.d("TRANSIENT_CAN_DUCK")
             audioFocusHelper.setVolume(AudioManager.ADJUST_LOWER)
         }
     }
 
     override fun onPause() {
-        Timber.d("onPause")
+        logger.d("onPause")
         sarahangPlayer.pause()
     }
 
     override fun onPlay() {
-        Timber.d("onPlay")
+        logger.d("onPlay")
         playOnFocus()
     }
 
     override fun onPlayFromSearch(query: String?, extras: Bundle?) {
-        Timber.d("onPlayFromSearch, query = $query, $extras")
+        logger.d("onPlayFromSearch, query = $query, $extras")
         query?.let {
             // val audio = findAudioForQuery(query)
             // if (audio != null) {
@@ -96,42 +97,42 @@ class MediaSessionCallback(
     }
 
     override fun onFastForward() {
-        Timber.d("onFastForward")
+        logger.d("onFastForward")
         sarahangPlayer.fastForward()
     }
 
     override fun onRewind() {
-        Timber.d("onRewind")
+        logger.d("onRewind")
         sarahangPlayer.rewind()
     }
 
     override fun onPlayFromMediaId(mediaId: String, extras: Bundle?) {
-        Timber.d("onPlayFromMediaId, $mediaId, $extras")
+        logger.d("onPlayFromMediaId, $mediaId, $extras")
         launch { sarahangPlayer.setDataFromMediaId(mediaId, extras ?: bundleOf()) }
     }
 
     override fun onSeekTo(position: Long) {
-        Timber.d("onSeekTo: position=$position")
+        logger.d("onSeekTo: position=$position")
         sarahangPlayer.seekTo(position)
     }
 
     override fun onSkipToNext() {
-        Timber.d("onSkipToNext()")
+        logger.d("onSkipToNext()")
         launch { sarahangPlayer.nextAudio() }
     }
 
     override fun onSkipToPrevious() {
-        Timber.d("onSkipToPrevious()")
+        logger.d("onSkipToPrevious()")
         launch { sarahangPlayer.previousAudio() }
     }
 
     override fun onSkipToQueueItem(id: Long) {
-        Timber.d("onSkipToQueueItem: $id")
+        logger.d("onSkipToQueueItem: $id")
         launch { sarahangPlayer.skipTo(id.toInt()) }
     }
 
     override fun onStop() {
-        Timber.d("onStop()")
+        logger.d("onStop()")
         sarahangPlayer.stop(true)
     }
 
@@ -219,7 +220,7 @@ class MediaSessionCallback(
 
     private suspend fun setSavedMediaSessionState() {
         val controller = mediaSession.controller ?: return
-        Timber.d(controller.playbackState.toString())
+        logger.d(controller.playbackState.toString())
         if (controller.playbackState == null || controller.playbackState.state == STATE_NONE) {
             sarahangPlayer.restoreQueueState()
         } else {

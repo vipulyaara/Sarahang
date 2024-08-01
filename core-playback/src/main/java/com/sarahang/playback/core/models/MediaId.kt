@@ -1,7 +1,7 @@
 package com.sarahang.playback.core.models
 
+import android.util.Log
 import com.sarahang.playback.core.apis.AudioDataSource
-import timber.log.Timber
 
 const val MEDIA_TYPE_AUDIO = "Media.Audio"
 const val MEDIA_TYPE_ARTIST = "Media.Artist"
@@ -15,7 +15,7 @@ data class MediaId(
     val type: String = MEDIA_TYPE_AUDIO,
     val value: String = "0",
     val index: Int = 0,
-    val caller: String = CALLER_SELF
+    val caller: String = CALLER_SELF,
 ) {
     val hasIndex = index >= 0
     val isShuffleIndex = index == MEDIA_ID_INDEX_SHUFFLED
@@ -42,7 +42,7 @@ fun String?.toMediaId(): MediaId {
 
     val knownTypes = listOf(MEDIA_TYPE_AUDIO, MEDIA_TYPE_AUDIO_QUERY, MEDIA_TYPE_ALBUM)
     if (type !in knownTypes) {
-        Timber.e("Unknown media type: $type")
+        Log.e("MediaId", "Unknown media type: $type")
         return MediaId()
     }
 

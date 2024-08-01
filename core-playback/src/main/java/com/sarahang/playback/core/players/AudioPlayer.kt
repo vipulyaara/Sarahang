@@ -17,9 +17,9 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
+import com.sarahang.playback.core.apis.Logger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Named
 import javax.inject.Singleton
@@ -57,6 +57,7 @@ interface AudioPlayer {
 class AudioPlayerImpl @Inject constructor(
     @ApplicationContext internal val context: Context,
     @Named("player") private val okHttpClient: OkHttpClient,
+    private val logger: Logger,
 ) : AudioPlayer, Player.Listener {
 
     private var playerBase: ExoPlayer? = null
@@ -70,11 +71,11 @@ class AudioPlayerImpl @Inject constructor(
 
     private var isPrepared = false
     private var isBuffering = false
-    private var onPrepared: OnPrepared<AudioPlayer> = { Timber.d("Prepared") }
-    private var onError: OnError<AudioPlayer> = { Timber.e(it) }
-    private var onBuffering: OnBuffering<AudioPlayer> = { Timber.d("Buffering") }
+    private var onPrepared: OnPrepared<AudioPlayer> = { logger.d("Prepared") }
+    private var onError: OnError<AudioPlayer> = { logger.e(it) }
+    private var onBuffering: OnBuffering<AudioPlayer> = { logger.d("Buffering") }
     private var onIsPlaying: OnIsPlaying<AudioPlayer> =
-        { playing, byUi -> Timber.d("$playing $byUi") }
+        { playing, byUi -> logger.d("$playing $byUi") }
     private var onReady: OnReady<AudioPlayer> = {}
     private var onCompletion: OnCompletion<AudioPlayer> = {}
     private var onPlaybackParamsChanged: OnPlaybackParametersChanged<AudioPlayer> = {}
@@ -88,8 +89,9 @@ class AudioPlayerImpl @Inject constructor(
         player.playWhenReady = true
     }
 
-    @OptIn(UnstableApi::class) override fun setSource(uri: Uri, local: Boolean): Boolean {
-        Timber.d("Setting source: local=$local, uri=$uri")
+    @OptIn(UnstableApi::class)
+    override fun setSource(uri: Uri, local: Boolean): Boolean {
+        logger.d("Setting source: local=$local, uri=$uri")
         return try {
             if (local) player.setMediaItem(MediaItem.fromUri(uri), true)
             else {
@@ -208,23 +210,24 @@ class AudioPlayerImpl @Inject constructor(
         onError(this, error)
     }
 
-    @OptIn(UnstableApi::class) private fun createPlayer(owner: AudioPlayerImpl): ExoPlayer {
+    @OptIn(UnstableApi::class)
+    private fun createPlayer(owner: AudioPlayerImpl): ExoPlayer {
         return ExoPlayer.Builder(context, DefaultRenderersFactory(context).apply {
             setExtensionRendererMode(EXTENSION_RENDERER_MODE_PREFER)
         }).setLoadControl(object : DefaultLoadControl() {
-                override fun onPrepared() {
-                    isPrepared = true
-                    onPrepared(owner)
-                }
-            }).build().apply {
-                val attr = AudioAttributes.Builder().apply {
-                    setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-                    setUsage(C.USAGE_MEDIA)
-                }.build()
-
-                setAudioAttributes(attr, false)
-                setPriorityTaskManager(PriorityTaskManager())
-                addListener(owner)
+            override fun onPrepared() {
+                isPrepared = true
+                onPrepared(owner)
             }
+        }).build().apply {
+            val attr = AudioAttributes.Builder().apply {
+                setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
+                setUsage(C.USAGE_MEDIA)
+            }.build()
+
+            setAudioAttributes(attr, false)
+            setPriorityTaskManager(PriorityTaskManager())
+            addListener(owner)
+        }
     }
 }

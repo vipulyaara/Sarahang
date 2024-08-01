@@ -2,6 +2,7 @@ package com.sarahang.playback.core.audio
 
 import android.support.v4.media.session.MediaSessionCompat
 import com.sarahang.playback.core.apis.AudioDataSource
+import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.toQueueItems
 import com.sarahang.playback.core.position
@@ -11,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 interface AudioQueueManager {
@@ -40,7 +40,8 @@ interface AudioQueueManager {
 }
 
 class AudioQueueManagerImpl @Inject constructor(
-    private val audioDataSource: AudioDataSource
+    private val audioDataSource: AudioDataSource,
+    private val logger: Logger,
 ) : AudioQueueManager, CoroutineScope by MainScope() {
 
     private lateinit var mediaSession: MediaSessionCompat
@@ -162,11 +163,11 @@ class AudioQueueManagerImpl @Inject constructor(
             currentAudioIndex = 0
             shuffled = shuffled.swap(currentIdIndex, 0)
         } else {
-            Timber.e("CurrentIdIndex is not found")
+            logger.e("CurrentIdIndex is not found")
             return
         }
 
-        Timber.d("Saving shuffled queue: ${shuffled.size}")
+        logger.d("Saving shuffled queue: ${shuffled.size}")
 
         // save non-shuffled original queue
         originalQueue = queue

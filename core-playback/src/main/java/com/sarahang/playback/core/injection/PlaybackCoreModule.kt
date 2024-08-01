@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.PlaybackConnectionImpl
 import com.sarahang.playback.core.apis.AudioDataSource
+import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.audio.AudioFocusHelperImpl
 import com.sarahang.playback.core.players.AudioPlayer
@@ -60,12 +61,14 @@ abstract class PlaybackCoreModule {
         fun playbackConnection(
             @ApplicationContext context: Context,
             audioPlayer: AudioPlayerImpl,
-            audioDataSource: AudioDataSource
+            audioDataSource: AudioDataSource,
+            logger: Logger,
         ): PlaybackConnection = PlaybackConnectionImpl(
             context = context,
             serviceComponent = ComponentName(context, PlayerService::class.java),
             audioPlayer = audioPlayer,
-            audioDataSource = audioDataSource
+            audioDataSource = audioDataSource,
+            logger = logger
         )
 
         @Provides

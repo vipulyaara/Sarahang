@@ -34,6 +34,7 @@ import com.sarahang.playback.core.R
 import com.sarahang.playback.core.REPEAT_ALL
 import com.sarahang.playback.core.REPEAT_ONE
 import com.sarahang.playback.core.apis.AudioDataSource
+import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.apis.PlayerEventLogger
 import com.sarahang.playback.core.audio.AudioFocusHelperImpl
 import com.sarahang.playback.core.audio.AudioQueueManagerImpl
@@ -58,7 +59,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -129,7 +129,8 @@ class SarahangPlayerImpl @Inject constructor(
     private val audioDataSource: AudioDataSource,
     private val preferences: PreferencesStore,
     private val mediaQueueBuilder: MediaQueueBuilder,
-    private val playerEventLogger: PlayerEventLogger
+    private val playerEventLogger: PlayerEventLogger,
+    private val logger: Logger,
 ) : SarahangPlayer, CoroutineScope by MainScope() {
 
     companion object {
@@ -159,7 +160,12 @@ class SarahangPlayerImpl @Inject constructor(
         pendingIntent
     ).apply {
         setCallback(
-            MediaSessionCallback(this, this@SarahangPlayerImpl, audioFocusHelper)
+            MediaSessionCallback(
+                mediaSession = this,
+                sarahangPlayer = this@SarahangPlayerImpl,
+                audioFocusHelper = audioFocusHelper,
+                logger = logger
+            )
         )
         setPlaybackState(stateBuilder.build())
 
@@ -211,7 +217,7 @@ class SarahangPlayerImpl @Inject constructor(
         audioPlayer.onReady {
 //            if (audioPlayer.playWhenReady()) {
             if (!audioPlayer.isPlaying()) {
-                Timber.d("Player ready but not currently playing, requesting to play")
+                logger.d("Player ready but not currently playing, requesting to play")
                 audioPlayer.play()
             }
             updatePlaybackState {
@@ -220,7 +226,7 @@ class SarahangPlayerImpl @Inject constructor(
 //            }
         }
         audioPlayer.onError { throwable ->
-            Timber.e(throwable, "AudioPlayer error")
+            logger.e(throwable, "AudioPlayer error")
             errorCallback(this@SarahangPlayerImpl, throwable)
             isInitialized = false
             updatePlaybackState {
@@ -248,7 +254,7 @@ class SarahangPlayerImpl @Inject constructor(
                 )
             }
         } else {
-            Timber.d("Couldn't pause player: ${audioPlayer.isPlaying()}, $isInitialized")
+            logger.d("Couldn't pause player: ${audioPlayer.isPlaying()}, $isInitialized")
         }
     }
 
@@ -271,7 +277,7 @@ class SarahangPlayerImpl @Inject constructor(
             isInitialized = true
             audioPlayer.prepare()
         } else {
-            Timber.e("Couldn't set new source")
+            logger.e("Couldn't set new source")
         }
     }
 
@@ -280,7 +286,7 @@ class SarahangPlayerImpl @Inject constructor(
             val audio = audioDataSource.findAudio(id)
             if (audio != null) playAudio(audio, index)
             else {
-                Timber.e("Audio by id: $id not found")
+                logger.e("Audio by id: $id not found")
                 updatePlaybackState {
                     setState(STATE_ERROR, 0, 1F)
                 }
@@ -302,7 +308,7 @@ class SarahangPlayerImpl @Inject constructor(
 
     override suspend fun skipTo(position: Int) {
         if (queueManager.currentAudioIndex == position) {
-            Timber.d("Not skipping to index=$position")
+            logger.d("Not skipping to index=$position")
             return
         }
         queueManager.skipTo(position)
@@ -524,7 +530,7 @@ class SarahangPlayerImpl @Inject constructor(
         if (queue == null)
             queue = mediaQueueBuilder.buildAudioList(mediaId).map { it.id }
 
-        Timber.d("setDataFromMediaId: $mediaId, queue: $queue, queueTitle: $queueTitle")
+        logger.d("setDataFromMediaId: $mediaId, queue: $queue, queueTitle: $queueTitle")
 
         if (queueTitle.isNullOrBlank())
             queueTitle = mediaQueueBuilder.buildQueueTitle(mediaId).toString()
@@ -545,7 +551,7 @@ class SarahangPlayerImpl @Inject constructor(
             delay(2000)
             saveQueueState()
         } else {
-            Timber.e("Queue is null or empty: $mediaId")
+            logger.e("Queue is null or empty: $mediaId")
         }
 
         logEvent("playMedia", _mediaId)
@@ -555,7 +561,7 @@ class SarahangPlayerImpl @Inject constructor(
         val mediaSession = getSession()
         val controller = mediaSession.controller
         if (controller == null || controller.playbackState == null) {
-            Timber.d("Not saving queue state")
+            logger.d("Not saving queue state")
             return
         }
 
@@ -569,15 +575,15 @@ class SarahangPlayerImpl @Inject constructor(
             title = controller.queueTitle?.toString()
         )
 
-        Timber.d("Saving queue state: idx=${queueState.currentIndex}, size=${queueState.queue.size}, title=${queueState.title}")
+        logger.d("Saving queue state: idx=${queueState.currentIndex}, size=${queueState.queue.size}, title=${queueState.title}")
         preferences.save(queueStateKey, queueState, QueueState.serializer())
     }
 
     override suspend fun restoreQueueState() {
-        Timber.d("Restoring queue state")
+        logger.d("Restoring queue state")
         var queueState =
             preferences.get(queueStateKey, QueueState.serializer(), QueueState(emptyList())).first()
-        Timber.d("Restoring state: ${queueState.currentIndex}, size=${queueState.queue.size}")
+        logger.d("Restoring state: ${queueState.currentIndex}, size=${queueState.queue.size}")
 
         if (queueState.state in listOf(
                 STATE_PLAYING,
@@ -595,7 +601,7 @@ class SarahangPlayerImpl @Inject constructor(
             setData(queueState.queue, queueState.title ?: "")
 
             queueManager.refreshCurrentAudio()?.apply {
-                Timber.d("Setting metadata from saved state: currentAudio=$id")
+                logger.d("Setting metadata from saved state: currentAudio=$id")
                 setMetaData(this)
             }
         }

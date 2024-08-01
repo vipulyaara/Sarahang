@@ -12,6 +12,7 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import com.sarahang.playback.core.apis.AudioDataSource
+import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.MEDIA_TYPE_ALBUM
 import com.sarahang.playback.core.models.MEDIA_TYPE_AUDIO
@@ -41,7 +42,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import timber.log.Timber
 
 const val PLAYBACK_PROGRESS_INTERVAL = 1000L
 
@@ -76,6 +76,7 @@ class PlaybackConnectionImpl(
     serviceComponent: ComponentName,
     private val audioPlayer: AudioPlayer,
     private val audioDataSource: AudioDataSource,
+    private val logger: Logger,
     private val coroutineScope: CoroutineScope = ProcessLifecycleOwner.get().lifecycleScope,
 ) : PlaybackConnection, CoroutineScope by coroutineScope {
 
@@ -143,13 +144,13 @@ class PlaybackConnectionImpl(
      * Resolves audios from given playback queue ids and validates current queues index.
      */
     private suspend fun buildPlaybackQueue(
-        data: Triple<MediaMetadataCompat, PlaybackStateCompat, PlaybackQueue>
+        data: Triple<MediaMetadataCompat, PlaybackStateCompat, PlaybackQueue>,
     ): PlaybackQueue {
         val (nowPlaying, state, queue) = data
         val nowPlayingId = nowPlaying.id.toMediaId().value
         val audios = audioDataSource.getByIds(queue.ids.toMediaAudioIds())
 
-        Timber.d("new queue ${audios.size} ${state.currentIndex}")
+        logger.d("new queue ${audios.size} ${state.currentIndex}")
         return queue.copy(audios = audios, currentIndex = state.currentIndex).let {
             // check if now playing id and current audio's id by index matches
             val synced = when {
@@ -276,9 +277,9 @@ class PlaybackConnectionImpl(
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {
             val newQueue = fromMediaController(mediaController ?: return)
-            Timber.d("Controller $mediaController")
-            Timber.d("Old queue: size=${queue?.size} ${queue?.joinToString()}")
-            Timber.d("New queue: size=${newQueue.size} ${newQueue.joinToString()}")
+            logger.d("Controller $mediaController")
+            logger.d("Old queue: size=${queue?.size} ${queue?.joinToString()}")
+            logger.d("New queue: size=${newQueue.size} ${newQueue.joinToString()}")
             this@PlaybackConnectionImpl.playbackQueueState.value = newQueue
         }
 

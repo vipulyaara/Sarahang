@@ -14,7 +14,6 @@ import android.util.Log
 import android.view.KeyEvent
 import androidx.core.content.ContextCompat
 import androidx.media.MediaBrowserServiceCompat
-import timber.log.Timber
 
 /**
  * Copy of androidx.media.session.MediaButtonReceiver to set FLAG_MUTABLE to pending intents.
@@ -24,7 +23,7 @@ import timber.log.Timber
 class MediaButtonReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_MEDIA_BUTTON != intent.action || !intent.hasExtra(Intent.EXTRA_KEY_EVENT)) {
-            Timber.tag(TAG).d("Ignore unsupported intent: %s", intent)
+            Log.d(TAG, "Ignore unsupported intent: $intent")
             return
         }
         val mediaButtonServiceComponentName =
@@ -60,7 +59,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
     private class MediaButtonConnectionCallback(
         private val mContext: Context,
         private val mIntent: Intent,
-        private val mPendingResult: PendingResult
+        private val mPendingResult: PendingResult,
     ) : MediaBrowserCompat.ConnectionCallback() {
         private var mMediaBrowser: MediaBrowserCompat? = null
         fun setMediaBrowser(mediaBrowser: MediaBrowserCompat?) {
@@ -117,7 +116,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
          */
         fun buildMediaButtonPendingIntent(
             context: Context,
-            @MediaKeyAction action: Long
+            @MediaKeyAction action: Long,
         ): PendingIntent? {
             val mbrComponent = getMediaButtonReceiverComponent(context)
             if (mbrComponent == null) {
@@ -157,7 +156,7 @@ class MediaButtonReceiver : BroadcastReceiver() {
         fun buildMediaButtonPendingIntent(
             context: Context?,
             mbrComponent: ComponentName?,
-            @MediaKeyAction action: Long
+            @MediaKeyAction action: Long,
         ): PendingIntent? {
             if (mbrComponent == null) {
                 Log.w(TAG, "The component name of media button receiver should be provided.")

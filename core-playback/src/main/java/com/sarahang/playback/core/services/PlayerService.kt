@@ -15,6 +15,7 @@ import com.sarahang.playback.core.PLAY_PAUSE
 import com.sarahang.playback.core.PREVIOUS
 import com.sarahang.playback.core.STOP_PLAYBACK
 import com.sarahang.playback.core.apis.AudioDataSource
+import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.isIdle
 import com.sarahang.playback.core.models.MediaId
 import com.sarahang.playback.core.models.MediaId.Companion.CALLER_OTHER
@@ -32,7 +33,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,6 +50,9 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
     @Inject
     lateinit var timer: SleepTimer
+
+    @Inject
+    lateinit var logger: Logger
 
     @Inject
     lateinit var mediaNotifications: MediaNotificationsImpl
@@ -81,10 +84,10 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
     private fun startForeground() {
         if (IS_FOREGROUND) {
-            Timber.w("Tried to start foreground, but was already in foreground")
+            logger.w("Tried to start foreground, but was already in foreground")
             return
         }
-        Timber.d("Starting foreground service")
+        logger.d("Starting foreground service")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
                 NOTIFICATION_ID,
@@ -103,10 +106,10 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
     private fun pauseForeground(removeNotification: Boolean) {
         if (!IS_FOREGROUND) {
-            Timber.w("Tried to stop foreground, but was already NOT in foreground")
+            logger.w("Tried to stop foreground, but was already NOT in foreground")
             return
         }
-        Timber.d("Stopping foreground service")
+        logger.d("Stopping foreground service")
         becomingNoisyReceiver.unregister()
         stopForeground(removeNotification)
         IS_FOREGROUND = false
@@ -126,7 +129,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             PREVIOUS -> controller.transportControls.skipToPrevious()
             STOP_PLAYBACK -> controller.transportControls.stop()
             ACTION_QUIT -> {
-                Timber.d("Quitting service by request")
+                logger.d("Quitting service by request")
                 controller.transportControls.pause()
                 timer.cancelAlarm()
             }
@@ -139,7 +142,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
     override fun onGetRoot(
         clientPackageName: String,
         clientUid: Int,
-        rootHints: Bundle?
+        rootHints: Bundle?,
     ): BrowserRoot {
         val caller =
             if (clientPackageName == applicationContext.packageName) CALLER_SELF else CALLER_OTHER
@@ -148,7 +151,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
     override fun onLoadChildren(
         parentId: String,
-        result: Result<MutableList<MediaBrowserCompat.MediaItem>>
+        result: Result<MutableList<MediaBrowserCompat.MediaItem>>,
     ) {
         result.detach()
         launch {
