@@ -1,11 +1,10 @@
 package com.sarahang.playback.ui.components.icons
 
 import androidx.compose.ui.graphics.vector.ImageVector
-import compose.icons.FeatherIcons
+import com.sarahang.playback.ui.icons.PlayerForward
+import com.sarahang.playback.ui.icons.PlayerRewind
 import compose.icons.FontAwesomeIcons
 import compose.icons.TablerIcons
-import compose.icons.feathericons.RotateCcw
-import compose.icons.feathericons.RotateCw
 import compose.icons.fontawesomeicons.Solid
 import compose.icons.fontawesomeicons.solid.Backward
 import compose.icons.fontawesomeicons.solid.Forward
@@ -28,9 +27,9 @@ object Icons {
     val Previous: ImageVector
         get() = FontAwesomeIcons.Solid.Backward
     val FastForward: ImageVector
-        get() = FeatherIcons.RotateCw
+        get() = PlayerForward
     val Rewind: ImageVector
-        get() = FeatherIcons.RotateCcw
+        get() = PlayerRewind
     val TimerOff: ImageVector
         get() = TablerIcons.Clock
 }
