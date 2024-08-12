@@ -68,8 +68,8 @@ class ColorExtractor @Inject constructor(
 @Composable
 fun DynamicTheme(
     model: Any?,
+    useDarkTheme: Boolean,
     fallback: Color = MaterialTheme.colorScheme.primary,
-    useDarkTheme: Boolean = false,
     style: PaletteStyle = PaletteStyle.Fidelity,
     content: @Composable () -> Unit,
 ) {
