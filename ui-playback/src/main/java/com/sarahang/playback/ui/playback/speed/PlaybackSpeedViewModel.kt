@@ -1,7 +1,6 @@
 package com.sarahang.playback.ui.playback.speed
 
 import androidx.lifecycle.ViewModel
-import com.sarahang.playback.core.apis.PlayerEventLogger
 import com.sarahang.playback.core.players.SarahangPlayer
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -9,8 +8,7 @@ import kotlin.math.roundToInt
 
 @HiltViewModel
 class PlaybackSpeedViewModel @Inject constructor(
-    private val sarahangPlayer: SarahangPlayer,
-    private val playerEventLogger: PlayerEventLogger,
+    private val sarahangPlayer: SarahangPlayer
 ) : ViewModel() {
     val currentSpeed = sarahangPlayer.playbackSpeed
 
@@ -19,8 +17,6 @@ class PlaybackSpeedViewModel @Inject constructor(
     }
 
     fun setSpeed(speed: Float) {
-        playerEventLogger.logEvent("set_playback_speed", mapOf("speed" to speed.toString()))
-
         if (speed > 0) { // UI slider can return negative values if swiped too fast
             sarahangPlayer.setPlaybackSpeed(speed)
         }
