@@ -77,7 +77,7 @@ fun PlaybackSheet(
     onClose: (() -> Unit)?,
     playerTheme: String = materialYouPlayerTheme,
     goToItem: () -> Unit = {},
-    goToCreator: () -> Unit = {}
+    goToCreator: () -> Unit = {},
 ) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
@@ -111,7 +111,7 @@ internal fun PlaybackSheet(
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
-    nowPlaying: MediaMetadataCompat
+    nowPlaying: MediaMetadataCompat,
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
@@ -214,7 +214,7 @@ private fun RowScope.ResizablePlaybackQueue(
     resizableLayoutViewModel: ResizablePlaybackSheetLayoutViewModel = hiltViewModel(),
     dragOffset: State<Float> = resizableLayoutViewModel.dragOffset.collectAsStateWithLifecycle(),
     setDragOffset: (Float) -> Unit = resizableLayoutViewModel::setDragOffset,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     ResizableLayout(
         availableWidth = maxWidth,
@@ -299,7 +299,7 @@ private fun PlaybackSheetTopBarTitle(
 
 private fun LazyListScope.playbackQueue(
     playbackQueue: PlaybackQueue,
-    playbackConnection: PlaybackConnection
+    playbackConnection: PlaybackConnection,
 ) {
     itemsIndexed(playbackQueue, key = { _, a -> a.id }) { index, audio ->
         AudioRow(
@@ -308,7 +308,7 @@ private fun LazyListScope.playbackQueue(
             onPlayAudio = {
                 playbackConnection.transportControls?.skipToQueueItem(index.toLong())
             },
-            modifier = Modifier.animateItemPlacement()
+            modifier = Modifier.animateItem()
         )
     }
 }

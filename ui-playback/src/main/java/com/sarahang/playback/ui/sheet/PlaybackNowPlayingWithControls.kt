@@ -21,10 +21,10 @@ import androidx.compose.material.icons.filled.RepeatOn
 import androidx.compose.material.icons.filled.RepeatOneOn
 import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material.icons.filled.ShuffleOn
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -116,7 +116,7 @@ internal fun PlaybackNowPlaying(
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
 
@@ -171,7 +171,7 @@ internal fun PlaybackControls(
     playbackState: PlaybackStateCompat,
     modifier: Modifier = Modifier,
     smallRippleRadius: Dp = SmallRippleRadius,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current
+    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -235,7 +235,7 @@ internal fun PlayerPreviousControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
     playbackState: PlaybackStateCompat,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.transportControls?.skipToPrevious() },
@@ -255,7 +255,7 @@ internal fun PlayerPreviousControl(
 private fun RewindControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.transportControls?.rewind() },
@@ -275,7 +275,7 @@ private fun RewindControl(
 private fun FastForwardControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.transportControls?.fastForward() },
@@ -316,7 +316,7 @@ internal fun PlayerNextControl(
 internal fun PlayerPlayControl(
     playbackConnection: PlaybackConnection,
     playbackState: PlaybackStateCompat,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.playPause() },
@@ -394,7 +394,7 @@ private fun PlaybackSpeedButton(modifier: Modifier = Modifier) {
 
     Box(
         modifier.simpleClickable(
-            indication = rememberRipple(bounded = false),
+            indication = ripple(bounded = false),
             label = stringResource(R.string.cd_open_sleep_timer)
         ) { showPlaybackSpeed = true }
     ) {
@@ -417,7 +417,7 @@ private fun PlaybackSpeedButton(modifier: Modifier = Modifier) {
 private fun RepeatButton(
     playbackConnection: PlaybackConnection,
     playbackMode: PlaybackModeState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
@@ -449,7 +449,7 @@ private fun ShuffleButton(
     smallRippleRadius: Dp,
     playbackMode: PlaybackModeState,
     contentColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     IconButton(
         onClick = { playbackConnection.mediaController?.toggleShuffleMode() },
