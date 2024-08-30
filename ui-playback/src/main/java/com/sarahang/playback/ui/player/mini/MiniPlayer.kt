@@ -102,7 +102,6 @@ fun MiniPlayer(
                 onPlayPause = { playbackConnection.mediaController?.playPause() },
                 openPlaybackSheet = openPlaybackSheet,
                 modifier = Modifier.testTag("mini_player"),
-                playerTheme = playerTheme,
             )
         }
     }
@@ -114,7 +113,6 @@ private fun PlaybackMiniControls(
     nowPlaying: MediaMetadataCompat,
     onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
-    playerTheme: String,
     height: Dp = PlaybackMiniControlsDefaults.Height,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     openPlaybackSheet: () -> Unit
