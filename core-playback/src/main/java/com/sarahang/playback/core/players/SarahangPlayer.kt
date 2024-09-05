@@ -83,8 +83,8 @@ const val DEFAULT_FORWARD_REWIND = 10 * 1000
 interface SarahangPlayer {
     fun getSession(): MediaSessionCompat
     fun playAudio(extras: Bundle = bundleOf(BY_UI_KEY to true))
-    suspend fun playAudio(id: String, index: Int? = null)
-    suspend fun playAudio(audio: Audio, index: Int? = null)
+    suspend fun playAudio(id: String, index: Int? = null, seekTo: Long? = null)
+    suspend fun playAudio(audio: Audio, index: Int? = null, seekTo: Long? = null)
     fun seekTo(position: Long)
     fun fastForward()
     fun rewind()
@@ -260,7 +260,7 @@ class SarahangPlayerImpl @Inject constructor(
 
     override fun playAudio(extras: Bundle) {
         if (isInitialized) {
-            audioPlayer.play()
+            audioPlayer.play(extras.getLong(SEEK_TO))
             return
         }
 
@@ -281,29 +281,29 @@ class SarahangPlayerImpl @Inject constructor(
         }
     }
 
-    override suspend fun playAudio(id: String, index: Int?) {
+    override suspend fun playAudio(id: String, index: Int?, seekTo: Long?) {
         if (audioFocusHelper.requestPlayback()) {
             val audio = audioDataSource.findAudio(id)
-            if (audio != null) playAudio(audio, index)
+            if (audio != null) playAudio(audio = audio, index = index, seekTo = seekTo)
             else {
                 logger.e("Audio by id: $id not found")
                 updatePlaybackState {
-                    setState(STATE_ERROR, 0, 1F)
+                    setState(STATE_ERROR, seekTo ?: 0, 1F)
                 }
             }
         }
     }
 
-    override suspend fun playAudio(audio: Audio, index: Int?) {
+    override suspend fun playAudio(audio: Audio, index: Int?, seekTo: Long?) {
         setCurrentAudioId(audio.id, index)
         val refreshedAudio = queueManager.refreshCurrentAudio()
         isInitialized = false
 
         updatePlaybackState {
-            setState(mediaSession.controller.playbackState.state, 0, 1F)
+            setState(mediaSession.controller.playbackState.state, seekTo ?: 0, 1F)
         }
         setMetaData(refreshedAudio ?: audio)
-        playAudio()
+        playAudio(bundleOf(SEEK_TO to seekTo))
     }
 
     override suspend fun skipTo(position: Int) {
@@ -545,7 +545,11 @@ class SarahangPlayerImpl @Inject constructor(
             }
 
             setData(queue, queueTitle)
-            playAudio(audioId, if (mediaId.hasIndex) mediaId.index else queue.indexOf(audioId))
+            playAudio(
+                id = audioId,
+                index = if (mediaId.hasIndex) mediaId.index else queue.indexOf(audioId),
+                seekTo = seekTo
+            )
             if (mediaId.isShuffleIndex) setShuffleMode(SHUFFLE_MODE_ALL)
             // delay for new queue to apply first
             delay(2000)

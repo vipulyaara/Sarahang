@@ -31,6 +31,7 @@ import com.sarahang.playback.core.players.QUEUE_LIST_KEY
 import com.sarahang.playback.core.players.QUEUE_MEDIA_ID_KEY
 import com.sarahang.playback.core.players.QUEUE_TITLE_KEY
 import com.sarahang.playback.core.players.QUEUE_TO_POSITION_KEY
+import com.sarahang.playback.core.players.SEEK_TO
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -61,7 +62,7 @@ interface PlaybackConnection {
 
     fun playAudio(audio: Audio, title: QueueTitle = QueueTitle())
     fun playNextAudio(audio: Audio)
-    fun playAlbum(albumId: String, index: Int = 0)
+    fun playAlbum(albumId: String, index: Int = 0, timestamp: Long? = null)
     fun playAudios(audios: List<Audio>, index: Int = 0, title: QueueTitle = QueueTitle())
     fun playWithQuery(query: String, audioId: String)
 
@@ -131,7 +132,8 @@ class PlaybackConnectionImpl(
             val initial = PlaybackProgressState(
                 total = duration,
                 position = position,
-                buffered = audioPlayer.bufferedPosition()
+                buffered = audioPlayer.bufferedPosition(),
+                isPlaying = state.state == PlaybackStateCompat.STATE_PLAYING
             )
             playbackProgress.value = initial
 
@@ -194,10 +196,12 @@ class PlaybackConnectionImpl(
         )
     }
 
-    override fun playAlbum(albumId: String, index: Int) {
+    override fun playAlbum(albumId: String, index: Int, timestamp: Long?) {
         transportControls?.playFromMediaId(
-            MediaId(MEDIA_TYPE_ALBUM, albumId, index).toString(),
-            null
+            MediaId(type = MEDIA_TYPE_ALBUM, value = albumId, index = index).toString(),
+            Bundle().apply {
+                putLong(SEEK_TO, timestamp ?: 0L)
+            }
         )
     }
 
