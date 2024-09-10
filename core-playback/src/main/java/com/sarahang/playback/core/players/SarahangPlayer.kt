@@ -182,8 +182,7 @@ class SarahangPlayerImpl @Inject constructor(
             preparedCallback(this@SarahangPlayerImpl)
             launch {
                 if (!mediaSession.isPlaying()) audioPlayer.seekTo(mediaSession.position())
-                playAudio()
-
+                playAudio(bundleOf(SEEK_TO to mediaSession.position()))
             }
         }
 
@@ -471,7 +470,7 @@ class SarahangPlayerImpl @Inject constructor(
             stateBuilder.build().extras + bundleOf(
                 QUEUE_CURRENT_INDEX to queueManager.currentAudioIndex,
                 QUEUE_HAS_PREVIOUS to (queueManager.previousAudioIndex != null),
-                QUEUE_HAS_NEXT to (queueManager.nextAudioIndex != null),
+                QUEUE_HAS_NEXT to (queueManager.nextAudioIndex != null)
             )
         )
         setPlaybackState(stateBuilder.build())
