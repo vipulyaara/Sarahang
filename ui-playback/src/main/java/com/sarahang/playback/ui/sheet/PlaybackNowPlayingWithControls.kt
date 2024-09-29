@@ -381,7 +381,7 @@ private fun PlaybackSpeedButton(viewModel: PlaybackSpeedViewModel, modifier: Mod
     Box(
         modifier.simpleClickable(
             indication = ripple(bounded = false),
-            label = stringResource(R.string.cd_open_sleep_timer)
+            label = stringResource(R.string.cd_change_playback_speed)
         ) { showPlaybackSpeed = true }
     ) {
         val speed = if ((currentSpeed * 10) % 10f == 0f) {

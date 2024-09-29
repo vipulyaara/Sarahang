@@ -18,6 +18,7 @@
     <string name="cd_repeat_off">Repeat off</string>
     <string name="cd_sleep_timer">Sleep timer</string>
     <string name="cd_open_sleep_timer">Open sleep timer</string>
+    <string name="cd_change_playback_speed">Change playback speed</string>
     <string name="cd_play">Play</string>
     <string name="cd_pause">Pause</string>
     <string name="cd_play_error">Play error</string>
