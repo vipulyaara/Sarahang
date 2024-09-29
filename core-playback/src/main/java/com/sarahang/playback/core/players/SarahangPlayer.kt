@@ -207,7 +207,8 @@ class SarahangPlayerImpl(
                     setExtras(
                         bundleOf(
                             REPEAT_MODE to getSession().repeatMode,
-                            SHUFFLE_MODE to getSession().shuffleMode
+                            SHUFFLE_MODE to getSession().shuffleMode,
+                            SEEK_TO to mediaSession.position()
                         )
                     )
                 }
@@ -259,7 +260,7 @@ class SarahangPlayerImpl(
 
     override fun playAudio(extras: Bundle) {
         if (isInitialized) {
-            audioPlayer.play(extras.getLong(SEEK_TO))
+            audioPlayer.play(extras.getLong(SEEK_TO).takeIf { it != 0L })
             return
         }
 
