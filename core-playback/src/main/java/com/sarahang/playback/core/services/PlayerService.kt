@@ -8,14 +8,11 @@ import android.support.v4.media.MediaBrowserCompat
 import androidx.media.MediaBrowserServiceCompat
 import androidx.media.session.MediaButtonReceiver
 import com.sarahang.playback.core.ACTION_QUIT
-import com.sarahang.playback.core.MediaNotificationsImpl
 import com.sarahang.playback.core.NEXT
 import com.sarahang.playback.core.NOTIFICATION_ID
 import com.sarahang.playback.core.PLAY_PAUSE
 import com.sarahang.playback.core.PREVIOUS
 import com.sarahang.playback.core.STOP_PLAYBACK
-import com.sarahang.playback.core.apis.AudioDataSource
-import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.isIdle
 import com.sarahang.playback.core.models.MediaId
 import com.sarahang.playback.core.models.MediaId.Companion.CALLER_OTHER
@@ -24,43 +21,31 @@ import com.sarahang.playback.core.models.toAudioList
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.models.toMediaItems
 import com.sarahang.playback.core.playPause
-import com.sarahang.playback.core.players.SarahangPlayerImpl
 import com.sarahang.playback.core.receivers.BecomingNoisyReceiver
-import com.sarahang.playback.core.timer.SleepTimer
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
 
-@AndroidEntryPoint
 class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope() {
+    private lateinit var component: PlayerServiceComponent
+    private val player by lazy { component.player }
+    private val mediaNotifications by lazy { component.mediaNotifications }
+    private val logger by lazy { component.logger }
+    private val timer by lazy { component.timer }
+    private val audioDataSource by lazy { component.audioDataSource }
 
     companion object {
         var IS_FOREGROUND = false
     }
 
-    @Inject
-    lateinit var player: SarahangPlayerImpl
-
-    @Inject
-    lateinit var audioDataSource: AudioDataSource
-
-    @Inject
-    lateinit var timer: SleepTimer
-
-    @Inject
-    lateinit var logger: Logger
-
-    @Inject
-    lateinit var mediaNotifications: MediaNotificationsImpl
-
     private lateinit var becomingNoisyReceiver: BecomingNoisyReceiver
 
     override fun onCreate() {
         super.onCreate()
+
+        component = PlayerServiceComponent::class.create(this.application)
 
         sessionToken = player.getSession().sessionToken
         becomingNoisyReceiver = BecomingNoisyReceiver(this, sessionToken!!)

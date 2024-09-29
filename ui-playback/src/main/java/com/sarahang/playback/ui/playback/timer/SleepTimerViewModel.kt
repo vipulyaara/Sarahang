@@ -8,7 +8,6 @@ import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.apis.PlayerEventLogger
 import com.sarahang.playback.core.timer.SleepTimer
 import com.sarahang.playback.core.timer.TimerInterval
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -17,7 +16,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
-@HiltViewModel
 class SleepTimerViewModel @Inject constructor(
     private val sleepTimer: SleepTimer,
     private val playerEventLogger: PlayerEventLogger,

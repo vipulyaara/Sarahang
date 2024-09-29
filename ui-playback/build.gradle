@@ -55,17 +55,11 @@ dependencies {
     implementation libs.androidx.lifecycle.runtime
     implementation libs.androidx.lifecycle.viewmodel.compose
     implementation libs.androidx.lifecycle.viewmodel.ktx
-    implementation libs.hilt.android
     implementation libs.kotlin.serialization
 
-    implementation libs.hilt.android
-    kapt libs.hilt.compiler
-
-    implementation libs.androidx.hilt.navigation
-    implementation libs.androidx.hilt.compose
-    kapt libs.androidx.hilt.compiler
-
     implementation libs.coil.compose
+    implementation libs.javax.inject
+
     implementation libs.icons.tabler
     implementation libs.icons.feather
     implementation libs.icons.font.awesome

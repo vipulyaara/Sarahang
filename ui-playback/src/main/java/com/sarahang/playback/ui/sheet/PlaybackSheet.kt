@@ -49,8 +49,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sarahang.playback.core.NONE_PLAYBACK_STATE
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artworkUri
@@ -66,6 +66,8 @@ import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
 import com.sarahang.playback.ui.components.isWideLayout
+import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
+import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.simpleClickable
 import kotlinx.coroutines.flow.collectLatest
@@ -78,6 +80,9 @@ fun PlaybackSheet(
     playerTheme: String = materialYouPlayerTheme,
     goToItem: () -> Unit = {},
     goToCreator: () -> Unit = {},
+    resizableViewModelFactory: () -> ResizablePlaybackSheetLayoutViewModel,
+    sleepTimerViewModelFactory: () -> SleepTimerViewModel,
+    playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
 ) {
     val listState = rememberLazyListState()
     val audioActionHandler = audioActionHandler()
@@ -92,11 +97,13 @@ fun PlaybackSheet(
                 onClose = onClose,
                 goToItem = goToItem,
                 goToCreator = goToCreator,
-                playerTheme = playerTheme,
                 listState = listState,
                 queueListState = rememberLazyListState(),
                 playbackConnection = playbackConnection,
-                nowPlaying = nowPlaying
+                nowPlaying = nowPlaying,
+                resizableViewModelFactory = resizableViewModelFactory,
+                sleepTimerViewModelFactory = sleepTimerViewModelFactory,
+                playbackSpeedViewModelFactory = playbackSpeedViewModelFactory
             )
         }
     }
@@ -107,11 +114,13 @@ internal fun PlaybackSheet(
     onClose: (() -> Unit)?,
     goToItem: () -> Unit,
     goToCreator: () -> Unit,
-    playerTheme: String,
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     nowPlaying: MediaMetadataCompat,
+    resizableViewModelFactory: () -> ResizablePlaybackSheetLayoutViewModel,
+    sleepTimerViewModelFactory: () -> SleepTimerViewModel,
+    playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
@@ -140,7 +149,8 @@ internal fun PlaybackSheet(
                 ResizablePlaybackQueue(
                     maxWidth = maxWidth,
                     playbackQueue = playbackQueue,
-                    queueListState = queueListState
+                    queueListState = queueListState,
+                    resizableLayoutViewModel = viewModel { resizableViewModelFactory() },
                 )
             }
 
@@ -184,6 +194,8 @@ internal fun PlaybackSheet(
                             onTitleClick = goToItem,
                             onArtistClick = goToCreator,
                             artworkVerticalAlignment = Alignment.CenterVertically,
+                            sleepTimerViewModelFactory = sleepTimerViewModelFactory,
+                            playbackSpeedViewModelFactory = playbackSpeedViewModelFactory,
                             modifier = Modifier
                                 .fillParentMaxWidth()
                                 .padding(vertical = 12.dp),
@@ -209,9 +221,9 @@ private fun RowScope.ResizablePlaybackQueue(
     maxWidth: Dp,
     playbackQueue: PlaybackQueue,
     queueListState: LazyListState,
+    resizableLayoutViewModel: ResizablePlaybackSheetLayoutViewModel,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(),
-    resizableLayoutViewModel: ResizablePlaybackSheetLayoutViewModel = hiltViewModel(),
     dragOffset: State<Float> = resizableLayoutViewModel.dragOffset.collectAsStateWithLifecycle(),
     setDragOffset: (Float) -> Unit = resizableLayoutViewModel::setDragOffset,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,

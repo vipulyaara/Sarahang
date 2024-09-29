@@ -1,6 +1,6 @@
 package com.sarahang.playback.core.audio
 
-import android.content.Context
+import android.app.Application
 import android.content.Context.AUDIO_SERVICE
 import android.media.AudioAttributes
 import android.media.AudioFocusRequest
@@ -14,7 +14,6 @@ import android.media.AudioManager.FLAG_PLAY_SOUND
 import android.media.AudioManager.OnAudioFocusChangeListener
 import android.media.AudioManager.STREAM_MUSIC
 import com.sarahang.playback.core.isOreo
-import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 typealias OnAudioFocusGain = AudioFocusHelper.() -> Unit
@@ -36,7 +35,7 @@ interface AudioFocusHelper {
 
 @Suppress("DEPRECATION")
 class AudioFocusHelperImpl @Inject constructor(
-    @ApplicationContext context: Context
+    context: Application,
 ) : AudioFocusHelper, OnAudioFocusChangeListener {
 
     private val audioManager: AudioManager = context.getSystemService(AUDIO_SERVICE) as AudioManager

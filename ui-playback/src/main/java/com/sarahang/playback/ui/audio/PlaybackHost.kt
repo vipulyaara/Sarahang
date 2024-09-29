@@ -2,18 +2,26 @@ package com.sarahang.playback.ui.audio
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.sarahang.playback.core.PlaybackConnection
+import com.sarahang.playback.core.SET_MEDIA_STATE
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 
 @Composable
 fun PlaybackHost(
-    viewModel: PlaybackConnectionViewModel = hiltViewModel(),
-    content: @Composable () -> Unit
+    playbackConnection: PlaybackConnection,
+    content: @Composable () -> Unit,
 ) {
+    val isConnected by playbackConnection.isConnected.collectAsStateWithLifecycle()
+    LaunchedEffect(isConnected) {
+        if (isConnected) {
+            playbackConnection.transportControls?.sendCustomAction(SET_MEDIA_STATE, null)
+        }
+    }
 
-    CompositionLocalProvider(
-        LocalPlaybackConnection provides viewModel.playbackConnection,
-    ) {
+    CompositionLocalProvider(LocalPlaybackConnection provides playbackConnection) {
         content()
     }
 }
@@ -21,7 +29,7 @@ fun PlaybackHost(
 @Composable
 fun AudioActionHost(
     audioActionHandler: AudioActionHandler = audioActionHandler(),
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(
         LocalAudioActionHandler provides audioActionHandler

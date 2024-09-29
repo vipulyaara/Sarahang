@@ -11,6 +11,7 @@ coroutines = "1.8.0-rc2"
 dagger = "2.48"
 hilt = "2.51.1"
 kotlin = "2.0.0"
+kotlininject = "0.7.2"
 material3 = "1.2.1"
 media3 = "1.3.1"
 room = "2.6.1"
@@ -72,6 +73,9 @@ compose-ui-ui = { module = "androidx.compose.ui:ui" }
 compose-ui-textfonts = { module = "androidx.compose.ui:ui-text-google-fonts" }
 compose-ui-util = { module = "androidx.compose.ui:ui-util" }
 compose-constraintlayout = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "constraintlayout" }
+
+kotlininject-compiler = { module = "me.tatarka.inject:kotlin-inject-compiler-ksp", version.ref = "kotlininject" }
+kotlininject-runtime = { module = "me.tatarka.inject:kotlin-inject-runtime", version.ref = "kotlininject" }
 
 kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 

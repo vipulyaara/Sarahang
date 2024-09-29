@@ -16,13 +16,13 @@ import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.suspendCancellableCoroutine
+import org.kafka.base.ApplicationScope
 import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-@Singleton
+@ApplicationScope
 class ColorExtractor @Inject constructor(
     private val context: Application,
 ) {

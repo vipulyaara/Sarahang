@@ -4,9 +4,9 @@
  */
 package com.sarahang.playback.core.players
 
+import android.app.Application
 import android.app.PendingIntent
 import android.app.PendingIntent.FLAG_IMMUTABLE
-import android.content.Context
 import android.content.Intent
 import android.media.session.PlaybackState
 import android.os.Bundle
@@ -51,7 +51,6 @@ import com.sarahang.playback.core.plus
 import com.sarahang.playback.core.position
 import com.sarahang.playback.core.repeatMode
 import com.sarahang.playback.core.shuffleMode
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -59,8 +58,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
-import javax.inject.Singleton
+import me.tatarka.inject.annotations.Inject
+import org.kafka.base.ApplicationScope
 
 typealias OnPrepared<T> = T.() -> Unit
 typealias OnError<T> = T.(error: Throwable) -> Unit
@@ -120,9 +119,10 @@ interface SarahangPlayer {
     fun setPlaybackSpeed(speed: Float)
 }
 
-@Singleton
-class SarahangPlayerImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+@Inject
+@ApplicationScope
+class SarahangPlayerImpl(
+    private val context: Application,
     private val audioPlayer: AudioPlayerImpl,
     private val queueManager: AudioQueueManagerImpl,
     private val audioFocusHelper: AudioFocusHelperImpl,

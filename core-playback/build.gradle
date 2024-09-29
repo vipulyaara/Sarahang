@@ -1,9 +1,9 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'dagger.hilt.android.plugin'
     id 'kotlin-kapt'
     id 'kotlinx-serialization'
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -35,8 +35,13 @@ android {
 }
 
 dependencies {
+    api(projects.base.annotations)
+    api(projects.core.analytics)
+    api(projects.data.repo)
+
     api(libs.media)
 
+    implementation libs.androidx.core
     implementation libs.androidx.lifecycle.process
 
     implementation libs.androidx.lifecycle.runtime
@@ -47,17 +52,18 @@ dependencies {
     implementation libs.media3.exoplayer
     implementation libs.media3.exoplayer.dash
 
-    implementation libs.hilt.android
-    kapt libs.hilt.compiler
-
-    implementation libs.androidx.hilt.navigation
-    implementation libs.androidx.hilt.compose
-    kapt libs.androidx.hilt.compiler
-
     implementation libs.coil.compose
+    implementation libs.javax.inject
 
     implementation libs.timber
     implementation libs.dataStore
 
     implementation libs.compose.runtime.runtime
+
+    ksp libs.kotlininject.compiler
+    implementation libs.kotlininject.runtime
+}
+
+ksp {
+    arg("me.tatarka.inject.enableJavaxAnnotations", "true")
 }

@@ -1,6 +1,6 @@
 package com.sarahang.playback.core.players
 
-import android.content.Context
+import android.app.Application
 import android.net.Uri
 import androidx.annotation.OptIn
 import androidx.media3.common.AudioAttributes
@@ -18,11 +18,10 @@ import androidx.media3.exoplayer.DefaultRenderersFactory.EXTENSION_RENDERER_MODE
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.sarahang.playback.core.apis.Logger
-import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
+import org.kafka.base.ApplicationScope
+import org.kafka.base.Named
 import javax.inject.Inject
-import javax.inject.Named
-import javax.inject.Singleton
 
 /**
  * Lower level player that handles the playback of a single audio file.
@@ -53,9 +52,9 @@ interface AudioPlayer {
     fun playWhenReady(): Boolean
 }
 
-@Singleton
+@ApplicationScope
 class AudioPlayerImpl @Inject constructor(
-    @ApplicationContext internal val context: Context,
+    internal val context: Application,
     @Named("player") private val okHttpClient: OkHttpClient,
     private val logger: Logger,
 ) : AudioPlayer, Player.Listener {

@@ -12,6 +12,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
+import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
 
 @Composable
 fun PlaybackArtworkPagerWithNowPlayingAndControls(
@@ -24,7 +26,9 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
     currentIndex: Int = 0,
     onArtworkClick: (() -> Unit)? = null,
     onTitleClick: () -> Unit = {},
-    onArtistClick: () -> Unit = {}
+    onArtistClick: () -> Unit = {},
+    sleepTimerViewModelFactory: () -> SleepTimerViewModel,
+    playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
 ) {
     Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
         PlaybackPager(
@@ -48,6 +52,8 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
             artistTextStyle = artistTextStyle,
             onTitleClick = onTitleClick,
             onArtistClick = onArtistClick,
+            sleepTimerViewModelFactory = sleepTimerViewModelFactory,
+            playbackSpeedViewModelFactory = playbackSpeedViewModelFactory,
         )
     }
 }

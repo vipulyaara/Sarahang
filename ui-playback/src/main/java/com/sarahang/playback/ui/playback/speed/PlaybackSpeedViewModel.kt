@@ -2,11 +2,9 @@ package com.sarahang.playback.ui.playback.speed
 
 import androidx.lifecycle.ViewModel
 import com.sarahang.playback.core.players.SarahangPlayer
-import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
-@HiltViewModel
 class PlaybackSpeedViewModel @Inject constructor(
     private val sarahangPlayer: SarahangPlayer
 ) : ViewModel() {

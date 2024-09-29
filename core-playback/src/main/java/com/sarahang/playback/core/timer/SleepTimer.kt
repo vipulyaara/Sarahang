@@ -1,6 +1,7 @@
 package com.sarahang.playback.core.timer
 
 import android.app.AlarmManager
+import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
@@ -11,14 +12,14 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import com.sarahang.playback.core.ACTION_QUIT
 import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.R
-import com.sarahang.playback.core.injection.ProcessLifetime
 import com.sarahang.playback.core.services.PlayerService
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import org.kafka.base.Named
+import org.kafka.base.ProcessLifetime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -33,9 +34,9 @@ interface SleepTimer {
 }
 
 class SleepTimerImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
+    private val context: Application,
     @ProcessLifetime private val processScope: CoroutineScope,
-    private val preferencesStore: PreferencesStore
+    private val preferencesStore: PreferencesStore,
 ) : SleepTimer {
     private val alarmManager by lazy { context.getSystemService<AlarmManager>() }
 
@@ -46,7 +47,7 @@ class SleepTimerImpl @Inject constructor(
     override fun start(
         time: Long,
         timeUnit: TimeUnit,
-        context: Context
+        context: Context,
     ) {
         cancelAlarm()
         val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)

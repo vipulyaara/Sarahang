@@ -40,8 +40,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artist
 import com.sarahang.playback.core.hasNext
@@ -84,19 +84,66 @@ internal fun PlaybackNowPlayingWithControls(
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
     onlyControls: Boolean = false,
+    sleepTimerViewModelFactory: () -> SleepTimerViewModel,
+    playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
 ) {
+    val playbackConnection = LocalPlaybackConnection.current
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = modifier.padding(32.dp)
     ) {
-        if (!onlyControls)
-            PlaybackNowPlaying(
-                nowPlaying = nowPlaying,
-                onTitleClick = onTitleClick,
-                onArtistClick = onArtistClick,
-                titleTextStyle = titleTextStyle,
-                artistTextStyle = artistTextStyle
-            )
+        if (!onlyControls) {
+            val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = modifier
+            ) {
+                Text(
+                    text = nowPlaying.title.orNa(),
+                    style = titleTextStyle,
+                    color = MaterialTheme.colorScheme.primary,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .simpleClickable(onClick = onTitleClick)
+                        .basicMarquee()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = nowPlaying.artist.orNa(),
+                    style = artistTextStyle,
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    color = MaterialTheme.colorScheme.primary.disabledAlpha(condition = true),
+                    modifier = Modifier
+                        .simpleClickable(onClick = onArtistClick)
+                        .basicMarquee()
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RepeatButton(
+                        playbackConnection = playbackConnection,
+                        playbackMode = playbackMode
+                    )
+
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(24.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        PlaybackSpeedButton(viewModel { playbackSpeedViewModelFactory() })
+                        SleepTimerButton(viewModel { sleepTimerViewModelFactory() })
+                    }
+                }
+            }
+        }
 
         PlaybackProgress(playbackState = playbackState)
 
@@ -104,65 +151,6 @@ internal fun PlaybackNowPlayingWithControls(
             playbackState = playbackState,
             modifier = Modifier.padding(top = 12.dp)
         )
-    }
-}
-
-@Composable
-internal fun PlaybackNowPlaying(
-    nowPlaying: MediaMetadataCompat,
-    onTitleClick: () -> Unit,
-    onArtistClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
-    artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
-    horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
-) {
-    val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
-
-    Column(
-        horizontalAlignment = horizontalAlignment,
-        modifier = modifier
-    ) {
-        Text(
-            text = nowPlaying.title.orNa(),
-            style = titleTextStyle,
-            color = MaterialTheme.colorScheme.primary,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            modifier = Modifier
-                .simpleClickable(onClick = onTitleClick)
-                .basicMarquee()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = nowPlaying.artist.orNa(),
-            style = artistTextStyle,
-            overflow = TextOverflow.Ellipsis,
-            maxLines = 1,
-            color = MaterialTheme.colorScheme.primary.disabledAlpha(condition = true),
-            modifier = Modifier
-                .simpleClickable(onClick = onArtistClick)
-                .basicMarquee()
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            RepeatButton(playbackConnection = playbackConnection, playbackMode = playbackMode)
-
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(24.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                PlaybackSpeedButton()
-                SleepTimerButton()
-            }
-        }
     }
 }
 
@@ -346,8 +334,7 @@ internal fun PlayerPlayControl(
 }
 
 @Composable
-private fun SleepTimerButton(modifier: Modifier = Modifier) {
-    val timerViewModel = hiltViewModel<SleepTimerViewModel>()
+private fun SleepTimerButton(timerViewModel: SleepTimerViewModel, modifier: Modifier = Modifier) {
     val timerViewState by timerViewModel.state.collectAsStateWithLifecycle()
 
     var showTimer by remember { mutableStateOf(false) }
@@ -383,8 +370,7 @@ private fun SleepTimerButton(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun PlaybackSpeedButton(modifier: Modifier = Modifier) {
-    val viewModel = hiltViewModel<PlaybackSpeedViewModel>()
+private fun PlaybackSpeedButton(viewModel: PlaybackSpeedViewModel, modifier: Modifier = Modifier) {
     val currentSpeed by viewModel.currentSpeed.collectAsStateWithLifecycle()
 
     var showPlaybackSpeed by remember { mutableStateOf(false) }

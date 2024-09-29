@@ -2,9 +2,6 @@ package com.sarahang.playback.core.injection
 
 import android.app.Application
 import android.content.ComponentName
-import android.content.Context
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.PlaybackConnectionImpl
 import com.sarahang.playback.core.apis.AudioDataSource
@@ -18,77 +15,59 @@ import com.sarahang.playback.core.players.SarahangPlayerImpl
 import com.sarahang.playback.core.services.PlayerService
 import com.sarahang.playback.core.timer.SleepTimer
 import com.sarahang.playback.core.timer.SleepTimerImpl
-import dagger.Binds
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
+import me.tatarka.inject.annotations.Component
+import me.tatarka.inject.annotations.Provides
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import org.kafka.base.ApplicationScope
+import org.kafka.base.Named
 import java.util.concurrent.TimeUnit
-import javax.inject.Named
-import javax.inject.Singleton
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@InstallIn(SingletonComponent::class)
-@Module
-abstract class PlaybackCoreModule {
+@Component
+@ApplicationScope
+interface PlaybackCoreModule {
+    @Provides
+    @ApplicationScope
+    fun okHttpCache(app: Application) = Cache(app.cacheDir, (10 * 1024 * 1024).toLong())
 
-    companion object {
-        @Provides
-        @Named("process")
-        fun processScope(): CoroutineScope = ProcessLifecycleOwner.get().lifecycleScope
+    @Provides
+    @Named("player")
+    fun playerOkHttp(
+        cache: Cache,
+    ): OkHttpClient = getBaseBuilder(cache)
+        .readTimeout(PLAYER_TIMEOUT, TimeUnit.MILLISECONDS)
+        .writeTimeout(PLAYER_TIMEOUT, TimeUnit.MILLISECONDS)
+        .connectTimeout(PLAYER_TIMEOUT_CONNECT, TimeUnit.MILLISECONDS)
+        .build()
 
-        @Provides
-        @Singleton
-        fun okHttpCache(app: Application) = Cache(app.cacheDir, (10 * 1024 * 1024).toLong())
+    @Provides
+    @ApplicationScope
+    fun playbackConnection(
+        context: Application,
+        audioPlayer: AudioPlayerImpl,
+        audioDataSource: AudioDataSource,
+        logger: Logger,
+    ): PlaybackConnection = PlaybackConnectionImpl(
+        context = context,
+        serviceComponent = ComponentName(context, PlayerService::class.java),
+        audioPlayer = audioPlayer,
+        audioDataSource = audioDataSource,
+        logger = logger
+    )
 
-        @Provides
-        @Named("player")
-        fun playerOkHttp(
-            cache: Cache,
-        ) = getBaseBuilder(cache)
-            .readTimeout(PLAYER_TIMEOUT, TimeUnit.MILLISECONDS)
-            .writeTimeout(PLAYER_TIMEOUT, TimeUnit.MILLISECONDS)
-            .connectTimeout(PLAYER_TIMEOUT_CONNECT, TimeUnit.MILLISECONDS)
-            .build()
+    @Provides
+    fun provideAudioFocusHelper(bind: AudioFocusHelperImpl): AudioFocusHelper = bind
 
-        @Provides
-        @Singleton
-        fun playbackConnection(
-            @ApplicationContext context: Context,
-            audioPlayer: AudioPlayerImpl,
-            audioDataSource: AudioDataSource,
-            logger: Logger,
-        ): PlaybackConnection = PlaybackConnectionImpl(
-            context = context,
-            serviceComponent = ComponentName(context, PlayerService::class.java),
-            audioPlayer = audioPlayer,
-            audioDataSource = audioDataSource,
-            logger = logger
-        )
+    @Provides
+    fun provideAudioPlayer(bind: AudioPlayerImpl): AudioPlayer = bind
 
-        @Provides
-        @ProcessLifetime
-        fun provideLongLifetimeScope(): CoroutineScope {
-            return ProcessLifecycleOwner.get().lifecycleScope
-        }
-    }
+    @Provides
+    fun provideSarahangPlayer(bind: SarahangPlayerImpl): SarahangPlayer = bind
 
-    @Binds
-    abstract fun provideAudioFocusHelper(bind: AudioFocusHelperImpl): AudioFocusHelper
-
-    @Binds
-    abstract fun provideAudioPlayer(bind: AudioPlayerImpl): AudioPlayer
-
-    @Binds
-    abstract fun provideSarahangPlayer(bind: SarahangPlayerImpl): SarahangPlayer
-
-    @Binds
-    abstract fun provideSleepTimer(bind: SleepTimerImpl): SleepTimer
+    @Provides
+    fun provideSleepTimer(bind: SleepTimerImpl): SleepTimer = bind
 }
 
 private val PLAYER_TIMEOUT = 2.minutes.inWholeMilliseconds

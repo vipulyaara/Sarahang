@@ -1,5 +1,5 @@
 package com.sarahang.playback.core
-
+import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -20,11 +20,10 @@ import androidx.core.app.NotificationCompat
 import androidx.palette.graphics.Palette
 import com.sarahang.playback.core.receivers.MediaButtonReceiver.Companion.buildMediaButtonPendingIntent
 import com.sarahang.playback.core.services.PlayerService
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import org.kafka.base.ProcessLifetime
 import javax.inject.Inject
-import javax.inject.Named
 import androidx.media.app.NotificationCompat as NotificationMediaCompat
 
 const val NOTIFICATION_ID = 2000
@@ -56,8 +55,8 @@ interface MediaNotifications {
 }
 
 class MediaNotificationsImpl @Inject constructor(
-    @ApplicationContext private val context: Context,
-    @Named("process") private val coroutineScope: CoroutineScope,
+    private val context: Application,
+    @ProcessLifetime private val coroutineScope: CoroutineScope,
 ) : MediaNotifications {
 
     private val notificationManager: NotificationManager =
@@ -117,7 +116,12 @@ class MediaNotificationsImpl @Inject constructor(
             if (isBuffering)
                 addAction(getBufferingAction())
             else
-                addAction(getPlayPauseAction(context, if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play))
+                addAction(
+                    getPlayPauseAction(
+                        context,
+                        if (isPlaying) R.drawable.ic_pause else R.drawable.ic_play
+                    )
+                )
             addAction(getNextAction(context))
             addAction(getStopAction(context))
         }
@@ -154,7 +158,7 @@ class MediaNotificationsImpl @Inject constructor(
 
     private fun getPlayPauseAction(
         context: Context,
-        @DrawableRes playButtonResId: Int
+        @DrawableRes playButtonResId: Int,
     ): NotificationCompat.Action {
         val actionIntent = Intent(context, PlayerService::class.java).apply { action = PLAY_PAUSE }
         val pendingIntent = getService(context, 0, actionIntent, FLAG_IMMUTABLE)
