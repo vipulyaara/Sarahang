@@ -35,9 +35,7 @@ android {
 }
 
 dependencies {
-    api(projects.base.annotations)
-    api(projects.core.analytics)
-    api(projects.data.repo)
+    api project(':base:annotations')
 
     api(libs.media)
 

@@ -25,8 +25,10 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 cacheFixPlugin = { id = "org.gradle.android.cache-fix", version = "3.0" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = "com.google.devtools.ksp:2.0.10-1.0.24"
 
 [libraries]
 accompanist-pager-core = { module = "com.google.accompanist:accompanist-pager", version.ref = "accompanist" }
@@ -91,3 +93,6 @@ media3-ui = { module = "androidx.media3:media3-ui", version.ref = "media3" }
 timber = "com.jakewharton.timber:timber:5.0.1"
 
 dataStore = "androidx.datastore:datastore-preferences:1.1.1"
+material-kolor = "com.materialkolor:material-kolor:1.7.0"
+androidx-core = "androidx.core:core-ktx:1.13.1"
+javax-inject = "javax.inject:javax.inject:1"
