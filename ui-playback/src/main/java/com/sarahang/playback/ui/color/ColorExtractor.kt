@@ -23,9 +23,7 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @ApplicationScope
-class ColorExtractor @Inject constructor(
-    private val context: Application,
-) {
+class ColorExtractor @Inject constructor(private val context: Application) {
     private val cache = lruCache<Any, Color>(100)
 
     suspend fun calculatePrimaryColor(

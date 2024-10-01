@@ -2,16 +2,16 @@ package com.sarahang.sample
 
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.apis.PlayerEventLogger
+import com.sarahang.playback.core.injection.PlaybackCoreModule
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.sample.FakeData.audios
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
+import me.tatarka.inject.annotations.Component
+import me.tatarka.inject.annotations.Provides
+import org.kafka.base.ApplicationScope
 
-@InstallIn(SingletonComponent::class)
-@Module
-class PlaybackModule {
+@Component
+@ApplicationScope
+interface PlaybackModule : PlaybackCoreModule {
 
     @Provides
     fun audioDataSource(): AudioDataSource = object : AudioDataSource {

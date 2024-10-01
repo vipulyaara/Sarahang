@@ -2,9 +2,9 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.cacheFixPlugin)
     alias(libs.plugins.kotlin.compose.compiler)
-    id 'dagger.hilt.android.plugin'
 }
 
 android {
@@ -66,13 +66,6 @@ dependencies {
 
     implementation(libs.dataStore)
 
-    implementation libs.hilt.android
-    kapt libs.hilt.compiler
-
-    implementation libs.androidx.hilt.navigation
-    implementation libs.androidx.hilt.compose
-    kapt libs.androidx.hilt.compiler
-
     implementation(libs.accompanist.pager.core)
     implementation(libs.accompanist.placeholder)
 
@@ -88,4 +81,13 @@ dependencies {
     implementation libs.dataStore
 
     implementation libs.compose.runtime.runtime
+
+    ksp libs.kotlininject.compiler
+    implementation libs.kotlininject.runtime
+}
+
+ksp {
+//    arg("me.tatarka.inject.generateCompanionExtensions", "true")
+    arg("me.tatarka.inject.enableJavaxAnnotations", "true")
+//    arg("me.tatarka.inject.dumpGraph", "true")
 }
