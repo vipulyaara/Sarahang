@@ -2,12 +2,16 @@ package com.sarahang.playback.core.injection
 
 import android.app.Application
 import android.content.ComponentName
+import com.sarahang.playback.core.MediaNotifications
+import com.sarahang.playback.core.MediaNotificationsImpl
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.PlaybackConnectionImpl
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.audio.AudioFocusHelperImpl
+import com.sarahang.playback.core.audio.AudioQueueManager
+import com.sarahang.playback.core.audio.AudioQueueManagerImpl
 import com.sarahang.playback.core.players.AudioPlayer
 import com.sarahang.playback.core.players.AudioPlayerImpl
 import com.sarahang.playback.core.players.SarahangPlayer
@@ -15,7 +19,6 @@ import com.sarahang.playback.core.players.SarahangPlayerImpl
 import com.sarahang.playback.core.services.PlayerService
 import com.sarahang.playback.core.timer.SleepTimer
 import com.sarahang.playback.core.timer.SleepTimerImpl
-import me.tatarka.inject.annotations.Component
 import me.tatarka.inject.annotations.Provides
 import okhttp3.Cache
 import okhttp3.OkHttpClient
@@ -25,7 +28,6 @@ import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@Component
 @ApplicationScope
 interface PlaybackCoreModule {
     @Provides
@@ -46,7 +48,7 @@ interface PlaybackCoreModule {
     @ApplicationScope
     fun playbackConnection(
         context: Application,
-        audioPlayer: AudioPlayerImpl,
+        audioPlayer: AudioPlayer,
         audioDataSource: AudioDataSource,
         logger: Logger,
     ): PlaybackConnection = PlaybackConnectionImpl(
@@ -58,16 +60,28 @@ interface PlaybackCoreModule {
     )
 
     @Provides
+    @ApplicationScope
     fun provideAudioFocusHelper(bind: AudioFocusHelperImpl): AudioFocusHelper = bind
 
     @Provides
+    @ApplicationScope
     fun provideAudioPlayer(bind: AudioPlayerImpl): AudioPlayer = bind
 
     @Provides
+    @ApplicationScope
+    fun provideAudioQueueManager(bind: AudioQueueManagerImpl): AudioQueueManager = bind
+
+    @Provides
+    @ApplicationScope
     fun provideSarahangPlayer(bind: SarahangPlayerImpl): SarahangPlayer = bind
 
     @Provides
+    @ApplicationScope
     fun provideSleepTimer(bind: SleepTimerImpl): SleepTimer = bind
+
+    @Provides
+    @ApplicationScope
+    fun provideMediaNotifications(bind: MediaNotificationsImpl): MediaNotifications = bind
 }
 
 private val PLAYER_TIMEOUT = 2.minutes.inWholeMilliseconds

@@ -29,7 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope() {
-    private lateinit var component: PlayerServiceComponent
+    private lateinit var component: PlayerServiceDependencies
     private val player by lazy { component.player }
     private val mediaNotifications by lazy { component.mediaNotifications }
     private val logger by lazy { component.logger }
@@ -45,7 +45,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
     override fun onCreate() {
         super.onCreate()
 
-        component = PlayerServiceComponent::class.create(this.application)
+        component = this.application as PlayerServiceDependencies
 
         sessionToken = player.getSession().sessionToken
         becomingNoisyReceiver = BecomingNoisyReceiver(this, sessionToken!!)

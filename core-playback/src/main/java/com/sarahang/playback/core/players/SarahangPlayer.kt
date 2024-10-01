@@ -36,8 +36,8 @@ import com.sarahang.playback.core.REPEAT_ONE
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.apis.PlayerEventLogger
-import com.sarahang.playback.core.audio.AudioFocusHelperImpl
-import com.sarahang.playback.core.audio.AudioQueueManagerImpl
+import com.sarahang.playback.core.audio.AudioFocusHelper
+import com.sarahang.playback.core.audio.AudioQueueManager
 import com.sarahang.playback.core.createDefaultPlaybackState
 import com.sarahang.playback.core.getBitmap
 import com.sarahang.playback.core.isPlaying
@@ -58,8 +58,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import me.tatarka.inject.annotations.Inject
 import org.kafka.base.ApplicationScope
+import javax.inject.Inject
 
 typealias OnPrepared<T> = T.() -> Unit
 typealias OnError<T> = T.(error: Throwable) -> Unit
@@ -119,13 +119,12 @@ interface SarahangPlayer {
     fun setPlaybackSpeed(speed: Float)
 }
 
-@Inject
 @ApplicationScope
-class SarahangPlayerImpl(
+class SarahangPlayerImpl @Inject constructor(
     private val context: Application,
-    private val audioPlayer: AudioPlayerImpl,
-    private val queueManager: AudioQueueManagerImpl,
-    private val audioFocusHelper: AudioFocusHelperImpl,
+    private val audioPlayer: AudioPlayer,
+    private val queueManager: AudioQueueManager,
+    private val audioFocusHelper: AudioFocusHelper,
     private val audioDataSource: AudioDataSource,
     private val preferences: PreferencesStore,
     private val mediaQueueBuilder: MediaQueueBuilder,
