@@ -92,8 +92,9 @@ class AudioPlayerImpl @Inject constructor(
     override fun setSource(uri: Uri, local: Boolean): Boolean {
         logger.d("Setting source: local=$local, uri=$uri")
         return try {
-            if (local) player.setMediaItem(MediaItem.fromUri(uri), true)
-            else {
+            if (local) {
+                player.setMediaItem(MediaItem.fromUri(uri), true)
+            } else {
                 val mediaSource =
                     ProgressiveMediaSource.Factory(OkHttpDataSource.Factory(okHttpClient))
                         .createMediaSource(MediaItem.fromUri(uri))

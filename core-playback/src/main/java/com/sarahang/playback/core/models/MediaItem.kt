@@ -76,6 +76,7 @@ fun MediaMetadataCompat.toAudio() = Audio(
     albumId = albumId.orEmpty(),
     duration = duration / 1000,
     playbackUrl = "",
+    localUri = null,
     coverImage = artworkUri.toString()
 )
 

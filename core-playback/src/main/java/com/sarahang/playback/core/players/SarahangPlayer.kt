@@ -265,8 +265,14 @@ class SarahangPlayerImpl @Inject constructor(
 
         val isSourceSet = when (val audio = queueManager.currentAudio) {
             is Audio -> {
-                val uri = audio.playbackUrl.toUri()
-                audioPlayer.setSource(uri, false)
+                val uri = if (audio.localUri.isNullOrEmpty()) {
+                    audio.playbackUrl.toUri()
+                } else {
+                    audio.localUri.toUri()
+                }
+
+                val local = !audio.localUri.isNullOrEmpty()
+                audioPlayer.setSource(uri = uri, local = local)
             }
 
             else -> false
