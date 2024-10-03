@@ -83,7 +83,7 @@ internal fun PlaybackNowPlayingWithControls(
     modifier: Modifier = Modifier,
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
     artistTextStyle: TextStyle = PlaybackNowPlayingDefaults.artistTextStyle,
-    onlyControls: Boolean = false,
+    isMiniPlayer: Boolean = false,
     sleepTimerViewModelFactory: () -> SleepTimerViewModel,
     playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
 ) {
@@ -91,9 +91,9 @@ internal fun PlaybackNowPlayingWithControls(
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.padding(32.dp)
+        modifier = modifier.padding(if (isMiniPlayer) 8.dp else 32.dp)
     ) {
-        if (!onlyControls) {
+        if (!isMiniPlayer) {
             val playbackMode by playbackConnection.playbackMode.collectAsStateWithLifecycle()
 
             Column(
@@ -149,7 +149,8 @@ internal fun PlaybackNowPlayingWithControls(
 
         PlaybackControls(
             playbackState = playbackState,
-            modifier = Modifier.padding(top = 12.dp)
+            compactControls = isMiniPlayer,
+            modifier = Modifier.padding(top = if (isMiniPlayer) 4.dp else 12.dp)
         )
     }
 }
@@ -159,6 +160,7 @@ internal fun PlaybackControls(
     playbackState: PlaybackStateCompat,
     modifier: Modifier = Modifier,
     smallRippleRadius: Dp = SmallRippleRadius,
+    compactControls: Boolean = false,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
 ) {
     Row(
@@ -171,19 +173,21 @@ internal fun PlaybackControls(
             smallRippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(20.dp)
-                .weight(2f)
+                .weight(if (compactControls) 8f else 2f)
         )
 
-        Spacer(Modifier.width(Specs.paddingLarge))
+        if (!compactControls) {
+            Spacer(Modifier.width(Specs.paddingLarge))
+            PlayerPreviousControl(
+                playbackConnection = playbackConnection,
+                smallRippleRadius = smallRippleRadius,
+                modifier = Modifier
+                    .size(40.dp)
+                    .weight(4f),
+                playbackState = playbackState
+            )
 
-        PlayerPreviousControl(
-            playbackConnection = playbackConnection,
-            smallRippleRadius = smallRippleRadius,
-            modifier = Modifier
-                .size(40.dp)
-                .weight(4f),
-            playbackState = playbackState
-        )
+        }
 
         Spacer(Modifier.width(Specs.padding))
 
@@ -197,23 +201,25 @@ internal fun PlaybackControls(
 
         Spacer(Modifier.width(Specs.padding))
 
-        PlayerNextControl(
-            playbackConnection = playbackConnection,
-            smallRippleRadius = smallRippleRadius,
-            playbackState = playbackState,
-            modifier = Modifier
-                .size(40.dp)
-                .weight(4f)
-        )
+        if (!compactControls) {
+            PlayerNextControl(
+                playbackConnection = playbackConnection,
+                smallRippleRadius = smallRippleRadius,
+                playbackState = playbackState,
+                modifier = Modifier
+                    .size(40.dp)
+                    .weight(4f)
+            )
 
-        Spacer(Modifier.width(Specs.paddingLarge))
+            Spacer(Modifier.width(Specs.paddingLarge))
+        }
 
         FastForwardControl(
             playbackConnection = playbackConnection,
             smallRippleRadius = smallRippleRadius,
             modifier = Modifier
                 .size(20.dp)
-                .weight(2f)
+                .weight(if (compactControls) 8f else 2f)
         )
     }
 }
