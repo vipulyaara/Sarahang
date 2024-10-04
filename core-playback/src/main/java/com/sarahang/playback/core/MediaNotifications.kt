@@ -22,7 +22,7 @@ import com.sarahang.playback.core.receivers.MediaButtonReceiver.Companion.buildM
 import com.sarahang.playback.core.services.PlayerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import org.kafka.base.ProcessLifetime
+import com.kafka.base.ProcessLifetime
 import javax.inject.Inject
 import androidx.media.app.NotificationCompat as NotificationMediaCompat
 

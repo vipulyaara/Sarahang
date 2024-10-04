@@ -19,8 +19,8 @@ import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.sarahang.playback.core.apis.Logger
 import okhttp3.OkHttpClient
-import org.kafka.base.ApplicationScope
-import org.kafka.base.Named
+import com.kafka.base.ApplicationScope
+import com.kafka.base.Named
 import javax.inject.Inject
 
 /**

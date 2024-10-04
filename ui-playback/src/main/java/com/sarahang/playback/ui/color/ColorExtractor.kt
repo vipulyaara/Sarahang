@@ -16,7 +16,7 @@ import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.suspendCancellableCoroutine
-import org.kafka.base.ApplicationScope
+import com.kafka.base.ApplicationScope
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume

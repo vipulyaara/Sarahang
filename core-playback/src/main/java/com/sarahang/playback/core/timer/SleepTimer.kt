@@ -18,7 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import org.kafka.base.ProcessLifetime
+import com.kafka.base.ProcessLifetime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 

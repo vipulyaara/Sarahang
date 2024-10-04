@@ -58,7 +58,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import org.kafka.base.ApplicationScope
+import com.kafka.base.ApplicationScope
 import javax.inject.Inject
 
 typealias OnPrepared<T> = T.() -> Unit
