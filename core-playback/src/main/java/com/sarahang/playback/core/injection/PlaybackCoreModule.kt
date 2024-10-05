@@ -2,10 +2,15 @@ package com.sarahang.playback.core.injection
 
 import android.app.Application
 import android.content.ComponentName
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.preferencesDataStoreFile
+import com.kafka.base.ApplicationScope
+import com.kafka.base.Named
 import com.sarahang.playback.core.MediaNotifications
 import com.sarahang.playback.core.MediaNotificationsImpl
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.PlaybackConnectionImpl
+import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.audio.AudioFocusHelper
@@ -22,14 +27,24 @@ import com.sarahang.playback.core.timer.SleepTimerImpl
 import me.tatarka.inject.annotations.Provides
 import okhttp3.Cache
 import okhttp3.OkHttpClient
-import com.kafka.base.ApplicationScope
-import com.kafka.base.Named
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+private const val dataStoreFileName = "sarahang_preferences.preferences_pb"
+
 @ApplicationScope
 interface PlaybackCoreModule {
+
+    @Provides
+    @ApplicationScope
+    fun providePlayerPreferenceStore(
+        context: Application,
+    ): PreferencesStore = PreferencesStore(
+        PreferenceDataStoreFactory.create(
+            produceFile = { context.preferencesDataStoreFile(dataStoreFileName) }
+        ))
+
     @Provides
     @ApplicationScope
     fun okHttpCache(app: Application) = Cache(app.cacheDir, (10 * 1024 * 1024).toLong())

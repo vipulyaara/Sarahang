@@ -1,12 +1,9 @@
 package com.sarahang.playback.core
 
-import android.app.Application
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,11 +16,7 @@ import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
-private const val STORE_NAME = "sarahang_preferences"
-
-val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = STORE_NAME)
-
-class PreferencesStore @Inject constructor(private val context: Application) {
+class PreferencesStore @Inject constructor(private val dataStore: DataStore<Preferences>) {
     private val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true
@@ -35,18 +28,18 @@ class PreferencesStore @Inject constructor(private val context: Application) {
     }
 
     suspend fun <T> save(key: Preferences.Key<T>, value: T) {
-        context.dataStore.edit { settings ->
+        dataStore.edit { settings ->
             settings[key] = value
         }
     }
 
     fun <T> data(key: Preferences.Key<T>): Flow<T?> =
-        context.dataStore.data.map { preferences ->
+        dataStore.data.map { preferences ->
             preferences[key]
         }
 
     fun <T> get(key: String, serializer: KSerializer<T>, defaultValue: T): Flow<T> {
-        return context.dataStore.data
+        return dataStore.data
             .map { preferences ->
                 try {
                     json.decodeFromString(
@@ -59,7 +52,7 @@ class PreferencesStore @Inject constructor(private val context: Application) {
             }
     }
 
-    fun <T> get(key: Preferences.Key<T>, defaultValue: T): Flow<T> = context.dataStore.data
+    fun <T> get(key: Preferences.Key<T>, defaultValue: T): Flow<T> = dataStore.data
         .map { preferences -> preferences[key] ?: return@map defaultValue }
 
     fun <T> getStateFlow(
