@@ -40,7 +40,6 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
         ) { audio, _, pagerMod ->
             PlaybackArtwork(
                 artwork = audio.coverImage,
-                nowPlaying = nowPlaying,
                 onClick = onArtworkClick,
                 modifier = pagerMod,
             )
