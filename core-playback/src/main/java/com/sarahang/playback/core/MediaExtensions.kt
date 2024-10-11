@@ -8,12 +8,12 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
+import co.touchlab.kermit.Logger
 import com.sarahang.playback.core.models.METADATA_KEY_ALBUM_ID
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.players.QUEUE_CURRENT_INDEX
 import com.sarahang.playback.core.players.QUEUE_HAS_NEXT
 import com.sarahang.playback.core.players.QUEUE_HAS_PREVIOUS
-import timber.log.Timber
 
 val NONE_PLAYBACK_STATE: PlaybackStateCompat =
     PlaybackStateCompat.Builder()
@@ -37,7 +37,7 @@ fun MediaControllerCompat.playPause() {
                 PLAY_ACTION, bundleOf(BY_UI_KEY to false)
             )
 
-            else -> Timber.d("Couldn't play or pause the media controller")
+            else -> Logger.d("Couldn't play or pause the media controller")
         }
     }
 }
@@ -47,11 +47,11 @@ fun MediaControllerCompat.toggleShuffleMode() {
         PlaybackStateCompat.SHUFFLE_MODE_NONE -> PlaybackStateCompat.SHUFFLE_MODE_ALL
         PlaybackStateCompat.SHUFFLE_MODE_ALL -> PlaybackStateCompat.SHUFFLE_MODE_NONE
         else -> {
-            Timber.e("Unknown shuffle mode $shuffleMode")
+            Logger.e("Unknown shuffle mode $shuffleMode")
             return
         }
     }
-    Timber.i("Toggling shuffle mode from=$shuffleMode, to=$new")
+    Logger.i("Toggling shuffle mode from=$shuffleMode, to=$new")
     transportControls.setShuffleMode(new)
 }
 

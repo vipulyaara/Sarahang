@@ -18,8 +18,7 @@ data class QueueTitle(val type: Type = Type.UNKNOWN, val value: String? = null) 
                 QueueTitle(
                     Type.from(parts[0]),
                     parts[1].let {
-                        if (it.isBlank()) null
-                        else it
+                        it.ifBlank { null }
                     }
                 )
             } catch (e: Exception) {

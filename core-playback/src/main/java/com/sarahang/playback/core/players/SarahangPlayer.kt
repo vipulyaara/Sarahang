@@ -47,7 +47,6 @@ import com.sarahang.playback.core.models.MediaId
 import com.sarahang.playback.core.models.QueueState
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.models.toMediaMetadata
-import com.sarahang.playback.core.plus
 import com.sarahang.playback.core.position
 import com.sarahang.playback.core.repeatMode
 import com.sarahang.playback.core.shuffleMode
@@ -104,7 +103,6 @@ interface SarahangPlayer {
     fun onError(error: OnError<SarahangPlayer>)
     fun onCompletion(completion: OnCompletion<SarahangPlayer>)
     fun onMetaDataChanged(metaDataChanged: OnMetaDataChanged)
-    fun updatePlaybackState(applier: PlaybackStateCompat.Builder.() -> Unit = {})
     fun setPlaybackState(state: PlaybackStateCompat)
     fun setShuffleMode(shuffleMode: Int)
     fun updateData(list: List<String> = emptyList(), title: String? = null)
@@ -470,7 +468,7 @@ class SarahangPlayerImpl @Inject constructor(
         this.metaDataChangedCallback = metaDataChanged
     }
 
-    override fun updatePlaybackState(applier: PlaybackStateCompat.Builder.() -> Unit) {
+    private fun updatePlaybackState(applier: PlaybackStateCompat.Builder.() -> Unit = {}) {
         applier(stateBuilder)
         stateBuilder.setExtras(
             stateBuilder.build().extras + bundleOf(
@@ -686,3 +684,6 @@ class SarahangPlayerImpl @Inject constructor(
     private fun logEvent(event: String, mediaId: String = queueManager.currentAudioId) =
         playerEventLogger.logEvent("player_$event", mapOf("mediaId" to mediaId))
 }
+
+operator fun Bundle?.plus(other: Bundle?) =
+    this.apply { (this ?: Bundle()).putAll(other ?: Bundle()) }

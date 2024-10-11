@@ -2,14 +2,15 @@ package com.sarahang.playback.core
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.ChecksSdkIntAtLeast
-import coil.imageLoader
-import coil.request.ImageRequest
-import coil.request.SuccessResult
-import coil.size.Precision
+import coil3.imageLoader
+import coil3.request.ImageRequest
+import coil3.request.SuccessResult
+import coil3.request.allowHardware
+import coil3.size.Precision
+import coil3.toBitmap
 
 @ChecksSdkIntAtLeast(api = Build.VERSION_CODES.O)
 fun isOreo() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -30,7 +31,7 @@ suspend fun Context.getBitmap(uri: Uri, size: Int): Bitmap? {
         .build()
 
     return when (val result = imageLoader.execute(request)) {
-        is SuccessResult -> (result.drawable as BitmapDrawable).bitmap
+        is SuccessResult -> result.image.toBitmap()
         else -> null
     }
 }

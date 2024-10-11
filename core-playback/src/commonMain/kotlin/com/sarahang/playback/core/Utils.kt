@@ -1,6 +1,5 @@
 package com.sarahang.playback.core
 
-import android.os.Bundle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -34,6 +33,3 @@ fun flowInterval(interval: Long, timeUnit: TimeUnit = TimeUnit.MILLISECONDS): Fl
         }
     }
 }
-
-operator fun Bundle?.plus(other: Bundle?) =
-    this.apply { (this ?: Bundle()).putAll(other ?: Bundle()) }

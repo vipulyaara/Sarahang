@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="player_name" translatable="false">Sarahang</string>
+
+    <string name="enable_alarm_permission_text" translatable="false">Select Kafka from the list</string>
+    <string name="timer_is_set" translatable="false">Timer is set</string>
+</resources>

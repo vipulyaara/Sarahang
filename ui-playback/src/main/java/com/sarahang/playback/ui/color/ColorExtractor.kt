@@ -12,11 +12,11 @@ import coil.ImageLoader
 import coil.request.ImageRequest
 import coil.size.Size
 import coil.size.SizeResolver
+import com.kafka.base.ApplicationScope
 import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.suspendCancellableCoroutine
-import com.kafka.base.ApplicationScope
 import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume

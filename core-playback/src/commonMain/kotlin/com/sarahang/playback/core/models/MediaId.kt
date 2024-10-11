@@ -1,6 +1,6 @@
 package com.sarahang.playback.core.models
 
-import android.util.Log
+import co.touchlab.kermit.Logger
 import com.sarahang.playback.core.apis.AudioDataSource
 
 const val MEDIA_TYPE_AUDIO = "Media.Audio"
@@ -42,7 +42,7 @@ fun String?.toMediaId(): MediaId {
 
     val knownTypes = listOf(MEDIA_TYPE_AUDIO, MEDIA_TYPE_AUDIO_QUERY, MEDIA_TYPE_ALBUM)
     if (type !in knownTypes) {
-        Log.e("MediaId", "Unknown media type: $type")
+        Logger.e(messageString = "Unknown media type: $type", throwable = null, tag = "MediaId")
         return MediaId()
     }
 
