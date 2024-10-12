@@ -56,16 +56,27 @@ interface PlaybackConnection {
     val playbackProgress: StateFlow<PlaybackProgressState>
     val playbackMode: StateFlow<PlaybackModeState>
 
-    val mediaController: MediaControllerCompat?
-    val transportControls: MediaControllerCompat.TransportControls?
+    fun sendCustomAction(action: String, extras: Map<String, Any?>?)
 
     fun playAudio(audio: Audio, title: QueueTitle = QueueTitle())
     fun playNextAudio(audio: Audio)
     fun playAlbum(albumId: String, index: Int = 0, timestamp: Long? = null)
     fun playAudios(audios: List<Audio>, index: Int = 0, title: QueueTitle = QueueTitle())
     fun playWithQuery(query: String, audioId: String)
+    fun playPause()
+    fun stop()
+    fun toggleRepeatMode()
+    fun toggleShuffleMode()
 
     fun swapQueue(from: Int, to: Int)
+    fun skipToQueueItem(index: Int)
+
+    fun seekTo(position: Long)
+
+    fun fastForward()
+    fun rewind()
+    fun skipToNext()
+    fun skipToPrevious()
 
     fun removeByPosition(position: Int)
     fun removeById(id: String)
@@ -105,8 +116,8 @@ class PlaybackConnectionImpl(
 
     override val playbackMode = MutableStateFlow(PlaybackModeState())
 
-    override var mediaController: MediaControllerCompat? = null
-    override val transportControls get() = mediaController?.transportControls
+    var mediaController: MediaControllerCompat? = null
+    private val transportControls get() = mediaController?.transportControls
     private val mediaBrowserConnectionCallback = MediaBrowserConnectionCallback(context)
     private val mediaBrowser = MediaBrowserCompat(
         context,
@@ -222,6 +233,22 @@ class PlaybackConnectionImpl(
         )
     }
 
+    override fun playPause() {
+        mediaController?.playPause()
+    }
+
+    override fun stop() {
+        transportControls?.stop()
+    }
+
+    override fun toggleRepeatMode() {
+        mediaController?.toggleRepeatMode()
+    }
+
+    override fun toggleShuffleMode() {
+        mediaController?.toggleShuffleMode()
+    }
+
     override fun swapQueue(from: Int, to: Int) {
         transportControls?.sendCustomAction(
             SWAP_ACTION,
@@ -248,6 +275,34 @@ class PlaybackConnectionImpl(
                 QUEUE_MEDIA_ID_KEY to id,
             )
         )
+    }
+
+    override fun sendCustomAction(action: String, extras: Map<String, Any?>?) {
+        transportControls?.sendCustomAction(action, extras?.toBundle())
+    }
+
+    override fun seekTo(position: Long) {
+        transportControls?.seekTo(position)
+    }
+
+    override fun skipToQueueItem(index: Int) {
+        transportControls?.skipToQueueItem(index.toLong())
+    }
+
+    override fun fastForward() {
+        transportControls?.fastForward()
+    }
+
+    override fun rewind() {
+        transportControls?.rewind()
+    }
+
+    override fun skipToNext() {
+        transportControls?.skipToNext()
+    }
+
+    override fun skipToPrevious() {
+        transportControls?.skipToPrevious()
     }
 
     private inner class MediaBrowserConnectionCallback(private val context: Context) :

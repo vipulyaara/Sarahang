@@ -115,7 +115,7 @@ internal fun PlaybackProgressSlider(
             colors = sliderColors,
             modifier = Modifier.alpha(isBuffering.not().toFloat()),
             onValueChangeFinished = {
-                playbackConnection.transportControls?.seekTo(
+                playbackConnection.seekTo(
                     (updatedProgressState.total.toFloat() * (updatedDraggingProgress
                         ?: 0f)).roundToLong()
                 )

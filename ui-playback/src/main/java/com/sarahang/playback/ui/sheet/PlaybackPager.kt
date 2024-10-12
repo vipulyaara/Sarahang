@@ -62,7 +62,7 @@ internal fun PlaybackPager(
             .collectLatest { page ->
                 if (lastRequestedPage != page) {
                     lastRequestedPage = page
-                    playbackConnection.transportControls?.skipToQueueItem(page.toLong())
+                    playbackConnection.skipToQueueItem(page)
                 }
             }
     }

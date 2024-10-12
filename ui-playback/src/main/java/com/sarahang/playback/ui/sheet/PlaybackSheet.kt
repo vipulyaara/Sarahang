@@ -317,9 +317,7 @@ private fun LazyListScope.playbackQueue(
         AudioRow(
             audio = audio,
             audioIndex = index,
-            onPlayAudio = {
-                playbackConnection.transportControls?.skipToQueueItem(index.toLong())
-            },
+            onPlayAudio = { playbackConnection.skipToQueueItem(index) },
             modifier = Modifier.animateItem()
         )
     }

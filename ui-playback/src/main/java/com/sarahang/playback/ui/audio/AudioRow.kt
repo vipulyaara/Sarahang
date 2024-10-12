@@ -69,7 +69,7 @@ fun AudioRow(
             .combinedClickable(
                 onClick = {
                     if (isCurrentAudio) {
-                        playbackConnection.mediaController?.playPause()
+                        playbackConnection.playPause()
                     } else {
                         if (onClick != null) onClick(audio)
                         else if (onPlayAudio != null) onPlayAudio(audio)
@@ -90,7 +90,7 @@ fun AudioRow(
                 ) {
                     PlaybackPlayPause(
                         playbackState = playbackState,
-                        onPlayPause = { playbackConnection.mediaController?.playPause() }
+                        onPlayPause = { playbackConnection.playPause() }
                     )
                 }
             }

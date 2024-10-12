@@ -12,7 +12,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.models.LocalPlaybackConnection
-import com.sarahang.playback.core.playPause
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.theme.coloredRippleClickable
@@ -37,7 +36,7 @@ internal fun PlaybackArtwork(
             .coloredRippleClickable(
                 onClick = {
                     if (onClick != null) onClick.invoke()
-                    else playbackConnection.mediaController?.playPause()
+                    else playbackConnection.playPause()
                 },
                 onClickLabel = stringResource(R.string.cd_play_pause),
                 color = contentColor,

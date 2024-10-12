@@ -100,7 +100,7 @@ fun MiniPlayer(
             PlaybackMiniControls(
                 playbackState = playbackState,
                 nowPlaying = nowPlaying,
-                onPlayPause = { playbackConnection.mediaController?.playPause() },
+                onPlayPause = { playbackConnection.playPause() },
                 openPlaybackSheet = openPlaybackSheet,
                 modifier = Modifier.testTag("mini_player"),
             )
@@ -121,7 +121,7 @@ private fun PlaybackMiniControls(
     val isWideLayout = currentWindowAdaptiveInfo()
         .windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
 
-    Dismissable(onDismiss = { playbackConnection.transportControls?.stop() }) {
+    Dismissable(onDismiss = { playbackConnection.stop() }) {
         var dragOffset by remember { mutableFloatStateOf(0f) }
         Surface(
             color = Color.Transparent,

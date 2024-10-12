@@ -45,10 +45,7 @@ import com.sarahang.playback.core.isPlayEnabled
 import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackModeState
-import com.sarahang.playback.core.playPause
 import com.sarahang.playback.core.title
-import com.sarahang.playback.core.toggleRepeatMode
-import com.sarahang.playback.core.toggleShuffleMode
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
@@ -232,7 +229,7 @@ internal fun PlayerPreviousControl(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.transportControls?.skipToPrevious() },
+        onClick = { playbackConnection.skipToPrevious() },
         rippleRadius = smallRippleRadius,
         modifier = modifier
     ) {
@@ -252,7 +249,7 @@ private fun RewindControl(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.transportControls?.rewind() },
+        onClick = { playbackConnection.rewind() },
         rippleRadius = smallRippleRadius,
         modifier = modifier
     ) {
@@ -272,7 +269,7 @@ private fun FastForwardControl(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.transportControls?.fastForward() },
+        onClick = { playbackConnection.fastForward() },
         rippleRadius = smallRippleRadius,
         modifier = modifier
     ) {
@@ -293,7 +290,7 @@ internal fun PlayerNextControl(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.transportControls?.skipToNext() },
+        onClick = { playbackConnection.skipToNext() },
         rippleRadius = smallRippleRadius,
         modifier = modifier
     ) {
@@ -313,7 +310,7 @@ internal fun PlayerPlayControl(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.mediaController?.playPause() },
+        onClick = { playbackConnection.playPause() },
         modifier = modifier,
         rippleRadius = 35.dp,
     ) {
@@ -412,7 +409,7 @@ private fun RepeatButton(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.mediaController?.toggleRepeatMode() },
+        onClick = { playbackConnection.toggleRepeatMode() },
         rippleRadius = SmallRippleRadius,
         modifier = modifier.size(24.dp)
     ) {
@@ -444,7 +441,7 @@ private fun ShuffleButton(
     modifier: Modifier = Modifier,
 ) {
     IconButton(
-        onClick = { playbackConnection.mediaController?.toggleShuffleMode() },
+        onClick = { playbackConnection.toggleShuffleMode() },
         modifier = modifier.size(24.dp),
         rippleRadius = smallRippleRadius,
     ) {

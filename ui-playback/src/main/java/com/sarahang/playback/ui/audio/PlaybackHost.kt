@@ -17,7 +17,7 @@ fun PlaybackHost(
     val isConnected by playbackConnection.isConnected.collectAsStateWithLifecycle()
     LaunchedEffect(isConnected) {
         if (isConnected) {
-            playbackConnection.transportControls?.sendCustomAction(SET_MEDIA_STATE, null)
+            playbackConnection.sendCustomAction(SET_MEDIA_STATE, null)
         }
     }
 
