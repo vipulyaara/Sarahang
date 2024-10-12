@@ -1,5 +1,6 @@
 package com.sarahang.playback.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -10,7 +11,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.sarahang.playback.core.PLAYBACK_PROGRESS_INTERVAL
+import com.sarahang.playback.core.players.PLAYBACK_PROGRESS_INTERVAL
 
 @Composable
 fun animatePlaybackProgress(
@@ -31,7 +32,7 @@ fun AnimatedVisibilityFade(
     exit: ExitTransition = fadeOut(),
     content: @Composable AnimatedVisibilityScope.() -> Unit
 ) {
-    androidx.compose.animation.AnimatedVisibility(
+    AnimatedVisibility(
         visible = visible,
         modifier = modifier,
         enter = enter,

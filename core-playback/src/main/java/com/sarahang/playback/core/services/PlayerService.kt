@@ -31,6 +31,7 @@ import kotlinx.coroutines.withContext
 class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope() {
     private lateinit var component: PlayerServiceDependencies
     private val player by lazy { component.player }
+    private val sessionPlayer by lazy { component.sessionPlayer }
     private val mediaNotifications by lazy { component.mediaNotifications }
     private val logger by lazy { component.logger }
     private val timer by lazy { component.timer }
@@ -47,11 +48,11 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
 
         component = this.application as PlayerServiceDependencies
 
-        sessionToken = player.getSession().sessionToken
+        sessionToken = sessionPlayer.getSession().sessionToken
         becomingNoisyReceiver = BecomingNoisyReceiver(this, sessionToken!!)
 
         player.onPlayingState { isPlaying, byUi ->
-            val isIdle = player.getSession().controller.playbackState.isIdle
+            val isIdle = sessionPlayer.getSession().controller.playbackState.isIdle
             if (!isPlaying && isIdle) {
                 pauseForeground(byUi)
                 mediaNotifications.clearNotifications()
@@ -59,11 +60,11 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
                 startForeground()
             }
 
-            mediaNotifications.updateNotification(getSession())
+            mediaNotifications.updateNotification(sessionPlayer.getSession())
         }
 
         player.onMetaDataChanged {
-            mediaNotifications.updateNotification(getSession())
+            mediaNotifications.updateNotification(sessionPlayer.getSession())
         }
     }
 
@@ -76,13 +77,13 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             startForeground(
                 NOTIFICATION_ID,
-                mediaNotifications.buildNotification(player.getSession()),
+                mediaNotifications.buildNotification(sessionPlayer.getSession()),
                 FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK
             )
         } else {
             startForeground(
                 NOTIFICATION_ID,
-                mediaNotifications.buildNotification(player.getSession())
+                mediaNotifications.buildNotification(sessionPlayer.getSession())
             )
         }
         becomingNoisyReceiver.register()
@@ -105,7 +106,7 @@ class PlayerService : MediaBrowserServiceCompat(), CoroutineScope by MainScope()
             return START_STICKY
         }
 
-        val mediaSession = player.getSession()
+        val mediaSession = sessionPlayer.getSession()
         val controller = mediaSession.controller
 
         when (intent.action) {

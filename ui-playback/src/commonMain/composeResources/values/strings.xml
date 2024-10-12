@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="generic_clipboard_copied" translatable="false">Copied</string>
+
+    <string name="audio_menu_play" translatable="false">Play</string>
+    <string name="audio_menu_playNext" translatable="false">Play next</string>
+    <string name="audio_menu_download" translatable="false">Download</string>
+    <string name="audio_menu_downloadById" translatable="false">Download</string>
+    <string name="audio_menu_copyLink" translatable="false">Copy link</string>
+
+    <string name="playback_queue_title" translatable="false">Next up</string>
+
+    <string name="cd_open_player">Open player</string>
+    <string name="cd_minimize_player">Minimize Player</string>
+    <string name="cd_shuffle">Shuffle</string>
+    <string name="cd_repeat_one_on">Repeat one on</string>
+    <string name="cd_repeat_all_on">Repeat all on</string>
+    <string name="cd_repeat_off">Repeat off</string>
+    <string name="cd_sleep_timer">Sleep timer</string>
+    <string name="cd_open_sleep_timer">Open sleep timer</string>
+    <string name="cd_change_playback_speed">Change playback speed</string>
+    <string name="cd_play">Play</string>
+    <string name="cd_pause">Pause</string>
+    <string name="cd_play_error">Play error</string>
+    <string name="cd_next">Next</string>
+    <string name="cd_fast_forward">Fast forward</string>
+    <string name="cd_rewind">Rewind</string>
+    <string name="cd_previous">Previous</string>
+    <string name="sleep_timer">Sleep Timer</string>
+    <string name="playback_speed">Playback Speed</string>
+    <string name="stop_timer">Stop Timer</string>
+    <string name="cd_play_pause">Play/Pause</string>
+    <string name="cd_set_timer">Set timer</string>
+    <string name="cd_stop_timer">Stop timer</string>
+</resources>

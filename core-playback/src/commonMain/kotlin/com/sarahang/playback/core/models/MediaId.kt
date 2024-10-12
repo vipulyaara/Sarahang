@@ -4,7 +4,6 @@ import co.touchlab.kermit.Logger
 import com.sarahang.playback.core.apis.AudioDataSource
 
 const val MEDIA_TYPE_AUDIO = "Media.Audio"
-const val MEDIA_TYPE_ARTIST = "Media.Artist"
 const val MEDIA_TYPE_ALBUM = "Media.Album"
 const val MEDIA_TYPE_AUDIO_QUERY = "Media.AudioQuery"
 

@@ -19,6 +19,7 @@ import com.sarahang.playback.core.audio.AudioQueueManager
 import com.sarahang.playback.core.audio.AudioQueueManagerImpl
 import com.sarahang.playback.core.players.AudioPlayer
 import com.sarahang.playback.core.players.AudioPlayerImpl
+import com.sarahang.playback.core.players.MediaSessionPlayer
 import com.sarahang.playback.core.players.SarahangPlayer
 import com.sarahang.playback.core.players.SarahangPlayerImpl
 import com.sarahang.playback.core.services.PlayerService
@@ -89,6 +90,10 @@ interface PlaybackCoreModule {
     @Provides
     @ApplicationScope
     fun provideSarahangPlayer(bind: SarahangPlayerImpl): SarahangPlayer = bind
+
+    @Provides
+    @ApplicationScope
+    fun provideMediaSessionPlayer(bind: SarahangPlayerImpl): MediaSessionPlayer = bind
 
     @Provides
     @ApplicationScope

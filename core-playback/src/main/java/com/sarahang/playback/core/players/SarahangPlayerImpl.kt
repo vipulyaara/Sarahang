@@ -27,7 +27,7 @@ import android.support.v4.media.session.PlaybackStateCompat.STATE_STOPPED
 import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import androidx.media3.common.PlaybackParameters
-import com.sarahang.playback.core.BY_UI_KEY
+import com.kafka.base.ApplicationScope
 import com.sarahang.playback.core.MediaQueueBuilder
 import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.R
@@ -50,23 +50,15 @@ import com.sarahang.playback.core.models.toMediaMetadata
 import com.sarahang.playback.core.position
 import com.sarahang.playback.core.repeatMode
 import com.sarahang.playback.core.shuffleMode
+import com.sarahang.playback.core.toBundle
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import com.kafka.base.ApplicationScope
 import javax.inject.Inject
 
-typealias OnPrepared<T> = T.() -> Unit
-typealias OnError<T> = T.(error: Throwable) -> Unit
-typealias OnCompletion<T> = T.() -> Unit
-typealias OnBuffering<T> = T.() -> Unit
-typealias OnReady<T> = T.() -> Unit
-typealias OnMetaDataChanged = SarahangPlayer.() -> Unit
-typealias OnIsPlaying<T> = T.(playing: Boolean, byUi: Boolean) -> Unit
 typealias OnPlaybackParametersChanged<T> = T.(params: PlaybackParameters) -> Unit
 
 const val REPEAT_MODE = "repeat_mode"
@@ -77,45 +69,6 @@ const val QUEUE_HAS_NEXT = "queue_has_next"
 
 const val DEFAULT_FORWARD_FORWARD = 10 * 1000
 const val DEFAULT_FORWARD_REWIND = 10 * 1000
-
-interface SarahangPlayer {
-    fun getSession(): MediaSessionCompat
-    fun playAudio(extras: Bundle = bundleOf(BY_UI_KEY to true))
-    suspend fun playAudio(id: String, index: Int? = null, seekTo: Long? = null)
-    suspend fun playAudio(audio: Audio, index: Int? = null, seekTo: Long? = null)
-    fun seekTo(position: Long)
-    fun fastForward()
-    fun rewind()
-    fun pause(extras: Bundle = bundleOf(BY_UI_KEY to true))
-    suspend fun nextAudio(): String?
-    suspend fun repeatAudio()
-    suspend fun repeatQueue()
-    suspend fun previousAudio()
-    fun playNext(id: String)
-    suspend fun skipTo(position: Int)
-    fun removeFromQueue(position: Int)
-    fun removeFromQueue(id: String)
-    fun swapQueueAudios(from: Int, to: Int)
-    fun stop(byUser: Boolean)
-    fun release()
-    fun onPlayingState(playing: OnIsPlaying<SarahangPlayer>)
-    fun onPrepared(prepared: OnPrepared<SarahangPlayer>)
-    fun onError(error: OnError<SarahangPlayer>)
-    fun onCompletion(completion: OnCompletion<SarahangPlayer>)
-    fun onMetaDataChanged(metaDataChanged: OnMetaDataChanged)
-    fun setPlaybackState(state: PlaybackStateCompat)
-    fun setShuffleMode(shuffleMode: Int)
-    fun updateData(list: List<String> = emptyList(), title: String? = null)
-    fun setData(list: List<String> = emptyList(), title: String? = null)
-    suspend fun setDataFromMediaId(_mediaId: String, extras: Bundle = bundleOf())
-    suspend fun saveQueueState()
-    suspend fun restoreQueueState()
-    fun clearRandomAudioPlayed()
-    fun setCurrentAudioId(audioId: String, index: Int? = null)
-    fun shuffleQueue(isShuffle: Boolean)
-    val playbackSpeed: StateFlow<Float>
-    fun setPlaybackSpeed(speed: Float)
-}
 
 @ApplicationScope
 class SarahangPlayerImpl @Inject constructor(
@@ -128,7 +81,7 @@ class SarahangPlayerImpl @Inject constructor(
     private val mediaQueueBuilder: MediaQueueBuilder,
     private val playerEventLogger: PlayerEventLogger,
     private val logger: Logger,
-) : SarahangPlayer, CoroutineScope by MainScope() {
+) : SarahangPlayer, MediaSessionPlayer, CoroutineScope by MainScope() {
 
     companion object {
         private const val queueStateKey = "player_queue_state"
@@ -160,8 +113,9 @@ class SarahangPlayerImpl @Inject constructor(
             MediaSessionCallback(
                 mediaSession = this,
                 sarahangPlayer = this@SarahangPlayerImpl,
+                mediaSessionPlayer = this@SarahangPlayerImpl,
                 audioFocusHelper = audioFocusHelper,
-                logger = logger
+                logger = logger,
             )
         )
         setPlaybackState(stateBuilder.build())
@@ -179,7 +133,7 @@ class SarahangPlayerImpl @Inject constructor(
             preparedCallback(this@SarahangPlayerImpl)
             launch {
                 if (!mediaSession.isPlaying()) audioPlayer.seekTo(mediaSession.position())
-                playAudio(bundleOf(SEEK_TO to mediaSession.position()))
+                playAudio(mapOf(SEEK_TO to mediaSession.position()))
             }
         }
 
@@ -238,13 +192,13 @@ class SarahangPlayerImpl @Inject constructor(
 
     override fun getSession(): MediaSessionCompat = mediaSession
 
-    override fun pause(extras: Bundle) {
+    override fun pause(extras: Map<String, Any?>) {
         if (isInitialized && (audioPlayer.isPlaying() || audioPlayer.isBuffering())) {
             audioPlayer.pause()
             updatePlaybackState {
                 setState(STATE_PAUSED, mediaSession.position(), 1F)
                 setExtras(
-                    extras + bundleOf(
+                    extras.toBundle() + bundleOf(
                         REPEAT_MODE to getSession().repeatMode,
                         SHUFFLE_MODE to getSession().shuffleMode
                     )
@@ -255,9 +209,9 @@ class SarahangPlayerImpl @Inject constructor(
         }
     }
 
-    override fun playAudio(extras: Bundle) {
+    override fun playAudio(extras: Map<String, Any?>) {
         if (isInitialized) {
-            audioPlayer.play(extras.getLong(SEEK_TO).takeIf { it != 0L })
+            audioPlayer.play(extras.toBundle().getLong(SEEK_TO).takeIf { it != 0L })
             return
         }
 
@@ -306,7 +260,7 @@ class SarahangPlayerImpl @Inject constructor(
             setState(mediaSession.controller.playbackState.state, seekTo ?: 0, 1F)
         }
         setMetaData(refreshedAudio ?: audio)
-        playAudio(bundleOf(SEEK_TO to seekTo))
+        playAudio(mapOf(SEEK_TO to seekTo))
     }
 
     override suspend fun skipTo(position: Int) {
@@ -521,12 +475,13 @@ class SarahangPlayerImpl @Inject constructor(
         queueManager.queueTitle = title ?: ""
     }
 
-    override suspend fun setDataFromMediaId(_mediaId: String, extras: Bundle) {
+    override suspend fun setDataFromMediaId(_mediaId: String, extras: Map<String, Any?>) {
         val mediaId = _mediaId.toMediaId()
-        var audioId = extras.getString(QUEUE_MEDIA_ID_KEY) ?: mediaId.value
-        var queue = extras.getStringArray(QUEUE_LIST_KEY)?.toList()
-        var queueTitle = extras.getString(QUEUE_TITLE_KEY)
-        val seekTo = extras.getLong(SEEK_TO)
+        val bundle = extras.toBundle()
+        var audioId = bundle.getString(QUEUE_MEDIA_ID_KEY) ?: mediaId.value
+        var queue = bundle.getStringArray(QUEUE_LIST_KEY)?.toList()
+        var queueTitle = bundle.getString(QUEUE_TITLE_KEY)
+        val seekTo = bundle.getLong(SEEK_TO)
 
         if (seekTo > 0) seekTo(seekTo)
 

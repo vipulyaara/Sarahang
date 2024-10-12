@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.color
 
-import android.app.Application
 import androidx.collection.lruCache
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -8,10 +7,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Color
-import coil.ImageLoader
-import coil.request.ImageRequest
-import coil.size.Size
-import coil.size.SizeResolver
+import androidx.compose.ui.graphics.ImageBitmap
+import coil3.Image
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.request.ImageRequest
+import coil3.size.SizeResolver
 import com.kafka.base.ApplicationScope
 import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
@@ -23,20 +24,20 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @ApplicationScope
-class ColorExtractor @Inject constructor(private val context: Application) {
+class ColorExtractor @Inject constructor(private val platformContext: PlatformContext) {
     private val cache = lruCache<Any, Color>(100)
 
     suspend fun calculatePrimaryColor(
         model: Any,
         sizeResolver: SizeResolver = DEFAULT_REQUEST_SIZE,
     ): Color {
-        val cached = cache[model]
+        val cached = cache.get(model)
         if (cached != null) {
             return cached
         }
 
         val bitmap = suspendCancellableCoroutine { cont ->
-            val request = ImageRequest.Builder(context)
+            val request = ImageRequest.Builder(platformContext)
                 .data(model)
                 .size(sizeResolver)
                 .prepareForColorExtractor()
@@ -50,7 +51,7 @@ class ColorExtractor @Inject constructor(private val context: Application) {
                 )
                 .build()
 
-            ImageLoader.Builder(context).build().enqueue(request)
+            ImageLoader.Builder(platformContext).build().enqueue(request)
         }
 
         val suitableColors = bitmap.themeColors()
@@ -59,7 +60,7 @@ class ColorExtractor @Inject constructor(private val context: Application) {
     }
 
     private companion object {
-        val DEFAULT_REQUEST_SIZE = SizeResolver(Size(96, 96))
+        val DEFAULT_REQUEST_SIZE = SizeResolver(coil3.size.Size(96, 96))
     }
 }
 
@@ -104,3 +105,7 @@ inline fun <T, R> T.cancellableRunCatching(block: T.() -> R): Result<R> {
 val LocalColorExtractor = staticCompositionLocalOf<ColorExtractor> {
     error("LocalColorExtractor not provided")
 }
+
+internal expect fun ImageRequest.Builder.prepareForColorExtractor(): ImageRequest.Builder
+
+internal expect fun Image.toComposeImageBitmap(): ImageBitmap

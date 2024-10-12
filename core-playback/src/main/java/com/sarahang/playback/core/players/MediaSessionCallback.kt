@@ -8,7 +8,6 @@ import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_ALL
 import android.support.v4.media.session.PlaybackStateCompat.SHUFFLE_MODE_NONE
 import android.support.v4.media.session.PlaybackStateCompat.STATE_NONE
 import androidx.core.os.bundleOf
-import com.sarahang.playback.core.BY_UI_KEY
 import com.sarahang.playback.core.PAUSE_ACTION
 import com.sarahang.playback.core.PLAY_ACTION
 import com.sarahang.playback.core.PLAY_ALL_SHUFFLED
@@ -24,6 +23,7 @@ import com.sarahang.playback.core.apis.Logger
 import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.models.toMediaIdList
+import com.sarahang.playback.core.toMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -40,6 +40,7 @@ const val QUEUE_TO_POSITION_KEY = "queue_to_position_key"
 class MediaSessionCallback(
     private val mediaSession: MediaSessionCompat,
     private val sarahangPlayer: SarahangPlayer,
+    private val mediaSessionPlayer: MediaSessionPlayer,
     private val audioFocusHelper: AudioFocusHelper,
     private val logger: Logger,
 ) : MediaSessionCompat.Callback(), CoroutineScope by MainScope() {
@@ -47,7 +48,7 @@ class MediaSessionCallback(
     init {
         audioFocusHelper.onAudioFocusGain {
             logger.d("onAudioFocusGain")
-            if (isAudioFocusGranted && !sarahangPlayer.getSession().isPlaying()) {
+            if (isAudioFocusGranted && !mediaSessionPlayer.getSession().isPlaying()) {
                 sarahangPlayer.playAudio()
             } else {
 //                audioFocusHelper.setVolume(AudioManager.ADJUST_RAISE)
@@ -62,7 +63,7 @@ class MediaSessionCallback(
 
         audioFocusHelper.onAudioFocusLossTransient {
             logger.d("TRANSIENT")
-            if (sarahangPlayer.getSession().isPlaying()) {
+            if (mediaSessionPlayer.getSession().isPlaying()) {
                 isAudioFocusGranted = true
                 sarahangPlayer.pause()
             }
@@ -108,7 +109,7 @@ class MediaSessionCallback(
 
     override fun onPlayFromMediaId(mediaId: String, extras: Bundle?) {
         logger.d("onPlayFromMediaId, $mediaId, $extras")
-        launch { sarahangPlayer.setDataFromMediaId(mediaId, extras ?: bundleOf()) }
+        launch { sarahangPlayer.setDataFromMediaId(mediaId, extras?.toMap() ?: mapOf()) }
     }
 
     override fun onSeekTo(position: Long) {
@@ -139,7 +140,7 @@ class MediaSessionCallback(
     override fun onSetRepeatMode(repeatMode: Int) {
         super.onSetRepeatMode(repeatMode)
         val bundle = mediaSession.controller.playbackState.extras ?: Bundle()
-        sarahangPlayer.setPlaybackState(
+        mediaSessionPlayer.setPlaybackState(
             Builder(mediaSession.controller.playbackState)
                 .setExtras(
                     bundle.apply {
@@ -152,7 +153,7 @@ class MediaSessionCallback(
     override fun onSetShuffleMode(shuffleMode: Int) {
         super.onSetShuffleMode(shuffleMode)
         val bundle = mediaSession.controller.playbackState.extras ?: Bundle()
-        sarahangPlayer.setPlaybackState(
+        mediaSessionPlayer.setPlaybackState(
             Builder(mediaSession.controller.playbackState)
                 .setExtras(
                     bundle.apply {
@@ -168,7 +169,7 @@ class MediaSessionCallback(
             SET_MEDIA_STATE -> launch { setSavedMediaSessionState() }
             REPEAT_ONE -> launch { sarahangPlayer.repeatAudio() }
             REPEAT_ALL -> launch { sarahangPlayer.repeatQueue() }
-            PAUSE_ACTION -> sarahangPlayer.pause(extras ?: bundleOf(BY_UI_KEY to true))
+            PAUSE_ACTION -> sarahangPlayer.pause(extras?.toMap() ?: mapOf(BY_UI_KEY to true))
             PLAY_ACTION -> playOnFocus(extras ?: bundleOf(BY_UI_KEY to true))
             PLAY_NEXT -> sarahangPlayer.playNext(extras?.getString(QUEUE_MEDIA_ID_KEY) ?: return)
             REMOVE_QUEUE_ITEM_BY_POSITION -> sarahangPlayer.removeFromQueue(
@@ -230,7 +231,7 @@ class MediaSessionCallback(
 
     private fun restoreMediaSession() {
         mediaSession.setMetadata(mediaSession.controller.metadata)
-        sarahangPlayer.setPlaybackState(mediaSession.controller.playbackState)
+        mediaSessionPlayer.setPlaybackState(mediaSession.controller.playbackState)
         sarahangPlayer.setData(
             mediaSession.controller?.queue.toMediaIdList().map { it.value },
             mediaSession.controller?.queueTitle.toString()
@@ -239,6 +240,6 @@ class MediaSessionCallback(
 
     private fun playOnFocus(extras: Bundle = bundleOf(BY_UI_KEY to true)) {
         if (audioFocusHelper.requestPlayback())
-            sarahangPlayer.playAudio(extras)
+            sarahangPlayer.playAudio(extras.toMap())
     }
 }

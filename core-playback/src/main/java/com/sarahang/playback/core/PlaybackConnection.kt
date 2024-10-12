@@ -26,6 +26,7 @@ import com.sarahang.playback.core.models.fromMediaController
 import com.sarahang.playback.core.models.toMediaAudioIds
 import com.sarahang.playback.core.models.toMediaId
 import com.sarahang.playback.core.players.AudioPlayer
+import com.sarahang.playback.core.players.PLAYBACK_PROGRESS_INTERVAL
 import com.sarahang.playback.core.players.QUEUE_FROM_POSITION_KEY
 import com.sarahang.playback.core.players.QUEUE_LIST_KEY
 import com.sarahang.playback.core.players.QUEUE_MEDIA_ID_KEY
@@ -43,8 +44,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-
-const val PLAYBACK_PROGRESS_INTERVAL = 1000L
 
 interface PlaybackConnection {
     val isConnected: StateFlow<Boolean>

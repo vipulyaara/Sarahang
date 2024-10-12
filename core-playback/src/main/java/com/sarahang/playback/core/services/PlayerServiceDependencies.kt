@@ -4,6 +4,7 @@ import com.sarahang.playback.core.MediaNotifications
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.apis.AudioDataSource
 import com.sarahang.playback.core.apis.Logger
+import com.sarahang.playback.core.players.MediaSessionPlayer
 import com.sarahang.playback.core.players.SarahangPlayer
 import com.sarahang.playback.core.timer.SleepTimer
 
@@ -13,6 +14,7 @@ import com.sarahang.playback.core.timer.SleepTimer
 // The only solution for now is to provide these through application class by implementing this interface
 interface PlayerServiceDependencies {
     val player: SarahangPlayer
+    val sessionPlayer: MediaSessionPlayer
     val timer: SleepTimer
     val logger: Logger
     val mediaNotifications: MediaNotifications

@@ -15,12 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ErrorOutline
-import androidx.compose.material.icons.filled.Repeat
-import androidx.compose.material.icons.filled.RepeatOn
-import androidx.compose.material.icons.filled.RepeatOneOn
-import androidx.compose.material.icons.filled.Shuffle
-import androidx.compose.material.icons.filled.ShuffleOn
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -58,6 +52,12 @@ import com.sarahang.playback.core.toggleShuffleMode
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
+import com.sarahang.playback.ui.icons.ErrorOutline
+import com.sarahang.playback.ui.icons.Repeat
+import com.sarahang.playback.ui.icons.RepeatOn
+import com.sarahang.playback.ui.icons.RepeatOneOn
+import com.sarahang.playback.ui.icons.Shuffle
+import com.sarahang.playback.ui.icons.ShuffleOn
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeed
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
 import com.sarahang.playback.ui.playback.timer.SleepTimer

@@ -30,6 +30,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -47,6 +48,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.window.core.layout.WindowWidthSizeClass
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.artwork
 import com.sarahang.playback.core.artworkUri
@@ -65,7 +67,6 @@ import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.components.animatePlaybackProgress
 import com.sarahang.playback.ui.components.icons.Icons
-import com.sarahang.playback.ui.components.isWideScreen
 import com.sarahang.playback.ui.sheet.PlayerNextControl
 import com.sarahang.playback.ui.sheet.PlayerPlayControl
 import com.sarahang.playback.ui.sheet.PlayerPreviousControl
@@ -117,7 +118,9 @@ private fun PlaybackMiniControls(
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     openPlaybackSheet: () -> Unit
 ) {
-    val isWideLayout = isWideScreen()
+    val isWideLayout = currentWindowAdaptiveInfo()
+        .windowSizeClass.windowWidthSizeClass == WindowWidthSizeClass.EXPANDED
+
     Dismissable(onDismiss = { playbackConnection.transportControls?.stop() }) {
         var dragOffset by remember { mutableFloatStateOf(0f) }
         Surface(

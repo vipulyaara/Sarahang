@@ -46,7 +46,6 @@ const val SET_MEDIA_STATE = "action_set_media_state"
 const val PLAY_ACTION = "action_play"
 const val PAUSE_ACTION = "action_pause"
 const val SWAP_ACTION = "swap_action"
-const val BY_UI_KEY = "by_ui_key"
 const val ACTION_QUIT = "$APP_PACKAGE_NAME.quitService"
 
 interface MediaNotifications {
