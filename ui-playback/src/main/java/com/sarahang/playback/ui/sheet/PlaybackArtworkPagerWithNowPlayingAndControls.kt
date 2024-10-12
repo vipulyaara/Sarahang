@@ -4,21 +4,21 @@
  */
 package com.sarahang.playback.ui.sheet
 
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
+import com.sarahang.playback.core.models.MediaMetadata
+import com.sarahang.playback.core.models.PlaybackState
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
 import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
 
 @Composable
 fun PlaybackArtworkPagerWithNowPlayingAndControls(
-    nowPlaying: MediaMetadataCompat,
-    playbackState: PlaybackStateCompat,
+    nowPlaying: MediaMetadata,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
     artworkVerticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     titleTextStyle: TextStyle = PlaybackNowPlayingDefaults.titleTextStyle,
@@ -37,9 +37,9 @@ fun PlaybackArtworkPagerWithNowPlayingAndControls(
             currentIndex = currentIndex,
             modifier = Modifier,
             verticalAlignment = artworkVerticalAlignment,
-        ) { audio, _, pagerMod ->
+        ) { coverImage, _, pagerMod ->
             PlaybackArtwork(
-                artwork = audio.coverImage,
+                artwork = coverImage,
                 onClick = onArtworkClick,
                 modifier = pagerMod,
             )

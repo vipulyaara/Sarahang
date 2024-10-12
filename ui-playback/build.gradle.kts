@@ -23,6 +23,7 @@ kotlin {
                 implementation(libs.kotlininject.runtime)
                 implementation(libs.javax.inject)
 
+                implementation(libs.dataStore)
                 implementation(libs.jetbrains.adaptive)
 
                 implementation(libs.icons.font.awesome)

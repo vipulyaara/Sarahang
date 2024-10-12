@@ -1,7 +1,5 @@
 package com.sarahang.playback.ui.player.mini
 
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
@@ -50,17 +48,10 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.window.core.layout.WindowWidthSizeClass
 import com.sarahang.playback.core.PlaybackConnection
-import com.sarahang.playback.core.artwork
-import com.sarahang.playback.core.artworkUri
 import com.sarahang.playback.core.isActive
-import com.sarahang.playback.core.isBuffering
-import com.sarahang.playback.core.isError
-import com.sarahang.playback.core.isPlayEnabled
-import com.sarahang.playback.core.isPlaying
-import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
-import com.sarahang.playback.core.models.toAudio
-import com.sarahang.playback.core.playPause
+import com.sarahang.playback.core.models.MediaMetadata
+import com.sarahang.playback.core.models.PlaybackState
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.audio.Dismissable
 import com.sarahang.playback.ui.color.DynamicTheme
@@ -88,7 +79,7 @@ fun MiniPlayer(
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
-    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.artworkUri
+    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.coverImage
 
     AnimatedVisibility(
         visible = (playbackState to nowPlaying).isActive,
@@ -110,8 +101,8 @@ fun MiniPlayer(
 
 @Composable
 private fun PlaybackMiniControls(
-    playbackState: PlaybackStateCompat,
-    nowPlaying: MediaMetadataCompat,
+    playbackState: PlaybackState,
+    nowPlaying: MediaMetadata,
     onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
     height: Dp = PlaybackMiniControlsDefaults.Height,
@@ -200,7 +191,7 @@ private fun PlaybackMiniControls(
 
 @Composable
 private fun RowScope.PlaybackNowPlaying(
-    nowPlaying: MediaMetadataCompat,
+    nowPlaying: MediaMetadata,
     maxHeight: Dp,
     modifier: Modifier = Modifier,
     coverOnly: Boolean = false,
@@ -211,18 +202,18 @@ private fun RowScope.PlaybackNowPlaying(
         modifier = modifier.weight(if (coverOnly) 3f else 7f),
     ) {
         CoverImage(
-            data = nowPlaying.artwork ?: nowPlaying.artworkUri,
+            data = nowPlaying.coverImage,
             size = maxHeight - 12.dp,
             modifier = Modifier.padding(8.dp)
         )
 
         if (!coverOnly)
-            PlaybackNowPlaying(nowPlaying.toAudio(), modifier = Modifier)
+            PlaybackNowPlaying(nowPlaying, modifier = Modifier)
     }
 }
 
 @Composable
-private fun PlaybackNowPlaying(audio: Audio, modifier: Modifier = Modifier) {
+private fun PlaybackNowPlaying(audio: MediaMetadata, modifier: Modifier = Modifier) {
     Column(
         modifier = Modifier
             .padding(vertical = Specs.paddingSmall)
@@ -250,7 +241,7 @@ private fun PlaybackNowPlaying(audio: Audio, modifier: Modifier = Modifier) {
 
 @Composable
 internal fun RowScope.PlaybackPlayPause(
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = Specs.iconSize,
@@ -280,7 +271,7 @@ internal fun RowScope.PlaybackPlayPause(
 
 @Composable
 private fun WidePlayerControls(
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colorScheme.background,
     smallRippleRadius: Dp = 30.dp,
@@ -319,7 +310,7 @@ private fun WidePlayerControls(
 
 @Composable
 private fun PlaybackProgress(
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     color: Color,
     modifier: Modifier = Modifier,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,

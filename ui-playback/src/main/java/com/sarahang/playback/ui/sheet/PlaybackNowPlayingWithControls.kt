@@ -1,7 +1,5 @@
 package com.sarahang.playback.ui.sheet
 
-import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,15 +35,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sarahang.playback.core.PlaybackConnection
-import com.sarahang.playback.core.artist
-import com.sarahang.playback.core.hasNext
-import com.sarahang.playback.core.hasPrevious
-import com.sarahang.playback.core.isError
-import com.sarahang.playback.core.isPlayEnabled
-import com.sarahang.playback.core.isPlaying
 import com.sarahang.playback.core.models.LocalPlaybackConnection
+import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.core.models.PlaybackModeState
-import com.sarahang.playback.core.title
+import com.sarahang.playback.core.models.PlaybackState
+import com.sarahang.playback.core.models.REPEAT_MODE_ALL
+import com.sarahang.playback.core.models.REPEAT_MODE_ONE
+import com.sarahang.playback.core.models.SHUFFLE_MODE_ALL
+import com.sarahang.playback.core.models.SHUFFLE_MODE_NONE
 import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
@@ -73,8 +70,8 @@ object PlaybackNowPlayingDefaults {
 
 @Composable
 internal fun PlaybackNowPlayingWithControls(
-    nowPlaying: MediaMetadataCompat,
-    playbackState: PlaybackStateCompat,
+    nowPlaying: MediaMetadata,
+    playbackState: PlaybackState,
     onTitleClick: () -> Unit,
     onArtistClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -154,7 +151,7 @@ internal fun PlaybackNowPlayingWithControls(
 
 @Composable
 internal fun PlaybackControls(
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
     smallRippleRadius: Dp = SmallRippleRadius,
     compactControls: Boolean = false,
@@ -225,7 +222,7 @@ internal fun PlaybackControls(
 internal fun PlayerPreviousControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
@@ -286,7 +283,7 @@ private fun FastForwardControl(
 internal fun PlayerNextControl(
     playbackConnection: PlaybackConnection,
     smallRippleRadius: Dp,
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
@@ -306,7 +303,7 @@ internal fun PlayerNextControl(
 @Composable
 internal fun PlayerPlayControl(
     playbackConnection: PlaybackConnection,
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
 ) {
     IconButton(
@@ -416,16 +413,16 @@ private fun RepeatButton(
         Icon(
             painter = rememberVectorPainter(
                 when (playbackMode.repeatMode) {
-                    PlaybackStateCompat.REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
-                    PlaybackStateCompat.REPEAT_MODE_ALL -> Icons.Default.RepeatOn
+                    REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
+                    REPEAT_MODE_ALL -> Icons.Default.RepeatOn
                     else -> Icons.Default.Repeat
                 }
             ),
             modifier = Modifier.fillMaxSize(),
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = when (playbackMode.repeatMode) {
-                PlaybackStateCompat.REPEAT_MODE_ONE -> stringResource(R.string.cd_repeat_one_on)
-                PlaybackStateCompat.REPEAT_MODE_ALL -> stringResource(R.string.cd_repeat_all_on)
+                REPEAT_MODE_ONE -> stringResource(R.string.cd_repeat_one_on)
+                REPEAT_MODE_ALL -> stringResource(R.string.cd_repeat_all_on)
                 else -> stringResource(R.string.cd_repeat_off)
             }
         )
@@ -448,8 +445,8 @@ private fun ShuffleButton(
         Icon(
             painter = rememberVectorPainter(
                 when (playbackMode.shuffleMode) {
-                    PlaybackStateCompat.SHUFFLE_MODE_NONE -> Icons.Default.Shuffle
-                    PlaybackStateCompat.SHUFFLE_MODE_ALL -> Icons.Default.ShuffleOn
+                    SHUFFLE_MODE_NONE -> Icons.Default.Shuffle
+                    SHUFFLE_MODE_ALL -> Icons.Default.ShuffleOn
                     else -> Icons.Default.Shuffle
                 }
             ),

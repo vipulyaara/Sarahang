@@ -18,13 +18,17 @@ import com.sarahang.playback.core.models.MEDIA_TYPE_ALBUM
 import com.sarahang.playback.core.models.MEDIA_TYPE_AUDIO
 import com.sarahang.playback.core.models.MEDIA_TYPE_AUDIO_QUERY
 import com.sarahang.playback.core.models.MediaId
+import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.core.models.PlaybackModeState
 import com.sarahang.playback.core.models.PlaybackProgressState
 import com.sarahang.playback.core.models.PlaybackQueue
+import com.sarahang.playback.core.models.PlaybackState
 import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.core.models.fromMediaController
 import com.sarahang.playback.core.models.toMediaAudioIds
 import com.sarahang.playback.core.models.toMediaId
+import com.sarahang.playback.core.playback.asMediaMetadata
+import com.sarahang.playback.core.playback.asPlaybackState
 import com.sarahang.playback.core.players.AudioPlayer
 import com.sarahang.playback.core.players.PLAYBACK_PROGRESS_INTERVAL
 import com.sarahang.playback.core.players.QUEUE_FROM_POSITION_KEY
@@ -45,43 +49,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-interface PlaybackConnection {
-    val isConnected: StateFlow<Boolean>
-    val playbackState: StateFlow<PlaybackStateCompat>
-    val nowPlaying: StateFlow<MediaMetadataCompat>
-    val nowPlayingAudio: StateFlow<PlaybackQueue.NowPlayingAudio?>
-
-    val playbackQueue: StateFlow<PlaybackQueue>
-
-    val playbackProgress: StateFlow<PlaybackProgressState>
-    val playbackMode: StateFlow<PlaybackModeState>
-
-    fun sendCustomAction(action: String, extras: Map<String, Any?>?)
-
-    fun playAudio(audio: Audio, title: QueueTitle = QueueTitle())
-    fun playNextAudio(audio: Audio)
-    fun playAlbum(albumId: String, index: Int = 0, timestamp: Long? = null)
-    fun playAudios(audios: List<Audio>, index: Int = 0, title: QueueTitle = QueueTitle())
-    fun playWithQuery(query: String, audioId: String)
-    fun playPause()
-    fun stop()
-    fun toggleRepeatMode()
-    fun toggleShuffleMode()
-
-    fun swapQueue(from: Int, to: Int)
-    fun skipToQueueItem(index: Int)
-
-    fun seekTo(position: Long)
-
-    fun fastForward()
-    fun rewind()
-    fun skipToNext()
-    fun skipToPrevious()
-
-    fun removeByPosition(position: Int)
-    fun removeById(id: String)
-}
-
 class PlaybackConnectionImpl(
     context: Context,
     serviceComponent: ComponentName,
@@ -90,18 +57,27 @@ class PlaybackConnectionImpl(
     private val logger: Logger,
     private val coroutineScope: CoroutineScope = ProcessLifecycleOwner.get().lifecycleScope,
 ) : PlaybackConnection, CoroutineScope by coroutineScope {
-
     override val isConnected = MutableStateFlow(false)
-    override val playbackState = MutableStateFlow(NONE_PLAYBACK_STATE)
-    override val nowPlaying = MutableStateFlow(NONE_PLAYING)
+
+    private val _playbackState = MutableStateFlow(NONE_PLAYBACK_STATE)
+    override val playbackState: StateFlow<PlaybackState>
+        get() = _playbackState.map { it.asPlaybackState() }
+            .stateIn(this, SharingStarted.WhileSubscribed(5000), NONE_PLAYING_STATE)
+
+    private val _nowPlaying = MutableStateFlow(NONE_PLAYING)
+    override val nowPlaying: StateFlow<MediaMetadata>
+        get() = _nowPlaying
+            .map { it.asMediaMetadata() }
+            .stateIn(this, SharingStarted.WhileSubscribed(5000), NONE_PLAYING.asMediaMetadata())
+
     private val playbackQueueState = MutableStateFlow(PlaybackQueue())
 
-    override val playbackQueue = combine(nowPlaying, playbackState, playbackQueueState, ::Triple)
+    override val playbackQueue = combine(_nowPlaying, _playbackState, playbackQueueState, ::Triple)
         .map(::buildPlaybackQueue)
         .distinctUntilChanged()
         .stateIn(this, SharingStarted.WhileSubscribed(5000), PlaybackQueue())
 
-    override val nowPlayingAudio = combine(playbackQueue, playbackState, ::Pair)
+    override val nowPlayingAudio = combine(playbackQueue, _playbackState, ::Pair)
         .map { (queue, playbackState) ->
             when (queue.isIndexValid && queue.isValid && !playbackState.isIdle) {
                 true -> PlaybackQueue.NowPlayingAudio.from(queue)
@@ -131,7 +107,7 @@ class PlaybackConnectionImpl(
     }
 
     private fun startPlaybackProgress() = launch {
-        combine(playbackState, nowPlaying, ::Pair).collectLatest { (state, current) ->
+        combine(_playbackState, _nowPlaying, ::Pair).collectLatest { (state, current) ->
             playbackProgressInterval.cancel()
             val duration = current.duration
             val position = state.position
@@ -326,11 +302,11 @@ class PlaybackConnectionImpl(
 
     private inner class MediaControllerCallback : MediaControllerCompat.Callback() {
         override fun onPlaybackStateChanged(state: PlaybackStateCompat?) {
-            playbackState.value = state ?: return
+            _playbackState.value = state ?: return
         }
 
         override fun onMetadataChanged(metadata: MediaMetadataCompat?) {
-            nowPlaying.value = metadata ?: return
+            _nowPlaying.value = metadata ?: return
         }
 
         override fun onQueueChanged(queue: MutableList<MediaSessionCompat.QueueItem>?) {

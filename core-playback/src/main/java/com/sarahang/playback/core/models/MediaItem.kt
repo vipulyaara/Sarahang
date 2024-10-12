@@ -5,13 +5,6 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.core.net.toUri
-import com.sarahang.playback.core.album
-import com.sarahang.playback.core.albumId
-import com.sarahang.playback.core.artist
-import com.sarahang.playback.core.artworkUri
-import com.sarahang.playback.core.duration
-import com.sarahang.playback.core.id
-import com.sarahang.playback.core.title
 
 fun List<MediaSessionCompat.QueueItem>?.toMediaIdList(): List<MediaId> {
     return this?.map { it.description.mediaId?.toMediaId() ?: MediaId() } ?: emptyList()
@@ -67,17 +60,5 @@ fun Audio.toMediaMetadata(builder: MediaMetadataCompat.Builder): MediaMetadataCo
         putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, coverImage)
         putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null)
     }
-
-fun MediaMetadataCompat.toAudio() = Audio(
-    id = id.toMediaId().value,
-    title = title ?: UNTITLED_SONG,
-    artist = artist,
-    album = album,
-    albumId = albumId.orEmpty(),
-    duration = duration / 1000,
-    playbackUrl = "",
-    localUri = null,
-    coverImage = artworkUri.toString()
-)
 
 const val METADATA_KEY_ALBUM_ID = "album_id"
