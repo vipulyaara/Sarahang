@@ -67,8 +67,8 @@ class PlaybackConnectionImpl(
     private val _nowPlaying = MutableStateFlow(NONE_PLAYING)
     override val nowPlaying: StateFlow<MediaMetadata>
         get() = _nowPlaying
-            .map { it.asMediaMetadata() }
-            .stateIn(this, SharingStarted.WhileSubscribed(5000), NONE_PLAYING.asMediaMetadata())
+            .map { if (it == NONE_PLAYING) MediaMetadata.NONE_PLAYING else it.asMediaMetadata() }
+            .stateIn(this, SharingStarted.WhileSubscribed(5000), MediaMetadata.NONE_PLAYING)
 
     private val playbackQueueState = MutableStateFlow(PlaybackQueue())
 
