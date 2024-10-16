@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.sheet
 
-import android.support.v4.media.MediaMetadataCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -51,11 +50,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.sarahang.playback.core.NONE_PLAYBACK_STATE
+import com.sarahang.playback.core.NONE_PLAYING_STATE
 import com.sarahang.playback.core.PlaybackConnection
-import com.sarahang.playback.core.artworkUri
-import com.sarahang.playback.core.isIdle
 import com.sarahang.playback.core.models.LocalPlaybackConnection
+import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.ui.R
@@ -89,7 +87,7 @@ fun PlaybackSheet(
 
     val playbackConnection = LocalPlaybackConnection.current
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
-    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.artworkUri
+    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.coverImage
 
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
         DynamicTheme(model = themeArtwork, useDarkTheme = useDarkTheme) {
@@ -117,7 +115,7 @@ internal fun PlaybackSheet(
     listState: LazyListState = rememberLazyListState(),
     queueListState: LazyListState = rememberLazyListState(),
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
-    nowPlaying: MediaMetadataCompat,
+    nowPlaying: MediaMetadata,
     resizableViewModelFactory: () -> ResizablePlaybackSheetLayoutViewModel,
     sleepTimerViewModelFactory: () -> SleepTimerViewModel,
     playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
@@ -127,11 +125,11 @@ internal fun PlaybackSheet(
 
     LaunchedEffect(playbackConnection) {
         playbackConnection.playbackState
-            .filter { it != NONE_PLAYBACK_STATE }
+            .filter { it != NONE_PLAYING_STATE }
             .collectLatest { if (it.isIdle) if (onClose != null) onClose() }
     }
 
-    if (playbackState == NONE_PLAYBACK_STATE) {
+    if (playbackState == NONE_PLAYING_STATE) {
         Row(Modifier.fillMaxSize()) { CircularProgressIndicator() }
         return
     }

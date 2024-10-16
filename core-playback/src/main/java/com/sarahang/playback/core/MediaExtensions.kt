@@ -10,7 +10,11 @@ import androidx.core.net.toUri
 import androidx.core.os.bundleOf
 import co.touchlab.kermit.Logger
 import com.sarahang.playback.core.models.METADATA_KEY_ALBUM_ID
+import com.sarahang.playback.core.models.MediaMetadata
+import com.sarahang.playback.core.models.PlaybackState
 import com.sarahang.playback.core.models.toMediaId
+import com.sarahang.playback.core.playback.asMediaMetadata
+import com.sarahang.playback.core.playback.asPlaybackState
 import com.sarahang.playback.core.players.BY_UI_KEY
 import com.sarahang.playback.core.players.QUEUE_CURRENT_INDEX
 import com.sarahang.playback.core.players.QUEUE_HAS_NEXT
@@ -20,6 +24,8 @@ val NONE_PLAYBACK_STATE: PlaybackStateCompat =
     PlaybackStateCompat.Builder()
         .setState(PlaybackStateCompat.STATE_NONE, 0, 0f)
         .build()
+
+val NONE_PLAYING_STATE: PlaybackState = NONE_PLAYBACK_STATE.asPlaybackState()
 
 val NONE_PLAYING: MediaMetadataCompat =
     MediaMetadataCompat.Builder()
@@ -99,8 +105,8 @@ inline val MediaSessionCompat.repeatMode
 inline val MediaSessionCompat.shuffleMode
     get() = controller.shuffleMode
 
-inline val Pair<PlaybackStateCompat, MediaMetadataCompat>.isActive
-    get() = (first.state != PlaybackStateCompat.STATE_NONE && second != NONE_PLAYING)
+inline val Pair<PlaybackState, MediaMetadata>.isActive
+    get() = (first.state != PlaybackStateCompat.STATE_NONE && second != NONE_PLAYING.asMediaMetadata())
 
 inline val PlaybackStateCompat.isPrepared
     get() = (state == PlaybackStateCompat.STATE_BUFFERING)

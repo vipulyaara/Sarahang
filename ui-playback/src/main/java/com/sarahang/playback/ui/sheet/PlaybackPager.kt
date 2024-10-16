@@ -4,7 +4,6 @@
  */
 package com.sarahang.playback.ui.sheet
 
-import android.support.v4.media.MediaMetadataCompat
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -22,7 +21,7 @@ import androidx.compose.ui.util.lerp
 import com.sarahang.playback.core.PlaybackConnection
 import com.sarahang.playback.core.models.Audio
 import com.sarahang.playback.core.models.LocalPlaybackConnection
-import com.sarahang.playback.core.models.toAudio
+import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.ui.theme.Specs
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
@@ -31,12 +30,12 @@ import kotlin.math.absoluteValue
 
 @Composable
 internal fun PlaybackPager(
-    nowPlaying: MediaMetadataCompat,
+    nowPlaying: MediaMetadata,
     modifier: Modifier = Modifier,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     currentIndex: Int = 0,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
-    content: @Composable (Audio, Int, Modifier) -> Unit,
+    content: @Composable (String?, Int, Modifier) -> Unit,
 ) {
     val playbackQueue by rememberFlowWithLifecycle(playbackConnection.playbackQueue)
     val playbackCurrentIndex = playbackQueue.currentIndex
@@ -46,7 +45,7 @@ internal fun PlaybackPager(
     }
 
     if (!playbackQueue.isValid) {
-        content(nowPlaying.toAudio(), playbackCurrentIndex, modifier)
+        content(nowPlaying.coverImage, playbackCurrentIndex, modifier)
         return
     }
     LaunchedEffect(Unit) {
@@ -93,6 +92,6 @@ internal fun PlaybackPager(
                     fraction = 1f - pageOffset.coerceIn(0f, 1f)
                 )
             }
-        content(currentAudio, page, pagerMod)
+        content(currentAudio.coverImage, page, pagerMod)
     }
 }

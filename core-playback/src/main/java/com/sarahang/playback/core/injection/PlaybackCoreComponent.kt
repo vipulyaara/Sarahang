@@ -35,7 +35,7 @@ import kotlin.time.Duration.Companion.seconds
 private const val dataStoreFileName = "sarahang_preferences.preferences_pb"
 
 @ApplicationScope
-interface PlaybackCoreModule {
+actual interface PlaybackCoreComponent {
 
     @Provides
     @ApplicationScope

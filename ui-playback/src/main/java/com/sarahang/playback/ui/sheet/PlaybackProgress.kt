@@ -4,7 +4,6 @@
  */
 package com.sarahang.playback.ui.sheet
 
-import android.support.v4.media.session.PlaybackStateCompat
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
@@ -32,10 +31,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.sarahang.playback.core.PlaybackConnection
-import com.sarahang.playback.core.isBuffering
 import com.sarahang.playback.core.millisToDuration
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.PlaybackProgressState
+import com.sarahang.playback.core.models.PlaybackState
 import com.sarahang.playback.ui.components.Slider
 import com.sarahang.playback.ui.components.SliderDefaults
 import com.sarahang.playback.ui.components.animatePlaybackProgress
@@ -43,7 +42,7 @@ import kotlin.math.roundToLong
 
 @Composable
 fun PlaybackProgress(
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     modifier: Modifier = Modifier,
     thumbRadius: Dp = 4.dp,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
@@ -67,7 +66,7 @@ fun PlaybackProgress(
 
 @Composable
 internal fun PlaybackProgressSlider(
-    playbackState: PlaybackStateCompat,
+    playbackState: PlaybackState,
     progressState: PlaybackProgressState,
     draggingProgress: Float?,
     setDraggingProgress: (Float?) -> Unit,
