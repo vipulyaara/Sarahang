@@ -33,6 +33,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import kafka.ui_playback.generated.resources.Res
 import kafka.ui_playback.generated.resources.playback_speed
 import kotlinx.coroutines.launch
@@ -40,11 +41,12 @@ import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PlaybackSpeed(
-    viewModel: PlaybackSpeedViewModel,
+    viewModelFactory: () -> PlaybackSpeedViewModel,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val coroutineScope = rememberCoroutineScope()
+    val viewModel = viewModel { viewModelFactory() }
     val currentSpeed by viewModel.currentSpeed.collectAsStateWithLifecycle()
 
     val dismissSheet: () -> Unit = {

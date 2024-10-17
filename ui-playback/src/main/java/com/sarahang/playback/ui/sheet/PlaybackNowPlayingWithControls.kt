@@ -132,8 +132,8 @@ internal fun PlaybackNowPlayingWithControls(
                         horizontalArrangement = Arrangement.spacedBy(24.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        PlaybackSpeedButton(viewModel { playbackSpeedViewModelFactory() })
-                        SleepTimerButton(viewModel { sleepTimerViewModelFactory() })
+                        PlaybackSpeedButton(playbackSpeedViewModelFactory)
+                        SleepTimerButton(sleepTimerViewModelFactory)
                     }
                 }
             }
@@ -334,12 +334,16 @@ internal fun PlayerPlayControl(
 }
 
 @Composable
-private fun SleepTimerButton(timerViewModel: SleepTimerViewModel, modifier: Modifier = Modifier) {
+private fun SleepTimerButton(
+    viewModelFactory: () -> SleepTimerViewModel,
+    modifier: Modifier = Modifier
+) {
+    val timerViewModel = viewModel { viewModelFactory() }
     val timerViewState by timerViewModel.state.collectAsStateWithLifecycle()
 
     var showTimer by remember { mutableStateOf(false) }
     if (showTimer) {
-        SleepTimer(viewModel = timerViewModel) { showTimer = false }
+        SleepTimer(viewModelFactory) { showTimer = false }
     }
 
     IconButton(
@@ -370,12 +374,16 @@ private fun SleepTimerButton(timerViewModel: SleepTimerViewModel, modifier: Modi
 }
 
 @Composable
-private fun PlaybackSpeedButton(viewModel: PlaybackSpeedViewModel, modifier: Modifier = Modifier) {
+private fun PlaybackSpeedButton(
+    viewModelFactory: () -> PlaybackSpeedViewModel,
+    modifier: Modifier = Modifier
+) {
+    val viewModel = viewModel { viewModelFactory() }
     val currentSpeed by viewModel.currentSpeed.collectAsStateWithLifecycle()
 
     var showPlaybackSpeed by remember { mutableStateOf(false) }
     if (showPlaybackSpeed) {
-        PlaybackSpeed(viewModel) { showPlaybackSpeed = false }
+        PlaybackSpeed(viewModelFactory) { showPlaybackSpeed = false }
     }
 
     Box(

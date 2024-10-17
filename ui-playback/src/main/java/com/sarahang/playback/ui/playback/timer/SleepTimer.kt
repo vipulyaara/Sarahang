@@ -23,15 +23,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.sarahang.playback.ui.R
 import kotlinx.coroutines.launch
 
 @Composable
 fun SleepTimer(
-    viewModel: SleepTimerViewModel,
+    viewModelFactory: () -> SleepTimerViewModel,
     onDismiss: () -> Unit
 ) {
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val viewModel = viewModel { viewModelFactory() }
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
