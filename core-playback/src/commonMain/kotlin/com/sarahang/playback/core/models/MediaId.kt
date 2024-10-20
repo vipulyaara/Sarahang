@@ -59,13 +59,3 @@ suspend fun MediaId.toAudioList(
 
     else -> emptyList()
 }
-
-suspend fun MediaId.toQueueTitle(
-    audioDataSource: AudioDataSource,
-): QueueTitle = when (type) {
-    MEDIA_TYPE_AUDIO -> QueueTitle(QueueTitle.Type.AUDIO, audioDataSource.findAudio(value)?.title)
-
-    else -> QueueTitle()
-}
-
-
