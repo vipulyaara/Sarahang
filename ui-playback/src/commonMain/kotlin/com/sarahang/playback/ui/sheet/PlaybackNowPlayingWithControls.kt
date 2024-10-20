@@ -26,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -43,7 +42,6 @@ import com.sarahang.playback.core.models.REPEAT_MODE_ALL
 import com.sarahang.playback.core.models.REPEAT_MODE_ONE
 import com.sarahang.playback.core.models.SHUFFLE_MODE_ALL
 import com.sarahang.playback.core.models.SHUFFLE_MODE_NONE
-import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
 import com.sarahang.playback.ui.icons.ErrorOutline
@@ -61,6 +59,22 @@ import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.disabledAlpha
 import com.sarahang.playback.ui.theme.orNa
 import com.sarahang.playback.ui.theme.simpleClickable
+import kafka.ui_playback.generated.resources.Res
+import kafka.ui_playback.generated.resources.cd_change_playback_speed
+import kafka.ui_playback.generated.resources.cd_fast_forward
+import kafka.ui_playback.generated.resources.cd_next
+import kafka.ui_playback.generated.resources.cd_open_sleep_timer
+import kafka.ui_playback.generated.resources.cd_pause
+import kafka.ui_playback.generated.resources.cd_play
+import kafka.ui_playback.generated.resources.cd_play_error
+import kafka.ui_playback.generated.resources.cd_previous
+import kafka.ui_playback.generated.resources.cd_repeat_all_on
+import kafka.ui_playback.generated.resources.cd_repeat_off
+import kafka.ui_playback.generated.resources.cd_repeat_one_on
+import kafka.ui_playback.generated.resources.cd_rewind
+import kafka.ui_playback.generated.resources.cd_shuffle
+import kafka.ui_playback.generated.resources.cd_sleep_timer
+import org.jetbrains.compose.resources.stringResource
 import com.sarahang.playback.ui.components.icons.Icons as PlayerIcons
 
 object PlaybackNowPlayingDefaults {
@@ -234,7 +248,7 @@ internal fun PlayerPreviousControl(
             painter = rememberVectorPainter(PlayerIcons.Previous),
             tint = MaterialTheme.colorScheme.primary.disabledAlpha(playbackState.hasPrevious),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = stringResource(R.string.cd_previous)
+            contentDescription = stringResource(Res.string.cd_previous)
         )
     }
 }
@@ -254,7 +268,7 @@ private fun RewindControl(
             painter = rememberVectorPainter(PlayerIcons.Rewind),
             modifier = Modifier.fillMaxSize(),
             tint = MaterialTheme.colorScheme.primary,
-            contentDescription = stringResource(R.string.cd_rewind)
+            contentDescription = stringResource(Res.string.cd_rewind)
         )
     }
 }
@@ -274,7 +288,7 @@ private fun FastForwardControl(
             painter = rememberVectorPainter(PlayerIcons.FastForward),
             modifier = Modifier.fillMaxSize(),
             tint = MaterialTheme.colorScheme.primary,
-            contentDescription = stringResource(R.string.cd_fast_forward)
+            contentDescription = stringResource(Res.string.cd_fast_forward)
         )
     }
 }
@@ -295,7 +309,7 @@ internal fun PlayerNextControl(
             painter = rememberVectorPainter(PlayerIcons.Next),
             tint = MaterialTheme.colorScheme.primary.disabledAlpha(playbackState.hasNext),
             modifier = Modifier.fillMaxSize(),
-            contentDescription = stringResource(R.string.cd_next)
+            contentDescription = stringResource(Res.string.cd_next)
         )
     }
 }
@@ -324,10 +338,10 @@ internal fun PlayerPlayControl(
             modifier = Modifier.fillMaxSize(),
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = when {
-                playbackState.isError -> stringResource(R.string.cd_play_error)
-                playbackState.isPlaying -> stringResource(R.string.cd_pause)
-                playbackState.isPlayEnabled -> stringResource(R.string.cd_play)
-                else -> stringResource(R.string.cd_play)
+                playbackState.isError -> stringResource(Res.string.cd_play_error)
+                playbackState.isPlaying -> stringResource(Res.string.cd_pause)
+                playbackState.isPlayEnabled -> stringResource(Res.string.cd_play)
+                else -> stringResource(Res.string.cd_play)
             }
         )
     }
@@ -348,7 +362,7 @@ private fun SleepTimerButton(
 
     IconButton(
         onClick = { showTimer = true },
-        onClickLabel = stringResource(R.string.cd_open_sleep_timer),
+        onClickLabel = stringResource(Res.string.cd_open_sleep_timer),
         rippleRadius = SmallRippleRadius,
         modifier = modifier.size(24.dp)
     ) {
@@ -367,7 +381,7 @@ private fun SleepTimerButton(
                 painter = rememberVectorPainter(PlayerIcons.TimerOff),
                 modifier = Modifier.fillMaxSize(),
                 tint = MaterialTheme.colorScheme.primary,
-                contentDescription = stringResource(R.string.cd_sleep_timer)
+                contentDescription = stringResource(Res.string.cd_sleep_timer)
             )
         }
     }
@@ -389,7 +403,7 @@ private fun PlaybackSpeedButton(
     Box(
         modifier.simpleClickable(
             indication = ripple(bounded = false),
-            label = stringResource(R.string.cd_change_playback_speed)
+            label = stringResource(Res.string.cd_change_playback_speed)
         ) { showPlaybackSpeed = true }
     ) {
         val speed = if ((currentSpeed * 10) % 10f == 0f) {
@@ -429,9 +443,9 @@ private fun RepeatButton(
             modifier = Modifier.fillMaxSize(),
             tint = MaterialTheme.colorScheme.primary,
             contentDescription = when (playbackMode.repeatMode) {
-                REPEAT_MODE_ONE -> stringResource(R.string.cd_repeat_one_on)
-                REPEAT_MODE_ALL -> stringResource(R.string.cd_repeat_all_on)
-                else -> stringResource(R.string.cd_repeat_off)
+                REPEAT_MODE_ONE -> stringResource(Res.string.cd_repeat_one_on)
+                REPEAT_MODE_ALL -> stringResource(Res.string.cd_repeat_all_on)
+                else -> stringResource(Res.string.cd_repeat_off)
             }
         )
     }
@@ -460,7 +474,7 @@ private fun ShuffleButton(
             ),
             tint = contentColor,
             modifier = Modifier.fillMaxSize(),
-            contentDescription = stringResource(R.string.cd_shuffle)
+            contentDescription = stringResource(Res.string.cd_shuffle)
         )
     }
 }

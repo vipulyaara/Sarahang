@@ -10,10 +10,7 @@ import com.sarahang.playback.core.SET_MEDIA_STATE
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 
 @Composable
-fun PlaybackHost(
-    playbackConnection: PlaybackConnection,
-    content: @Composable () -> Unit,
-) {
+fun PlaybackHost(playbackConnection: PlaybackConnection, content: @Composable () -> Unit) {
     val isConnected by playbackConnection.isConnected.collectAsStateWithLifecycle()
     LaunchedEffect(isConnected) {
         if (isConnected) {
@@ -28,7 +25,8 @@ fun PlaybackHost(
 
 @Composable
 fun AudioActionHost(
-    audioActionHandler: AudioActionHandler = audioActionHandler(),
+    showMessage: (String) -> Unit,
+    audioActionHandler: AudioActionHandler = audioActionHandler(showMessage = showMessage),
     content: @Composable () -> Unit,
 ) {
     CompositionLocalProvider(

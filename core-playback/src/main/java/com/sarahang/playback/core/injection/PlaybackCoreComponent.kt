@@ -2,8 +2,6 @@ package com.sarahang.playback.core.injection
 
 import android.app.Application
 import android.content.ComponentName
-import androidx.datastore.preferences.core.PreferenceDataStoreFactory
-import androidx.datastore.preferences.preferencesDataStoreFile
 import com.kafka.base.ApplicationScope
 import com.kafka.base.Named
 import com.sarahang.playback.core.MediaNotifications
@@ -17,6 +15,7 @@ import com.sarahang.playback.core.audio.AudioFocusHelper
 import com.sarahang.playback.core.audio.AudioFocusHelperImpl
 import com.sarahang.playback.core.audio.AudioQueueManager
 import com.sarahang.playback.core.audio.AudioQueueManagerImpl
+import com.sarahang.playback.core.createDataStore
 import com.sarahang.playback.core.players.AudioPlayer
 import com.sarahang.playback.core.players.AudioPlayerImpl
 import com.sarahang.playback.core.players.MediaSessionPlayer
@@ -36,15 +35,15 @@ private const val dataStoreFileName = "sarahang_preferences.preferences_pb"
 
 @ApplicationScope
 actual interface PlaybackCoreComponent {
-
-    @Provides
     @ApplicationScope
-    fun providePlayerPreferenceStore(
-        context: Application,
-    ): PreferencesStore = PreferencesStore(
-        PreferenceDataStoreFactory.create(
-            produceFile = { context.preferencesDataStoreFile(dataStoreFileName) }
-        ))
+    @Provides
+    fun providePlayerPreferencesStore(context: Application): PreferencesStore {
+        val dataStore = createDataStore(
+            producePath = { context.filesDir.resolve(dataStoreFileName).absolutePath }
+        )
+
+        return PreferencesStore(dataStore)
+    }
 
     @Provides
     @ApplicationScope

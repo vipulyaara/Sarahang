@@ -1,6 +1,5 @@
 package com.sarahang.playback.core.timer
 
-import androidx.media3.common.BuildConfig
 import com.sarahang.playback.core.millisToDuration
 import java.util.concurrent.TimeUnit
 
@@ -22,7 +21,6 @@ sealed class TimerInterval(val time: Long, val timeUnit: TimeUnit, val text: Str
         fun find(timeInMillis: Long) = all().first { it.millis() == timeInMillis }
 
         fun all() = buildList {
-            if (BuildConfig.DEBUG) addAll(listOf(FiveSeconds, TenSeconds))
             addAll(
                 listOf(
                     FiveMinutes,

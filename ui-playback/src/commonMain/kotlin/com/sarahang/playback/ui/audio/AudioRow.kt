@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 package com.sarahang.playback.ui.audio
 
 import androidx.compose.animation.AnimatedVisibility
@@ -6,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
@@ -42,7 +45,6 @@ object AudiosDefaults {
     const val maxLines = 1
 }
 
-@Suppress("AnimateAsStateLabel")
 @Composable
 fun AudioRow(
     audio: Audio,

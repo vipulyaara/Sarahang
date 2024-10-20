@@ -13,6 +13,7 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -40,7 +41,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -52,7 +52,6 @@ import com.sarahang.playback.core.isActive
 import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.core.models.PlaybackState
-import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.audio.Dismissable
 import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.CoverImage
@@ -61,25 +60,30 @@ import com.sarahang.playback.ui.components.icons.Icons
 import com.sarahang.playback.ui.sheet.PlayerNextControl
 import com.sarahang.playback.ui.sheet.PlayerPlayControl
 import com.sarahang.playback.ui.sheet.PlayerPreviousControl
-import com.sarahang.playback.ui.sheet.materialYouPlayerTheme
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.orNa
+import kafka.ui_playback.generated.resources.Res
+import kafka.ui_playback.generated.resources.cd_open_player
+import kafka.ui_playback.generated.resources.cd_pause
+import kafka.ui_playback.generated.resources.cd_play
+import kafka.ui_playback.generated.resources.cd_play_error
+import org.jetbrains.compose.resources.stringResource
 
 object PlaybackMiniControlsDefaults {
     val Height = 56.dp
 }
 
+typealias MiniPlayer = @Composable ColumnScope.(Boolean, () -> Unit) -> Unit
+
 @Composable
 fun MiniPlayer(
     useDarkTheme: Boolean,
     modifier: Modifier = Modifier,
-    playerTheme: String = materialYouPlayerTheme,
     playbackConnection: PlaybackConnection = LocalPlaybackConnection.current,
     openPlaybackSheet: () -> Unit = {}
 ) {
     val playbackState by playbackConnection.playbackState.collectAsStateWithLifecycle()
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
-    val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.coverImage
 
     AnimatedVisibility(
         visible = (playbackState to nowPlaying).isActive,
@@ -87,7 +91,7 @@ fun MiniPlayer(
         enter = slideInVertically(initialOffsetY = { it / 2 }),
         exit = slideOutVertically(targetOffsetY = { it / 2 })
     ) {
-        DynamicTheme(model = themeArtwork, useDarkTheme = useDarkTheme) {
+        DynamicTheme(model = nowPlaying.coverImage, useDarkTheme = useDarkTheme) {
             PlaybackMiniControls(
                 playbackState = playbackState,
                 nowPlaying = nowPlaying,
@@ -120,7 +124,7 @@ private fun PlaybackMiniControls(
             modifier = modifier
                 .animateContentSize()
                 .semantics(mergeDescendants = true) {}
-                .clickable(onClickLabel = stringResource(R.string.cd_open_player)) { openPlaybackSheet() }
+                .clickable(onClickLabel = stringResource(Res.string.cd_open_player)) { openPlaybackSheet() }
                 // open playback sheet on swipe up
                 .draggable(
                     orientation = Orientation.Vertical,
@@ -260,10 +264,10 @@ internal fun RowScope.PlaybackPlayPause(
             modifier = Modifier.size(size),
             tint = MaterialTheme.colorScheme.onPrimary,
             contentDescription = when {
-                playbackState.isError -> stringResource(R.string.cd_play_error)
-                playbackState.isPlaying -> stringResource(R.string.cd_pause)
-                playbackState.isPlayEnabled -> stringResource(R.string.cd_play)
-                else -> stringResource(R.string.cd_play)
+                playbackState.isError -> stringResource(Res.string.cd_play_error)
+                playbackState.isPlaying -> stringResource(Res.string.cd_pause)
+                playbackState.isPlayEnabled -> stringResource(Res.string.cd_play)
+                else -> stringResource(Res.string.cd_play)
             }
         )
     }

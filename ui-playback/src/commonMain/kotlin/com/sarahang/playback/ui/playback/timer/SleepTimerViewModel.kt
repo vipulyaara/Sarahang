@@ -1,6 +1,5 @@
 package com.sarahang.playback.ui.playback.timer
 
-import android.content.Context
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -38,15 +37,14 @@ class SleepTimerViewModel @Inject constructor(
         initialValue = SleepTimerViewState()
     )
 
-    fun startTimer(timerInterval: TimerInterval, context: Context) {
+    fun startTimer(timerInterval: TimerInterval) {
         playerEventLogger.logEvent(
             event = "player_timer_started",
             data = mapOf("duration" to timerInterval.formattedTime())
         )
         sleepTimer.start(
             time = timerInterval.time,
-            timeUnit = timerInterval.timeUnit,
-            context = context
+            timeUnit = timerInterval.timeUnit
         )
     }
 
@@ -62,4 +60,4 @@ data class SleepTimerViewState(
     val isTimerRunning: Boolean = false
 )
 
-private val defaultTimerIntervalKey = longPreferencesKey("default_timer_interval")
+internal val defaultTimerIntervalKey = longPreferencesKey("default_timer_interval")

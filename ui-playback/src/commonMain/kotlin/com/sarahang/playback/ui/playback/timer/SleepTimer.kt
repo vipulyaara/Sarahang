@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
+
 package com.sarahang.playback.ui.playback.timer
 
 import androidx.compose.foundation.clickable
@@ -9,6 +11,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -19,13 +22,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.sarahang.playback.ui.R
+import kafka.ui_playback.generated.resources.Res
+import kafka.ui_playback.generated.resources.cd_set_timer
+import kafka.ui_playback.generated.resources.cd_stop_timer
+import kafka.ui_playback.generated.resources.sleep_timer
+import kafka.ui_playback.generated.resources.stop_timer
 import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun SleepTimer(
@@ -36,7 +42,6 @@ fun SleepTimer(
     val viewModel = viewModel { viewModelFactory() }
     val viewState by viewModel.state.collectAsStateWithLifecycle()
     val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     val dismissSheet: () -> Unit = {
         coroutineScope
@@ -62,7 +67,7 @@ fun SleepTimer(
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     Text(
-                        text = stringResource(id = R.string.sleep_timer),
+                        text = stringResource(Res.string.sleep_timer),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -78,8 +83,8 @@ fun SleepTimer(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(onClickLabel = stringResource(R.string.cd_set_timer)) {
-                            viewModel.startTimer(timerInterval = interval, context = context)
+                        .clickable(onClickLabel = stringResource(Res.string.cd_set_timer)) {
+                            viewModel.startTimer(timerInterval = interval)
                             dismissSheet()
                         }
                         .padding(horizontal = 24.dp, vertical = 16.dp)
@@ -91,7 +96,7 @@ fun SleepTimer(
                     StopTimerItem(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable(onClickLabel = stringResource(R.string.cd_stop_timer)) {
+                            .clickable(onClickLabel = stringResource(Res.string.cd_stop_timer)) {
                                 viewModel.stopTimer()
                                 dismissSheet()
                             }
@@ -111,7 +116,7 @@ private fun StopTimerItem(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
-            text = stringResource(id = R.string.stop_timer),
+            text = stringResource(Res.string.stop_timer),
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary,
         )

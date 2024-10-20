@@ -4,7 +4,6 @@
  */
 package com.sarahang.playback.ui.sheet
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -27,7 +26,6 @@ fun <T> rememberFlowWithLifecycle(
     )
 }
 
-@SuppressLint("StateFlowValueCalledInComposition") // only used as initial value
 @Composable
 fun <T> rememberFlowWithLifecycle(
     stateFlow: StateFlow<T>,

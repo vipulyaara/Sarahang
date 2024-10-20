@@ -1,6 +1,7 @@
 package com.sarahang.playback.core
 
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -14,7 +15,15 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import okio.Path.Companion.toPath
 import javax.inject.Inject
+
+fun createDataStore(producePath: () -> String): DataStore<Preferences> =
+    PreferenceDataStoreFactory.createWithPath(
+        produceFile = { producePath().toPath() }
+    )
+
+internal const val dataStoreFileName = "sarahang_preferences.preferences_pb"
 
 class PreferencesStore @Inject constructor(private val dataStore: DataStore<Preferences>) {
     private val json = Json {

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.sarahang.playback.ui.sheet
 
 import androidx.compose.foundation.background
@@ -23,6 +25,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,7 +47,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -56,7 +58,6 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.core.models.PlaybackQueue
 import com.sarahang.playback.core.models.QueueTitle
-import com.sarahang.playback.ui.R
 import com.sarahang.playback.ui.audio.AudioRow
 import com.sarahang.playback.ui.audio.LocalAudioActionHandler
 import com.sarahang.playback.ui.audio.audioActionHandler
@@ -68,13 +69,17 @@ import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
 import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
 import com.sarahang.playback.ui.theme.Specs
 import com.sarahang.playback.ui.theme.simpleClickable
+import kafka.ui_playback.generated.resources.Res
+import kafka.ui_playback.generated.resources.cd_minimize_player
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PlaybackSheet(
     useDarkTheme: Boolean,
     onClose: (() -> Unit)?,
+    showMessage: (String) -> Unit,
     playerTheme: String = materialYouPlayerTheme,
     goToItem: () -> Unit = {},
     goToCreator: () -> Unit = {},
@@ -83,7 +88,7 @@ fun PlaybackSheet(
     playbackSpeedViewModelFactory: () -> PlaybackSpeedViewModel,
 ) {
     val listState = rememberLazyListState()
-    val audioActionHandler = audioActionHandler()
+    val audioActionHandler = audioActionHandler(showMessage = showMessage)
 
     val playbackConnection = LocalPlaybackConnection.current
     val nowPlaying by playbackConnection.nowPlaying.collectAsStateWithLifecycle()
@@ -272,7 +277,7 @@ private fun PlaybackSheetTopBar(
                         painter = rememberVectorPainter(Icons.Default.KeyboardArrowDown),
                         modifier = Modifier.size(Specs.iconSize),
                         tint = colorScheme.onPrimary,
-                        contentDescription = stringResource(R.string.cd_minimize_player),
+                        contentDescription = stringResource(Res.string.cd_minimize_player),
                     )
                 }
             },

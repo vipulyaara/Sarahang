@@ -3,12 +3,12 @@ package com.sarahang.playback.core.timer
 import android.app.AlarmManager
 import android.app.Application
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.os.SystemClock
 import android.widget.Toast
 import androidx.core.content.getSystemService
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import com.kafka.base.ProcessLifetime
 import com.sarahang.playback.core.ACTION_QUIT
 import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.R
@@ -18,19 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import com.kafka.base.ProcessLifetime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-
-interface SleepTimer {
-    fun start(time: Long, timeUnit: TimeUnit, context: Context)
-
-    // alarm PendingIntent, if an alarm is set, or null if no alarm is set
-    fun alarmIntent(): PendingIntent?
-    fun cancelAlarm()
-
-    fun observeRunningStatus(): Flow<Boolean>
-}
 
 class SleepTimerImpl @Inject constructor(
     private val context: Application,
@@ -43,11 +32,7 @@ class SleepTimerImpl @Inject constructor(
         setRunningStatus()
     }
 
-    override fun start(
-        time: Long,
-        timeUnit: TimeUnit,
-        context: Context,
-    ) {
+    override fun start(time: Long, timeUnit: TimeUnit) {
         cancelAlarm()
         val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)
 
@@ -93,7 +78,7 @@ class SleepTimerImpl @Inject constructor(
         }
     }
 
-    override fun alarmIntent() = makeTimerPendingIntent(PendingIntent.FLAG_NO_CREATE)
+    private fun alarmIntent() = makeTimerPendingIntent(PendingIntent.FLAG_NO_CREATE)
 
     private fun makeTimerPendingIntent(flag: Int): PendingIntent? {
         return PendingIntent.getService(

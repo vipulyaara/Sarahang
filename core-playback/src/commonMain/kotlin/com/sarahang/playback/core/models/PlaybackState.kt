@@ -11,4 +11,8 @@ interface PlaybackState {
     val isPlayEnabled: Boolean
     val hasNext: Boolean
     val hasPrevious: Boolean
+
+    companion object {
+        val STATE_NONE: Int = 0
+    }
 }
