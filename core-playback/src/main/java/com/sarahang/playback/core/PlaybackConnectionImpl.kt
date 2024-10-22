@@ -194,18 +194,14 @@ class PlaybackConnectionImpl(
     override fun playNextAudio(audio: Audio) {
         transportControls?.sendCustomAction(
             PLAY_NEXT,
-            bundleOf(
-                QUEUE_MEDIA_ID_KEY to audio.id
-            )
+            bundleOf(QUEUE_MEDIA_ID_KEY to audio.id)
         )
     }
 
     override fun playWithQuery(query: String, audioId: String) {
         transportControls?.playFromMediaId(
             MediaId(MEDIA_TYPE_AUDIO_QUERY, query, -1).toString(),
-            bundleOf(
-                QUEUE_MEDIA_ID_KEY to audioId
-            )
+            bundleOf(QUEUE_MEDIA_ID_KEY to audioId)
         )
     }
 
