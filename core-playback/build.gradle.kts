@@ -19,6 +19,7 @@ kotlin {
 
                 implementation(libs.dataStore)
                 implementation(libs.kotlin.serialization)
+                implementation(libs.kotlinx.datetime)
                 implementation(libs.kermit)
             }
         }

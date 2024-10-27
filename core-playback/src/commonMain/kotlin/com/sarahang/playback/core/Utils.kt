@@ -3,7 +3,8 @@ package com.sarahang.playback.core
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
-import java.util.concurrent.TimeUnit
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 fun Long.millisToDuration(): String {
     val seconds = (this / 1000).toInt() % 60
@@ -22,8 +23,8 @@ fun timeAddZeros(number: Int?, ifZero: String = ""): String {
     }
 }
 
-fun flowInterval(interval: Long, timeUnit: TimeUnit = TimeUnit.MILLISECONDS): Flow<Int> {
-    val delayMillis = timeUnit.toMillis(interval)
+fun flowInterval(interval: Long, timeUnit: DurationUnit = DurationUnit.MILLISECONDS): Flow<Int> {
+    val delayMillis = interval.toDuration(timeUnit).inWholeMilliseconds
     return channelFlow {
         var tick = 0
         send(tick)
