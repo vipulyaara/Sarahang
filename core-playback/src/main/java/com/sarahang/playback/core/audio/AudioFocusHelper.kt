@@ -14,7 +14,7 @@ import android.media.AudioManager.FLAG_PLAY_SOUND
 import android.media.AudioManager.OnAudioFocusChangeListener
 import android.media.AudioManager.STREAM_MUSIC
 import com.sarahang.playback.core.isOreo
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
 typealias OnAudioFocusGain = AudioFocusHelper.() -> Unit
 typealias OnAudioFocusLoss = AudioFocusHelper.() -> Unit
@@ -34,7 +34,8 @@ interface AudioFocusHelper {
 }
 
 @Suppress("DEPRECATION")
-class AudioFocusHelperImpl @Inject constructor(
+@Inject
+class AudioFocusHelperImpl(
     context: Application,
 ) : AudioFocusHelper, OnAudioFocusChangeListener {
 

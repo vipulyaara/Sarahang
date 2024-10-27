@@ -57,7 +57,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
 typealias OnPlaybackParametersChanged<T> = T.(params: PlaybackParameters) -> Unit
 
@@ -71,7 +71,8 @@ const val DEFAULT_FORWARD_FORWARD = 10 * 1000
 const val DEFAULT_FORWARD_REWIND = 10 * 1000
 
 @ApplicationScope
-class SarahangPlayerImpl @Inject constructor(
+@Inject
+class SarahangPlayerImpl(
     private val context: Application,
     private val audioPlayer: AudioPlayer,
     private val queueManager: AudioQueueManager,

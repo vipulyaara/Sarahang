@@ -5,10 +5,15 @@
 package com.sarahang.playback.core
 
 import com.sarahang.playback.core.apis.AudioDataSource
-import com.sarahang.playback.core.models.*
-import javax.inject.Inject
+import com.sarahang.playback.core.models.Audio
+import com.sarahang.playback.core.models.MEDIA_TYPE_ALBUM
+import com.sarahang.playback.core.models.MEDIA_TYPE_AUDIO
+import com.sarahang.playback.core.models.MediaId
+import com.sarahang.playback.core.models.QueueTitle
+import me.tatarka.inject.annotations.Inject
 
-class MediaQueueBuilder @Inject constructor(
+@Inject
+class MediaQueueBuilder(
     private val audioDataSource: AudioDataSource
 ) {
     suspend fun buildAudioList(source: MediaId): List<Audio> = with(source) {
@@ -21,8 +26,16 @@ class MediaQueueBuilder @Inject constructor(
 
     suspend fun buildQueueTitle(source: MediaId): QueueTitle = with(source) {
         when (type) {
-            MEDIA_TYPE_AUDIO -> QueueTitle(QueueTitle.Type.AUDIO, audioDataSource.findAudio(value)?.title)
-            MEDIA_TYPE_ALBUM -> QueueTitle(QueueTitle.Type.ALBUM, audioDataSource.findAudiosByItemId(value).firstOrNull()?.album)
+            MEDIA_TYPE_AUDIO -> QueueTitle(
+                QueueTitle.Type.AUDIO,
+                audioDataSource.findAudio(value)?.title
+            )
+
+            MEDIA_TYPE_ALBUM -> QueueTitle(
+                QueueTitle.Type.ALBUM,
+                audioDataSource.findAudiosByItemId(value).firstOrNull()?.album
+            )
+
             else -> QueueTitle()
         }
     }

@@ -17,11 +17,11 @@ import androidx.media3.exoplayer.DefaultRenderersFactory
 import androidx.media3.exoplayer.DefaultRenderersFactory.EXTENSION_RENDERER_MODE_PREFER
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
-import com.sarahang.playback.core.apis.Logger
-import okhttp3.OkHttpClient
 import com.kafka.base.ApplicationScope
 import com.kafka.base.Named
-import javax.inject.Inject
+import com.sarahang.playback.core.apis.Logger
+import me.tatarka.inject.annotations.Inject
+import okhttp3.OkHttpClient
 
 /**
  * Lower level player that handles the playback of a single audio file.
@@ -53,7 +53,8 @@ interface AudioPlayer {
 }
 
 @ApplicationScope
-class AudioPlayerImpl @Inject constructor(
+@Inject
+class AudioPlayerImpl(
     internal val context: Application,
     @Named("player") private val okHttpClient: OkHttpClient,
     private val logger: Logger,

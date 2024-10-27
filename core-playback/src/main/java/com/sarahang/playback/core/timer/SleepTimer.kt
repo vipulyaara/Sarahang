@@ -18,10 +18,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
-class SleepTimerImpl @Inject constructor(
+@Inject
+class SleepTimerImpl(
     private val context: Application,
     @ProcessLifetime private val processScope: CoroutineScope,
     private val preferencesStore: PreferencesStore,
@@ -32,9 +34,10 @@ class SleepTimerImpl @Inject constructor(
         setRunningStatus()
     }
 
-    override fun start(time: Long, timeUnit: TimeUnit) {
+    override fun start(time: Long, timeUnit: DurationUnit) {
         cancelAlarm()
-        val alarmTime = SystemClock.elapsedRealtime() + timeUnit.toMillis(time)
+        val alarmTime =
+            SystemClock.elapsedRealtime() + time.toDuration(timeUnit).inWholeMilliseconds
 
         makeTimerPendingIntent(PendingIntent.FLAG_CANCEL_CURRENT)?.let { pendingIntent ->
             setInexactAlarm(alarmTime = alarmTime, pendingIntent = pendingIntent)

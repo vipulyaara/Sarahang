@@ -12,7 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
 interface AudioQueueManager {
     var currentAudioIndex: Int
@@ -39,7 +39,8 @@ interface AudioQueueManager {
     suspend fun shuffleQueue(isShuffle: Boolean = false)
 }
 
-class AudioQueueManagerImpl @Inject constructor(
+@Inject
+class AudioQueueManagerImpl(
     private val audioDataSource: AudioDataSource,
     private val logger: Logger,
 ) : AudioQueueManager, CoroutineScope by MainScope() {

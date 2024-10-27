@@ -1,11 +1,12 @@
 package com.sarahang.playback.core.timer
 
 import kotlinx.coroutines.flow.Flow
-import java.util.concurrent.TimeUnit
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
+import kotlin.time.DurationUnit
 
-class SleepTimerImpl @Inject constructor(): SleepTimer {
-    override fun start(time: Long, timeUnit: TimeUnit) {
+@Inject
+class SleepTimerImpl : SleepTimer {
+    override fun start(time: Long, timeUnit: DurationUnit) {
         TODO("Not yet implemented")
     }
 

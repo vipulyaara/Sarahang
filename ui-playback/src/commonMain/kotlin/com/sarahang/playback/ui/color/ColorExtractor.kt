@@ -18,13 +18,14 @@ import com.materialkolor.DynamicMaterialTheme
 import com.materialkolor.PaletteStyle
 import com.materialkolor.ktx.themeColors
 import kotlinx.coroutines.suspendCancellableCoroutine
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
 @ApplicationScope
-class ColorExtractor @Inject constructor(private val platformContext: PlatformContext) {
+@Inject
+class ColorExtractor(private val platformContext: PlatformContext) {
     private val cache = lruCache<Any, Color>(100)
 
     suspend fun calculatePrimaryColor(

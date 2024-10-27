@@ -15,7 +15,6 @@ kotlin {
 
                 implementation(libs.coil3.compose)
                 implementation(libs.kotlininject.runtime)
-                implementation(libs.javax.inject)
 
                 implementation(libs.dataStore)
                 implementation(libs.kotlin.serialization)

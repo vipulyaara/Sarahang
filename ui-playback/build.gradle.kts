@@ -21,7 +21,6 @@ kotlin {
                 implementation(libs.androidx.collection)
                 implementation(libs.coil3.compose)
                 implementation(libs.kotlininject.runtime)
-                implementation(libs.javax.inject)
 
                 implementation(libs.dataStore)
                 implementation(libs.jetbrains.adaptive)

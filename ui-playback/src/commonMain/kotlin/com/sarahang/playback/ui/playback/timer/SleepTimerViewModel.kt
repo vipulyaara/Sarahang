@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
-class SleepTimerViewModel @Inject constructor(
+@Inject
+class SleepTimerViewModel(
     private val sleepTimer: SleepTimer,
     private val playerEventLogger: PlayerEventLogger,
     preferences: PreferencesStore,

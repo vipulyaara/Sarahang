@@ -2,10 +2,11 @@ package com.sarahang.playback.ui.playback.speed
 
 import androidx.lifecycle.ViewModel
 import com.sarahang.playback.core.players.SarahangPlayer
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 import kotlin.math.roundToInt
 
-class PlaybackSpeedViewModel @Inject constructor(
+@Inject
+class PlaybackSpeedViewModel(
     private val sarahangPlayer: SarahangPlayer
 ) : ViewModel() {
     val currentSpeed = sarahangPlayer.playbackSpeed

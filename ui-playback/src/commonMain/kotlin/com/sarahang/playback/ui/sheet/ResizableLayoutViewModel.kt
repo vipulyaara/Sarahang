@@ -13,9 +13,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
-open class ResizableLayoutViewModel @Inject constructor(
+@Inject
+open class ResizableLayoutViewModel(
     preferencesStore: PreferencesStore,
     preferenceKey: Preferences.Key<Float>,
     defaultDragOffset: Float = 0f,

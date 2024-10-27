@@ -3,11 +3,13 @@ package com.sarahang.playback.ui.sheet
 import androidx.datastore.preferences.core.floatPreferencesKey
 import com.sarahang.playback.core.PreferencesStore
 import com.sarahang.playback.core.apis.PlayerEventLogger
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 
-private val PlaybackSheetLayoutDragOffsetKey = floatPreferencesKey("PlaybackSheetLayoutDragOffsetKey")
+private val PlaybackSheetLayoutDragOffsetKey =
+    floatPreferencesKey("PlaybackSheetLayoutDragOffsetKey")
 
-class ResizablePlaybackSheetLayoutViewModel @Inject constructor(
+@Inject
+class ResizablePlaybackSheetLayoutViewModel(
     preferencesStore: PreferencesStore,
     logger: PlayerEventLogger,
 ) : ResizableLayoutViewModel(

@@ -15,8 +15,8 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.Json
+import me.tatarka.inject.annotations.Inject
 import okio.Path.Companion.toPath
-import javax.inject.Inject
 
 fun createDataStore(producePath: () -> String): DataStore<Preferences> =
     PreferenceDataStoreFactory.createWithPath(
@@ -25,7 +25,8 @@ fun createDataStore(producePath: () -> String): DataStore<Preferences> =
 
 internal const val dataStoreFileName = "sarahang_preferences.preferences_pb"
 
-class PreferencesStore @Inject constructor(private val dataStore: DataStore<Preferences>) {
+@Inject
+class PreferencesStore(private val dataStore: DataStore<Preferences>) {
     private val json = Json {
         ignoreUnknownKeys = true
         coerceInputValues = true

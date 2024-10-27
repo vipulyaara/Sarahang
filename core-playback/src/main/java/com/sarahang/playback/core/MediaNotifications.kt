@@ -19,12 +19,12 @@ import android.support.v4.media.session.PlaybackStateCompat.ACTION_STOP
 import androidx.annotation.DrawableRes
 import androidx.core.app.NotificationCompat
 import androidx.palette.graphics.Palette
+import com.kafka.base.ProcessLifetime
 import com.sarahang.playback.core.receivers.MediaButtonReceiver.Companion.buildMediaButtonPendingIntent
 import com.sarahang.playback.core.services.PlayerService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
-import com.kafka.base.ProcessLifetime
-import javax.inject.Inject
+import me.tatarka.inject.annotations.Inject
 import androidx.media.app.NotificationCompat as NotificationMediaCompat
 
 interface MediaNotifications {
@@ -33,7 +33,8 @@ interface MediaNotifications {
     fun clearNotifications()
 }
 
-class MediaNotificationsImpl @Inject constructor(
+@Inject
+class MediaNotificationsImpl(
     private val context: Application,
     @ProcessLifetime private val coroutineScope: CoroutineScope,
 ) : MediaNotifications {
