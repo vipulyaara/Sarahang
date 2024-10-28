@@ -86,28 +86,6 @@ private class PodcastSliderStateImpl(
         )
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as PodcastSliderStateImpl
-
-        if (range != other.range) return false
-        if (floatRange != other.floatRange) return false
-        if (animatable != other.animatable) return false
-        if (decayAnimationSpec != other.decayAnimationSpec) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = range.hashCode()
-        result = 31 * result + floatRange.hashCode()
-        result = 31 * result + animatable.hashCode()
-        result = 31 * result + decayAnimationSpec.hashCode()
-        return result
-    }
-
     companion object {
         val Saver = Saver<PodcastSliderStateImpl, List<Any>>(save = {
             listOf(
