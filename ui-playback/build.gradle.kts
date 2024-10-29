@@ -9,8 +9,8 @@ kotlin {
     sourceSets {
         commonMain {
             dependencies {
-                api(projects.base.annotations)
-                implementation(project(":core-playback"))
+                implementation(projects.base.annotations)
+                api(project(":core-playback"))
 
                 implementation(compose.components.resources)
                 implementation(compose.foundation)
