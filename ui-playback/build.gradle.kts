@@ -7,7 +7,7 @@ plugins {
 
 kotlin {
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 api(projects.base.annotations)
                 implementation(project(":core-playback"))
@@ -37,17 +37,7 @@ kotlin {
             }
         }
 
-        val jvmCommon by creating {
-            dependsOn(commonMain)
-        }
-
-        val jvmMain by getting {
-            dependsOn(jvmCommon)
-        }
-
-        val androidMain by getting {
-            dependsOn(jvmCommon)
-
+        androidMain {
             dependencies {
                 api(libs.media)
 
