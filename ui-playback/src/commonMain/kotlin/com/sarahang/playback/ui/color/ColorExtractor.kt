@@ -70,7 +70,7 @@ fun DynamicTheme(
     model: Any?,
     useDarkTheme: Boolean,
     fallback: Color = MaterialTheme.colorScheme.primary,
-    style: PaletteStyle = PaletteStyle.TonalSpot,
+    style: PaletteStyle = PaletteStyle.Monochrome,
     content: @Composable () -> Unit,
 ) {
     val colorExtractor = LocalColorExtractor.current
