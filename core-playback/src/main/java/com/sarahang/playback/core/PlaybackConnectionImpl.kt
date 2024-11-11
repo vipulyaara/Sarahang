@@ -27,8 +27,6 @@ import com.sarahang.playback.core.models.QueueTitle
 import com.sarahang.playback.core.models.fromMediaController
 import com.sarahang.playback.core.models.toMediaAudioIds
 import com.sarahang.playback.core.models.toMediaId
-import com.sarahang.playback.core.playback.asMediaMetadata
-import com.sarahang.playback.core.playback.asPlaybackState
 import com.sarahang.playback.core.players.AudioPlayer
 import com.sarahang.playback.core.players.PLAYBACK_PROGRESS_INTERVAL
 import com.sarahang.playback.core.players.QUEUE_FROM_POSITION_KEY
@@ -61,13 +59,16 @@ class PlaybackConnectionImpl(
 
     private val _playbackState = MutableStateFlow(NONE_PLAYBACK_STATE)
     override val playbackState: StateFlow<PlaybackState>
-        get() = _playbackState.map { it.asPlaybackState() }
+        get() = _playbackState
+            .map { NONE_PLAYING_STATE }
+            .distinctUntilChanged()
             .stateIn(this, SharingStarted.WhileSubscribed(5000), NONE_PLAYING_STATE)
 
     private val _nowPlaying = MutableStateFlow(NONE_PLAYING)
     override val nowPlaying: StateFlow<MediaMetadata>
         get() = _nowPlaying
-            .map { if (it == NONE_PLAYING) MediaMetadata.NONE_PLAYING else it.asMediaMetadata() }
+            .map {  MediaMetadata.NONE_PLAYING }
+            .distinctUntilChanged()
             .stateIn(this, SharingStarted.WhileSubscribed(5000), MediaMetadata.NONE_PLAYING)
 
     private val playbackQueueState = MutableStateFlow(PlaybackQueue())
