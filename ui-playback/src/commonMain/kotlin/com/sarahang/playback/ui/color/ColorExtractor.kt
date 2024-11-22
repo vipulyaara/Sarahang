@@ -32,7 +32,7 @@ class ColorExtractor(private val platformContext: PlatformContext) {
         model: Any,
         sizeResolver: SizeResolver = DEFAULT_REQUEST_SIZE,
     ): Color {
-        val cached = cache.get(model)
+        val cached = cache[model]
         if (cached != null) {
             return cached
         }
