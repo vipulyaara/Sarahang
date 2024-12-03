@@ -12,6 +12,7 @@ import coil3.Image
 import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.request.ImageRequest
+import coil3.size.Size
 import coil3.size.SizeResolver
 import com.kafka.base.ApplicationScope
 import com.materialkolor.DynamicMaterialTheme
@@ -43,12 +44,8 @@ class ColorExtractor(private val platformContext: PlatformContext) {
                 .size(sizeResolver)
                 .prepareForColorExtractor()
                 .target(
-                    onSuccess = { result ->
-                        cont.resume(result.toComposeImageBitmap())
-                    },
-                    onError = {
-                        cont.resumeWithException(IllegalArgumentException())
-                    },
+                    onSuccess = { result -> cont.resume(result.toComposeImageBitmap()) },
+                    onError = { cont.resumeWithException(IllegalArgumentException()) },
                 )
                 .build()
 
@@ -61,7 +58,7 @@ class ColorExtractor(private val platformContext: PlatformContext) {
     }
 
     private companion object {
-        val DEFAULT_REQUEST_SIZE = SizeResolver(coil3.size.Size(96, 96))
+        val DEFAULT_REQUEST_SIZE = SizeResolver(Size(96, 96))
     }
 }
 
@@ -78,9 +75,7 @@ fun DynamicTheme(
     val color by produceState<Color?>(initialValue = null, model, colorExtractor) {
         val result = cancellableRunCatching {
             colorExtractor.calculatePrimaryColor(model!!)
-        }.onFailure {
-            it.printStackTrace()
-        }
+        }.onFailure { it.printStackTrace() }
         value = result.getOrNull()
     }
 
