@@ -10,6 +10,7 @@ import androidx.annotation.ChecksSdkIntAtLeast
 import coil3.imageLoader
 import coil3.request.ImageRequest
 import coil3.request.SuccessResult
+import coil3.request.allowHardware
 import coil3.size.Precision
 import coil3.toBitmap
 import java.io.Serializable
@@ -29,6 +30,7 @@ suspend fun Context.getBitmap(uri: Uri, size: Int): Bitmap? {
         .data(uri)
         .size(size)
         .precision(Precision.INEXACT)
+        .allowHardware(false)
         .build()
 
     return when (val result = imageLoader.execute(request)) {
