@@ -77,12 +77,14 @@ class PlaybackConnectionImpl(
 
     private val playbackQueueState = MutableStateFlow(PlaybackQueue())
 
-    override val playbackQueue = combine(_nowPlaying, _playbackState, playbackQueueState, ::Triple)
+    private val _playbackQueueFlow = combine(_nowPlaying, _playbackState, playbackQueueState, ::Triple)
         .map(::buildPlaybackQueue)
         .distinctUntilChanged()
-        .stateIn(this, SharingStarted.WhileSubscribed(5000), PlaybackQueue())
+        .stateIn(this, SharingStarted.Lazily, PlaybackQueue())
+    override val playbackQueue: StateFlow<PlaybackQueue>
+        get() = _playbackQueueFlow
 
-    override val nowPlayingAudio = combine(playbackQueue, _playbackState, ::Pair)
+    private val _nowPlayingAudioFlow = combine(playbackQueue, _playbackState, ::Pair)
         .map { (queue, playbackState) ->
             when (queue.isIndexValid && queue.isValid && !playbackState.isIdle) {
                 true -> PlaybackQueue.NowPlayingAudio.from(queue)
@@ -90,7 +92,9 @@ class PlaybackConnectionImpl(
             }
         }
         .distinctUntilChanged()
-        .stateIn(this, SharingStarted.WhileSubscribed(5000), null)
+        .stateIn(this, SharingStarted.Lazily, null)
+    override val nowPlayingAudio: StateFlow<PlaybackQueue.NowPlayingAudio?>
+        get() = _nowPlayingAudioFlow
 
     private var playbackProgressInterval: Job = Job()
     override val playbackProgress = MutableStateFlow(PlaybackProgressState())
