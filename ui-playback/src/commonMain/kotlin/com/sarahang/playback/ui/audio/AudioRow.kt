@@ -13,7 +13,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,6 +24,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
@@ -59,9 +59,8 @@ fun AudioRow(
     val nowPlayingAudio by playbackConnection.nowPlayingAudio.collectAsStateWithLifecycle()
     val isCurrentAudio = nowPlayingAudio.isCurrentAudio(audio, audioIndex)
 
-    val containerColor by animateColorAsState(if (isCurrentAudio) MaterialTheme.colorScheme.primary else Color.Transparent)
-    val contentColor = if (isCurrentAudio) MaterialTheme.colorScheme.onPrimary
-    else MaterialTheme.colorScheme.onBackground
+    val containerColor by animateColorAsState(if (isCurrentAudio) MaterialTheme.colorScheme.surface else Color.Transparent)
+    val contentColor = if (isCurrentAudio) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onPrimary
 
     Row(
         horizontalArrangement = Arrangement.SpaceBetween,
@@ -79,8 +78,10 @@ fun AudioRow(
                 }
             )
             .fillMaxWidth()
+            .padding(horizontal = 12.dp)
+            .clip(MaterialTheme.shapes.medium)
             .background(containerColor)
-            .padding(PaddingValues(vertical = 8.dp))
+            .padding(vertical = 8.dp)
     ) {
         CompositionLocalProvider(LocalContentColor provides contentColor) {
             AudioRowItem(audio = audio, modifier = Modifier.weight(1f)) {
@@ -91,6 +92,7 @@ fun AudioRow(
                 ) {
                     PlaybackPlayPause(
                         playbackState = playbackState,
+                        color = LocalContentColor.current,
                         onPlayPause = { playbackConnection.playPause() }
                     )
                 }
@@ -115,7 +117,12 @@ fun AudioRowItem(
             .padding(horizontal = 16.dp)
     ) {
         CoverImage(data = audio.coverImage, size = AudiosDefaults.imageSize)
-        Description(audio, maxLines, contentColor, Modifier.weight(1f, true))
+        Description(
+            audio = audio,
+            maxLines = maxLines,
+            contentColor = contentColor,
+            modifier = Modifier.weight(1f, true)
+        )
         playPauseButton()
     }
 }

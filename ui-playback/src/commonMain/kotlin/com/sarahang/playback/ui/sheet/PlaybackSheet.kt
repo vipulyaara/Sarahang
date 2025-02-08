@@ -42,7 +42,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -162,15 +162,7 @@ internal fun PlaybackSheet(
                 contentColor = colorScheme.onSurface,
                 modifier = Modifier
                     .testTag("playback_sheet")
-                    .background(
-                        Brush.verticalGradient(
-                            listOf(
-                                colorScheme.primary,
-                                colorScheme.background,
-                                colorScheme.background
-                            )
-                        )
-                    )
+                    .background(colorScheme.primary)
                     .weight(1f)
             ) { paddings ->
                 LazyColumn(
@@ -201,6 +193,9 @@ internal fun PlaybackSheet(
                             playbackSpeedViewModelFactory = playbackSpeedViewModelFactory,
                             modifier = Modifier
                                 .fillParentMaxWidth()
+                                .padding(12.dp)
+                                .clip(MaterialTheme.shapes.medium)
+                                .background(colorScheme.surface)
                                 .padding(vertical = 12.dp),
                         )
                     }
@@ -280,6 +275,10 @@ private fun PlaybackSheetTopBar(
                         contentDescription = stringResource(Res.string.cd_minimize_player),
                     )
                 }
+            },
+            actions = {
+                // fake action to keep the title centered
+                IconButton(onClick = {}) {}
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color.Transparent,

@@ -60,7 +60,11 @@ fun PlaybackProgress(
             thumbRadius = if (isDragging) thumbRadius * 3 else thumbRadius,
             contentColor = MaterialTheme.colorScheme.primary
         )
-        PlaybackProgressDuration(progressState, draggingProgress, thumbRadius)
+        PlaybackProgressDuration(
+            progressState = progressState,
+            draggingProgress = draggingProgress,
+            thumbRadius = thumbRadius
+        )
     }
 }
 
@@ -164,12 +168,12 @@ internal fun BoxScope.PlaybackProgressDuration(
         Text(
             text = currentDuration,
             style = MaterialTheme.typography.bodySmall,
-            color = LocalContentColor.current.copy(alpha = 0.6f)
+            color = LocalContentColor.current
         )
         Text(
             text = progressState.totalDuration,
             style = MaterialTheme.typography.bodySmall,
-            color = LocalContentColor.current.copy(alpha = 0.6f)
+            color = LocalContentColor.current
         )
     }
 }

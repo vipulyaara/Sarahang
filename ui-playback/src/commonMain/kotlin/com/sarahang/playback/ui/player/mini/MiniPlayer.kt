@@ -53,7 +53,6 @@ import com.sarahang.playback.core.models.LocalPlaybackConnection
 import com.sarahang.playback.core.models.MediaMetadata
 import com.sarahang.playback.core.models.PlaybackState
 import com.sarahang.playback.ui.audio.Dismissable
-import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.CoverImage
 import com.sarahang.playback.ui.components.animatePlaybackProgress
 import com.sarahang.playback.ui.components.icons.Icons
@@ -91,7 +90,7 @@ fun MiniPlayer(
         enter = slideInVertically(initialOffsetY = { it / 2 }),
         exit = slideOutVertically(targetOffsetY = { it / 2 })
     ) {
-        DynamicTheme(model = nowPlaying.coverImage, useDarkTheme = useDarkTheme) {
+//        DynamicTheme(model = nowPlaying.coverImage, useDarkTheme = useDarkTheme) {
             PlaybackMiniControls(
                 playbackState = playbackState,
                 nowPlaying = nowPlaying,
@@ -99,7 +98,7 @@ fun MiniPlayer(
                 openPlaybackSheet = openPlaybackSheet,
                 modifier = Modifier.testTag("mini_player"),
             )
-        }
+//        }
     }
 }
 
@@ -249,6 +248,7 @@ internal fun RowScope.PlaybackPlayPause(
     onPlayPause: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = Specs.iconSize,
+    color: Color = MaterialTheme.colorScheme.onPrimary
 ) {
     IconButton(
         onClick = onPlayPause,
@@ -262,7 +262,7 @@ internal fun RowScope.PlaybackPlayPause(
                 else -> Icons.Hourglass
             },
             modifier = Modifier.size(size),
-            tint = MaterialTheme.colorScheme.onPrimary,
+            tint = color,
             contentDescription = when {
                 playbackState.isError -> stringResource(Res.string.cd_play_error)
                 playbackState.isPlaying -> stringResource(Res.string.cd_pause)
