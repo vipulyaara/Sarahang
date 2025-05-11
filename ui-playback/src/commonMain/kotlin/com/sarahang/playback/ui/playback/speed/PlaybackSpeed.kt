@@ -31,6 +31,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -84,6 +86,9 @@ fun PlaybackSpeed(
 
             PodcastSlider(state = sliderState)
 
+            Spacer(modifier = Modifier.size(24.dp))
+
+            val hapticFeedback = LocalHapticFeedback.current
             LaunchedEffect(sliderState.currentValue) {
                 viewModel.setSpeedRaw(sliderState.currentValue)
             }
@@ -94,6 +99,7 @@ fun PlaybackSpeed(
                 intervals = viewModel.quickSpeedIntervals,
                 currentSpeed = currentSpeed
             ) {
+                hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                 viewModel.setSpeed(it)
                 dismissSheet()
             }

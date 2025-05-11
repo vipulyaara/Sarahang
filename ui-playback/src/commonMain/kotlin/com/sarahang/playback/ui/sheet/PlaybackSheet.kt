@@ -95,7 +95,7 @@ fun PlaybackSheet(
     val themeArtwork = if (playerTheme == materialYouPlayerTheme) null else nowPlaying.coverImage
 
     CompositionLocalProvider(LocalAudioActionHandler provides audioActionHandler) {
-        DynamicTheme(model = themeArtwork, useDarkTheme = useDarkTheme) {
+        DynamicTheme(model = themeArtwork, useDarkTheme = true) {
             PlaybackSheet(
                 onClose = onClose,
                 goToItem = goToItem,

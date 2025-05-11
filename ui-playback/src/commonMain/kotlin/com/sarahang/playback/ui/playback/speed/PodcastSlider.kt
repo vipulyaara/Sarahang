@@ -31,9 +31,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -123,6 +125,10 @@ fun PodcastSlider(
     barColor: Color = MaterialTheme.colorScheme.onSurface,
     primaryColor: Color = MaterialTheme.colorScheme.primary,
     currentValueLabel: @Composable (Int) -> Unit = { value ->
+        val haptic = LocalHapticFeedback.current
+        LaunchedEffect(value) {
+            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
         Text(
             text = (value.toDouble() / 10).toString() + "x",
             style = MaterialTheme.typography.titleLarge,
@@ -134,9 +140,7 @@ fun PodcastSlider(
             Text((value.toDouble() / 10).toString(), style = MaterialTheme.typography.bodySmall)
     },
 ) {
-    Column(
-        modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+    Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         currentValueLabel(state.currentValue.roundToInt())
         Icon(
             imageVector = Icons.Filled.ArrowDropDown,
