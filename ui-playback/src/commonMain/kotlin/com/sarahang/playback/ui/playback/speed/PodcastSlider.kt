@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,6 +35,7 @@ import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.unit.dp
+import com.sarahang.playback.ui.components.icons.Icons
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlin.math.absoluteValue
@@ -143,7 +142,7 @@ fun PodcastSlider(
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         currentValueLabel(state.currentValue.roundToInt())
         Icon(
-            imageVector = Icons.Filled.ArrowDropDown,
+            imageVector = Icons.ChevronDown,
             contentDescription = null,
             tint = primaryColor,
             modifier = Modifier.size(32.dp)

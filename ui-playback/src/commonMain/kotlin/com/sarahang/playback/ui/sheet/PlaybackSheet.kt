@@ -21,8 +21,6 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -64,6 +62,7 @@ import com.sarahang.playback.ui.audio.audioActionHandler
 import com.sarahang.playback.ui.color.DynamicTheme
 import com.sarahang.playback.ui.components.ResizableLayout
 import com.sarahang.playback.ui.components.copy
+import com.sarahang.playback.ui.components.icons.Icons
 import com.sarahang.playback.ui.components.isWideLayout
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
 import com.sarahang.playback.ui.playback.timer.SleepTimerViewModel
@@ -269,7 +268,7 @@ private fun PlaybackSheetTopBar(
             navigationIcon = {
                 IconButton(onClick = onClose) {
                     Icon(
-                        painter = rememberVectorPainter(Icons.Default.KeyboardArrowDown),
+                        painter = rememberVectorPainter(Icons.ChevronDown),
                         modifier = Modifier.size(Specs.iconSize),
                         tint = colorScheme.onPrimary,
                         contentDescription = stringResource(Res.string.cd_minimize_player),

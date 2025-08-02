@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -44,12 +43,7 @@ import com.sarahang.playback.core.models.SHUFFLE_MODE_ALL
 import com.sarahang.playback.core.models.SHUFFLE_MODE_NONE
 import com.sarahang.playback.ui.components.AnimatedVisibilityFade
 import com.sarahang.playback.ui.components.IconButton
-import com.sarahang.playback.ui.icons.ErrorOutline
-import com.sarahang.playback.ui.icons.Repeat
-import com.sarahang.playback.ui.icons.RepeatOn
-import com.sarahang.playback.ui.icons.RepeatOneOn
-import com.sarahang.playback.ui.icons.Shuffle
-import com.sarahang.playback.ui.icons.ShuffleOn
+import com.sarahang.playback.ui.components.icons.Icons
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeed
 import com.sarahang.playback.ui.playback.speed.PlaybackSpeedViewModel
 import com.sarahang.playback.ui.playback.timer.SleepTimer
@@ -327,7 +321,7 @@ internal fun PlayerPlayControl(
     ) {
         val painter = rememberVectorPainter(
             when {
-                playbackState.isError -> Icons.Filled.ErrorOutline
+                playbackState.isError -> Icons.ErrorOutline
                 playbackState.isPlaying -> PlayerIcons.Pause
                 playbackState.isPlayEnabled -> PlayerIcons.PlayCircle
                 else -> PlayerIcons.PlayCircle
@@ -435,9 +429,9 @@ private fun RepeatButton(
         Icon(
             painter = rememberVectorPainter(
                 when (playbackMode.repeatMode) {
-                    REPEAT_MODE_ONE -> Icons.Default.RepeatOneOn
-                    REPEAT_MODE_ALL -> Icons.Default.RepeatOn
-                    else -> Icons.Default.Repeat
+                    REPEAT_MODE_ONE -> Icons.RepeatOnce
+                    REPEAT_MODE_ALL -> Icons.Repeat
+                    else -> Icons.Repeat
                 }
             ),
             modifier = Modifier.fillMaxSize(),
@@ -467,9 +461,9 @@ private fun ShuffleButton(
         Icon(
             painter = rememberVectorPainter(
                 when (playbackMode.shuffleMode) {
-                    SHUFFLE_MODE_NONE -> Icons.Default.Shuffle
-                    SHUFFLE_MODE_ALL -> Icons.Default.ShuffleOn
-                    else -> Icons.Default.Shuffle
+                    SHUFFLE_MODE_NONE -> Icons.Shuffle
+                    SHUFFLE_MODE_ALL -> Icons.ShuffleOn
+                    else -> Icons.Shuffle
                 }
             ),
             tint = contentColor,

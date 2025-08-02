@@ -9,8 +9,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarDefaults
@@ -30,6 +28,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.compose.SubcomposeAsyncImage
 import coil3.compose.SubcomposeAsyncImageContent
 import coil3.request.ImageRequest
+import com.sarahang.playback.ui.components.icons.Icons
 
 @Composable
 fun CoverImage(
@@ -41,7 +40,7 @@ fun CoverImage(
     contentColor: Color = MaterialTheme.colorScheme.secondary,
     contentScale: ContentScale = ContentScale.Crop,
     shape: Shape = MaterialTheme.shapes.small,
-    icon: VectorPainter = rememberVectorPainter(Icons.Default.PlayArrow),
+    icon: VectorPainter = rememberVectorPainter(Icons.Play),
     iconPadding: Dp = if (size != Dp.Unspecified) size * 0.25f else 24.dp,
     contentDescription: String? = null,
     elevation: Dp = 2.dp,
